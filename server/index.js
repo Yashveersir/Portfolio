@@ -110,9 +110,15 @@ app.post('/api/contact', async (req, res) => {
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log('✅ Connected successfully to MongoDB Atlas (cluster0)');
-    app.listen(PORT, () => console.log(`🚀 Contact backend running on http://localhost:${PORT}`));
-  })
-  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
+// Start the server FIRST so Render doesn't time out waiting for MongoDB to connect
+app.listen(PORT, () => {
+  console.log(`🚀 Contact backend running on port ${PORT}`);
+  
+  if (MONGO_URI) {
+    mongoose.connect(MONGO_URI)
+      .then(() => console.log('✅ Connected successfully to MongoDB Atlas (cluster0)'))
+      .catch((err) => console.error('❌ MongoDB Connection Error:', err.message));
+  } else {
+    console.log('⚠️ MONGO_URI environment variable is missing! Database will not connect.');
+  }
+});
