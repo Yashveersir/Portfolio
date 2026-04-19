@@ -1,16 +1,102 @@
-# React + Vite
+# 🚀 Premium 3D Full-Stack Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Portfolio Preview](https://github.com/Yashveersir/Portfolio/blob/main/public/preview.png?raw=true)
 
-Currently, two official plugins are available:
+Welcome to my professional portfolio! This is a state-of-the-art, full-stack web application designed to showcase my skills as a Full-Stack Developer and Generative AI enthusiast. It features a stunning 3D-inspired UI, smooth animations, and a secure backend system.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+### 🌍 Live Links
+- **Official Domain:** [yashveersingh.xyz](https://yashveersingh.xyz)
+- **Alt Preview (Vercel):** [yashveersir-portfolio.vercel.app](https://yashveersir-portfolio.vercel.app)
+- **Backend API:** [portfolio-d6sq.onrender.com](https://portfolio-d6sq.onrender.com)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+### ✨ Key Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Crystal Clear 3D UI:** Modern glassmorphism design with floating 3D tech icons and interactive orbit animations.
+- **Dynamic Content:** Real-time components including a floating hero section, detailed project grid, and certification carousels.
+- **Custom MERN Backend:** A dedicated Node.js/Express server that securely handles contact submissions.
+- **Automated Email Engine:** Instant, premium-styled HTML auto-replies sent to anyone who contacts me using Nodemailer.
+- **Micro-Animations:** Powered by Framer Motion for a fluid, responsive user experience.
+- **Full Responsiveness:** Optimized for everything from ultra-wide monitors to mobile devices.
+
+---
+
+### 🛠️ Tech Stack
+
+| Category | Technologies |
+| :--- | :--- |
+| **Frontend** | React, Vite, Tailwind CSS, Framer Motion |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB Atlas |
+| **Deployment** | Vercel (Frontend), Render (Backend) |
+| **Email Service** | NodeMailer + Gmail SMTP |
+
+---
+
+### 📂 Project Structure
+
+```bash
+Portfolio/
+├── server/             # Node.js backend
+│   ├── index.js        # Main API logic
+│   └── .env            # Private credentials (ignored by git)
+├── src/                # React components & UI
+│   ├── components/     # Reusable modules (Hero, Projects, etc.)
+│   ├── constants/      # Site data & social links
+│   └── utils/          # Motion configurations
+├── public/             # Static assets & PDF certificates
+└── package.json        # Project dependencies
+```
+
+---
+
+### 🚀 Setup & Local Development
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Yashveersir/Portfolio.git
+   cd Portfolio
+   ```
+
+2. **Install Dependencies:**
+   ```bash
+   # Install Frontend
+   npm install
+
+   # Install Backend
+   cd server
+   npm install
+   ```
+
+3. **Configure Environment Variables:**
+   Create a `.env` file in the `server/` directory:
+   ```env
+   MONGO_URI=your_mongodb_atlas_url
+   EMAIL_USER=your_email@gmail.com
+   EMAIL_PASS=your_google_app_password
+   ```
+
+4. **Run the Project:**
+   ```bash
+   # Start Backend (from /server folder)
+   npm start
+
+   # Start Frontend (from / root folder)
+   npm run dev
+   ```
+
+---
+
+### 📬 Contact Me
+
+I'm always open to discussing new projects, creative ideas or opportunities to be part of your visions.
+
+- **Email:** [singhyash9631@gmail.com](mailto:singhyash9631@gmail.com)
+- **LinkedIn:** [Yashveer Singh](https://www.linkedin.com/in/yashveer-singh-41bb36280)
+- **GitHub:** [@Yashveersir](https://github.com/Yashveersir)
+
+---
+*Built with ❤️ by Yashveer Singh*
