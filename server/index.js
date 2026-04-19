@@ -10,6 +10,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Main Backend Landing Page
+app.get('/', (req, res) => {
+  res.send(`
+    <div style="font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #0f172a; color: white; text-align: center;">
+      <h1 style="background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 3rem; margin-bottom: 10px;">Yashveer's Portfolio API</h1>
+      <p style="color: #94a3b8; font-size: 1.2rem; margin-bottom: 30px;">Operational & Secure</p>
+      <div style="padding: 20px; border: 1px solid #1e293b; border-radius: 12px; background: #1e293b; margin-bottom: 40px;">
+        <span style="color: #4ade80;">✔</span> Database Connected<br>
+        <span style="color: #4ade80;">✔</span> Email Server Online<br>
+        <span style="color: #4ade80;">✔</span> CORS Whitelisted
+      </div>
+      <a href="https://yashveersingh.xyz" style="padding: 15px 30px; background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%); color: white; border-radius: 10px; text-decoration: none; font-weight: bold; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Return to Main Website</a>
+    </div>
+  `);
+});
+
 // MongoDB Schema for Contact Messages
 const messageSchema = new mongoose.Schema({
   name: { type: String, required: true },
