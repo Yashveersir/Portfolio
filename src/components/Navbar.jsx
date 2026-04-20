@@ -86,7 +86,7 @@ export default function Navbar() {
 
         {/* Resume Button (Desktop) */}
         <a
-          href="/resume.pdf"
+          href="/Yashveer_Singh_Resume_2026-04-10.pdf"
           target="_blank"
           rel="noopener noreferrer"
           className="hidden md:inline-flex btn-primary !py-2 !px-5 !text-sm"
@@ -135,7 +135,7 @@ export default function Navbar() {
                 </motion.li>
               ))}
               <li className="mt-2">
-                <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="btn-primary w-full justify-center !text-sm">
+                <a href="/Yashveer_Singh_Resume_2026-04-10.pdf" target="_blank" rel="noopener noreferrer" className="btn-primary w-full justify-center !text-sm">
                   <span>View Resume</span>
                 </a>
               </li>

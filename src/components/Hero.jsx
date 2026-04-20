@@ -81,7 +81,7 @@ export default function Hero() {
                 <span>View Projects</span>
                 <FaArrowRight className="relative z-10 text-sm" />
               </a>
-              <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="btn-outline">
+              <a href="/Yashveer_Singh_Resume_2026-04-10.pdf" target="_blank" rel="noopener noreferrer" className="btn-outline">
                 <FaEnvelope className="hidden" /> {/* Just to keep spacing uniform if needed, or replace icon */}
                 <span>Download Resume</span>
               </a>
