@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+/* eslint-disable-next-line no-unused-vars */
 import { motion } from 'framer-motion';
 import { projects } from '../constants';
 import { fadeIn, textVariant, staggerContainer } from '../utils/motion';
