@@ -109,10 +109,17 @@ function ProjectCard({ project, index }) {
             <p className="text-xs text-text-dim mb-1">{project.role}</p>
             <p className="text-xs text-primary-light mb-4">{project.outcome}</p>
 
-            {/* Description */}
-            <p className="text-text-muted text-sm leading-relaxed mb-5">
-              {project.description}
-            </p>
+            {/* Description Bullets */}
+            <ul className="list-none m-0 p-0 mb-5 space-y-1">
+              {(project.descriptionBullets || [project.description]).map((point) => (
+                <li
+                  key={point}
+                  className="text-text-muted text-sm leading-relaxed pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-primary-light"
+                >
+                  {point}
+                </li>
+              ))}
+            </ul>
 
             {/* Features */}
             <div className="mb-5">

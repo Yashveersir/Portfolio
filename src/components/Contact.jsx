@@ -13,7 +13,7 @@ const contactInfo = [
 
 export default function Contact() {
   const formRef = useRef();
-  const [form, setForm] = useState({ name: '', email: '', message: '', budget: '', timeline: '' });
+  const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState('idle'); // idle | sending | success | error
 
   const handleChange = (e) => {
@@ -29,22 +29,15 @@ export default function Contact() {
     try {
       // Safely hardcode Render URL in production to prevent Vercel env var misconfigurations
       const API_URL = import.meta.env.DEV ? 'http://localhost:5000' : 'https://portfolio-d6sq.onrender.com';
-      const payload = {
-        name: form.name,
-        email: form.email,
-        message: form.message,
-        budget: form.budget,
-        timeline: form.timeline,
-      };
       const response = await fetch(`${API_URL}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(form)
       });
 
       if (response.ok) {
         setStatus('success');
-        setForm({ name: '', email: '', message: '', budget: '', timeline: '' });
+        setForm({ name: '', email: '', message: '' });
       } else {
         setStatus('error');
       }
@@ -186,45 +179,6 @@ export default function Contact() {
                     className="w-full px-4 py-3.5 rounded-xl bg-dark-200/60 border border-white/[0.08] text-white text-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-text-dim resize-none"
                     style={{ fontFamily: 'var(--font-body)' }}
                   />
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-text-muted text-sm font-medium mb-2 block">
-                      Budget (optional)
-                    </label>
-                    <select
-                      name="budget"
-                      value={form.budget}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3.5 rounded-xl bg-dark-200/60 border border-white/[0.08] text-white text-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
-                      style={{ fontFamily: 'var(--font-body)' }}
-                    >
-                      <option value="">Select range</option>
-                      <option value="Below $500">Below $500</option>
-                      <option value="$500 - $2000">$500 - $2000</option>
-                      <option value="$2000 - $5000">$2000 - $5000</option>
-                      <option value="$5000+">$5000+</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-text-muted text-sm font-medium mb-2 block">
-                      Timeline (optional)
-                    </label>
-                    <select
-                      name="timeline"
-                      value={form.timeline}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3.5 rounded-xl bg-dark-200/60 border border-white/[0.08] text-white text-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
-                      style={{ fontFamily: 'var(--font-body)' }}
-                    >
-                      <option value="">Select timeline</option>
-                      <option value="ASAP">ASAP</option>
-                      <option value="1 - 2 weeks">1 - 2 weeks</option>
-                      <option value="2 - 4 weeks">2 - 4 weeks</option>
-                      <option value="1+ month">1+ month</option>
-                    </select>
-                  </div>
                 </div>
 
                 {/* Submit */}

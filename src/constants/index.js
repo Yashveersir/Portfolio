@@ -79,6 +79,11 @@ export const projects = [
     subtitle: 'Full-Stack E-Commerce Platform',
     role: 'Role: Full-Stack Developer',
     outcome: 'Outcome: launched digital ordering flow with live inventory updates',
+    descriptionBullets: [
+      'OTP-based login flow for secure customer onboarding',
+      'Live inventory tracking to prevent overselling',
+      'Event-driven notifications for order and stock updates',
+    ],
     description:
       'A complete e-commerce system with OTP-based authentication, real-time inventory management, and event-driven notification engine. Built with Node.js, Express, MongoDB, and vanilla JavaScript.',
     tags: ['Node.js', 'Express', 'MongoDB', 'JavaScript', 'REST API'],
@@ -101,6 +106,11 @@ export const projects = [
     subtitle: 'Real-Time Multi-Team Task Manager',
     role: 'Role: Full-Stack Intern Engineer',
     outcome: 'Outcome: improved team task visibility with real-time workflow updates',
+    descriptionBullets: [
+      'Multi-tenant workspace setup with invite-based access',
+      'Real-time kanban sync using WebSocket events',
+      'Priority-aware dashboard for sprint planning visibility',
+    ],
     description:
       'A production-ready task management system with multi-tenant workspace architecture, real-time Kanban board, and WebSocket-powered collaboration. Built during internship at Vaidsys Technologies.',
     tags: ['React', 'Node.js', 'MongoDB', 'Socket.io', 'Tailwind CSS'],
@@ -123,6 +133,11 @@ export const projects = [
     subtitle: 'Secure Financial REST API',
     role: 'Role: Backend API Engineer',
     outcome: 'Outcome: enabled secure transfers with automated transactional notifications',
+    descriptionBullets: [
+      'JWT + bcrypt authentication for protected account access',
+      'Fund transfer endpoints with validation and safety checks',
+      'Automated email alerts for transaction confirmations',
+    ],
     description:
       'Secure transaction REST API with JWT authentication, bcrypt password hashing, fund transfer system, and automated email notifications for every transaction.',
     tags: ['Node.js', 'Express', 'MongoDB', 'JWT', 'bcrypt'],

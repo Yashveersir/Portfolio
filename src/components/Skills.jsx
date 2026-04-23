@@ -81,11 +81,13 @@ export default function Skills() {
                 }}
               >
                 {skill.image ? (
-                  <img
-                    src={skill.image}
-                    alt={skill.name}
-                    className="w-14 h-14 object-contain transition-all duration-300 group-hover:scale-110 drop-shadow-md"
-                  />
+                  <div className="w-16 h-16 rounded-xl bg-white/90 border border-white/30 p-2 flex items-center justify-center shadow-lg">
+                    <img
+                      src={skill.image}
+                      alt={skill.name}
+                      className="w-full h-full object-contain transition-all duration-300 group-hover:scale-110 drop-shadow-md"
+                    />
+                  </div>
                 ) : (
                   <div
                     className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl transition-all duration-300 group-hover:scale-110 shadow-lg border border-white/10 group-hover:border-white/30"

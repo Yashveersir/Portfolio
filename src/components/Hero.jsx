@@ -8,7 +8,6 @@ import { fadeIn, textVariant } from '../utils/motion';
 export default function Hero() {
   const typingSequence = typingLines.flatMap((line) => [line, 2000]);
   const heroStats = [
-    { label: 'Projects Built', value: '10+' },
     { label: 'Certifications', value: '13' },
     { label: 'Response Time', value: '<24h' },
   ];
@@ -109,7 +108,7 @@ export default function Hero() {
               variants={fadeIn('up', 0.45)}
               initial="hidden"
               animate="show"
-              className="grid grid-cols-3 gap-3 sm:gap-4 w-full max-w-xl mb-10"
+              className="grid grid-cols-2 gap-3 sm:gap-4 w-full max-w-md mb-10"
             >
               {heroStats.map((stat) => (
                 <div
