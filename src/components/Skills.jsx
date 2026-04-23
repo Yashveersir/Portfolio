@@ -68,38 +68,48 @@ export default function Skills() {
             initial="hidden"
             animate="show"
             exit={{ opacity: 0, y: 20 }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-4xl mx-auto"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 max-w-5xl mx-auto"
+            style={{ perspective: '1000px' }}
           >
             {skillCategories[activeTab].skills.map((skill, i) => (
               <motion.div
                 key={skill.name}
                 variants={fadeIn('up', i * 0.05)}
-                className="glass rounded-2xl card-spacing flex flex-col items-center gap-3 cursor-default group gradient-border card-hover-lift"
+                className="relative glass-strong rounded-2xl card-spacing flex flex-col items-center gap-4 cursor-default group border border-white/5 hover:border-white/20 transition-all duration-500"
+                style={{ transformStyle: 'preserve-3d' }}
                 whileHover={{
-                  scale: 1.08,
-                  boxShadow: `0 0 30px ${skillCategories[activeTab].color}25`,
+                  rotateY: 15,
+                  rotateX: -10,
+                  z: 30,
+                  boxShadow: `0 20px 40px -10px ${skillCategories[activeTab].color}30`,
                 }}
               >
+                {/* 3D Background Glow */}
+                <div 
+                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"
+                  style={{ background: skillCategories[activeTab].color, transform: 'translateZ(-10px) scale(0.95)' }}
+                />
+
                 {skill.image ? (
-                  <div className="w-16 h-16 rounded-xl bg-white/90 border border-white/30 p-2 flex items-center justify-center shadow-lg">
+                  <div className="w-16 h-16 rounded-xl bg-white/95 border border-white/40 p-2 flex items-center justify-center shadow-xl transform translate-z-10 transition-transform duration-500 group-hover:scale-110">
                     <img
                       src={skill.image}
                       alt={skill.name}
-                      className="w-full h-full object-contain transition-all duration-300 group-hover:scale-110 drop-shadow-md"
+                      className="w-full h-full object-contain drop-shadow-md"
                     />
                   </div>
                 ) : (
                   <div
-                    className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl transition-all duration-300 group-hover:scale-110 shadow-lg border border-white/10 group-hover:border-white/30"
+                    className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl transition-all duration-500 group-hover:scale-110 shadow-2xl border border-white/10 group-hover:border-white/30 transform translate-z-10"
                     style={{
-                      background: `${skillCategories[activeTab].color}15`,
+                      background: `linear-gradient(135deg, ${skillCategories[activeTab].color}20, ${skillCategories[activeTab].color}05)`,
                       color: skillCategories[activeTab].color,
                     }}
                   >
                     {skill.icon ? <skill.icon /> : <span className="text-xl font-bold">{skill.name[0]}</span>}
                   </div>
                 )}
-                <span className="text-sm font-medium text-text-muted group-hover:text-white transition-colors text-center">
+                <span className="text-sm font-semibold text-text-muted group-hover:text-white transition-all duration-300 tracking-tight transform translate-z-5">
                   {skill.name}
                 </span>
               </motion.div>
