@@ -69,14 +69,16 @@ export default function About() {
             {highlights.map((h, i) => (
               <motion.div
                 key={h.title}
-                className="glass rounded-xl card-spacing flex items-center gap-5 cursor-default gradient-border card-hover-lift"
+                className="glass-strong rounded-xl card-spacing flex items-center gap-5 cursor-default border border-white/5 hover:border-white/20 transition-all duration-500"
                 whileHover={{
+                  y: -5,
+                  x: 5,
                   scale: 1.02,
-                  boxShadow: '0 0 30px rgba(99, 102, 241, 0.15)',
+                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
                 }}
-                transition={{ type: 'spring', stiffness: 300 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
               >
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-2xl text-primary-light shrink-0">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-2xl text-white shrink-0 group-hover:scale-110 transition-transform duration-500">
                   {h.icon}
                 </div>
                 <div className="min-w-0 text-left">
@@ -86,7 +88,7 @@ export default function About() {
                   >
                     {h.title}
                   </h3>
-                  <p className="text-text-muted text-sm">{h.subtitle}</p>
+                  <p className="text-text-muted text-sm font-medium">{h.subtitle}</p>
                 </div>
               </motion.div>
             ))}
