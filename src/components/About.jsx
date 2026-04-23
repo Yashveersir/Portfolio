@@ -35,7 +35,7 @@ export default function About() {
             whileInView="show"
             viewport={{ once: true, amount: 0.3 }}
           >
-            <div className="glass rounded-2xl card-spacing-lg neon-glow">
+            <div className="glass rounded-2xl card-spacing-lg neon-glow card-hover-lift">
               <p className="text-text-muted leading-relaxed text-lg mb-8">
                 {aboutText}
               </p>
@@ -69,7 +69,7 @@ export default function About() {
             {highlights.map((h, i) => (
               <motion.div
                 key={h.title}
-                className="glass rounded-xl card-spacing flex items-center gap-5 cursor-default gradient-border"
+                className="glass rounded-xl card-spacing flex items-center gap-5 cursor-default gradient-border card-hover-lift"
                 whileHover={{
                   scale: 1.02,
                   boxShadow: '0 0 30px rgba(99, 102, 241, 0.15)',

@@ -74,7 +74,7 @@ export default function Skills() {
               <motion.div
                 key={skill.name}
                 variants={fadeIn('up', i * 0.05)}
-                className="glass rounded-2xl card-spacing flex flex-col items-center gap-3 cursor-default group gradient-border"
+                className="glass rounded-2xl card-spacing flex flex-col items-center gap-3 cursor-default group gradient-border card-hover-lift"
                 whileHover={{
                   scale: 1.08,
                   boxShadow: `0 0 30px ${skillCategories[activeTab].color}25`,

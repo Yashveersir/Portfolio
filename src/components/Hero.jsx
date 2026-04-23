@@ -1,12 +1,17 @@
 import { motion } from 'framer-motion';
 import { TypeAnimation } from 'react-type-animation';
-import { FaArrowRight, FaEnvelope, FaGithub, FaLinkedin, FaReact, FaNodeJs } from 'react-icons/fa';
+import { FaArrowRight, FaDownload, FaGithub, FaLinkedin, FaReact, FaNodeJs } from 'react-icons/fa';
 import { SiMongodb, SiExpress, SiTailwindcss } from 'react-icons/si';
 import { typingLines, socialLinks } from '../constants';
 import { fadeIn, textVariant } from '../utils/motion';
 
 export default function Hero() {
   const typingSequence = typingLines.flatMap((line) => [line, 2000]);
+  const heroStats = [
+    { label: 'Projects Built', value: '10+' },
+    { label: 'Certifications', value: '13' },
+    { label: 'Response Time', value: '<24h' },
+  ];
 
   return (
     <section
@@ -46,9 +51,18 @@ export default function Hero() {
               variants={fadeIn('up', 0.2)}
               initial="hidden"
               animate="show"
-              className="text-lg sm:text-xl md:text-2xl text-text-muted mb-4 font-medium"
+              className="text-lg sm:text-xl md:text-2xl text-text-muted mb-5 font-medium"
             >
               Full-Stack Developer &nbsp;|&nbsp; MERN &nbsp;|&nbsp; Gen AI
+            </motion.p>
+
+            <motion.p
+              variants={fadeIn('up', 0.25)}
+              initial="hidden"
+              animate="show"
+              className="text-sm sm:text-base text-text-dim max-w-xl mb-9 leading-relaxed"
+            >
+              I build secure backends, polished user interfaces, and AI-powered product workflows that are ready for real users.
             </motion.p>
 
             {/* Typing animation */}
@@ -82,12 +96,29 @@ export default function Hero() {
                 <FaArrowRight className="relative z-10 text-sm" />
               </a>
               <a href="/Yashveer-Singh-Resume.pdf" target="_blank" rel="noopener noreferrer" className="btn-outline">
-                <FaEnvelope className="hidden" /> {/* Just to keep spacing uniform if needed, or replace icon */}
+                <FaDownload />
                 <span>Download Resume</span>
               </a>
               <a href="#contact" className="btn-outline border-transparent hover:bg-white/5">
                 <span>Contact Me</span>
               </a>
+            </motion.div>
+
+            <motion.div
+              variants={fadeIn('up', 0.45)}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-3 gap-3 sm:gap-4 w-full max-w-xl mb-10"
+            >
+              {heroStats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="glass card-spacing rounded-xl text-center card-hover-lift"
+                >
+                  <p className="text-xl sm:text-2xl font-bold text-white mb-1">{stat.value}</p>
+                  <p className="text-[11px] sm:text-xs text-text-dim uppercase tracking-wider">{stat.label}</p>
+                </div>
+              ))}
             </motion.div>
 
             {/* Social Links */}

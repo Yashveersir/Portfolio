@@ -90,26 +90,32 @@ export default function App() {
       {/* Main Content */}
       <main className="relative z-10">
         <Hero />
+        <div className="section-divider" />
 
         <Suspense fallback={<SectionLoader />}>
           <About />
         </Suspense>
+        <div className="section-divider" />
 
         <Suspense fallback={<SectionLoader />}>
           <Skills />
         </Suspense>
+        <div className="section-divider" />
 
         <Suspense fallback={<SectionLoader />}>
           <Projects />
         </Suspense>
+        <div className="section-divider" />
 
         <Suspense fallback={<SectionLoader />}>
           <Certifications />
         </Suspense>
+        <div className="section-divider" />
 
         <Suspense fallback={<SectionLoader />}>
           <Experience />
         </Suspense>
+        <div className="section-divider" />
 
         <Suspense fallback={<SectionLoader />}>
           <Contact />

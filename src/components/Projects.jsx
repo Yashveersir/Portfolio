@@ -53,7 +53,7 @@ function ProjectCard({ project, index }) {
     <motion.div variants={fadeIn('up', index * 0.15)} className="h-full">
       <TiltCard className="h-full">
         <div
-          className={`glass rounded-2xl overflow-hidden h-full flex flex-col gradient-border ${
+          className={`glass rounded-2xl overflow-hidden h-full flex flex-col gradient-border card-hover-lift group ${
             project.featured ? 'neon-glow' : ''
           }`}
         >
@@ -64,6 +64,26 @@ function ProjectCard({ project, index }) {
               background: `linear-gradient(90deg, ${project.color}, ${project.color}66)`,
             }}
           />
+
+          {project.images?.[0] && (
+            <div className="px-4 pt-4 sm:px-5 sm:pt-5">
+              <div className="relative overflow-hidden rounded-xl border border-white/10">
+              <img
+                src={project.images[0]}
+                alt={`${project.title} preview`}
+                className="w-full h-44 object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
+              />
+                <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/65 to-transparent" />
+                <span
+                  className="absolute left-3 bottom-2 text-[10px] font-semibold uppercase tracking-wider"
+                  style={{ color: project.color }}
+                >
+                  Live Preview
+                </span>
+              </div>
+            </div>
+          )}
 
           <div className="card-spacing-lg flex flex-col flex-1">
             {/* Featured badge */}

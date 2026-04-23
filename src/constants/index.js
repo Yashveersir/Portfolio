@@ -91,8 +91,7 @@ export const projects = [
     featured: true,
     color: '#22d3ee',
     images: [
-      'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200&h=800',
-      'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&q=80&w=1200&h=800',
+      '/project-images/green-valley-home.png',
     ]
   },
   {
@@ -112,8 +111,7 @@ export const projects = [
     featured: true,
     color: '#a855f7',
     images: [
-      'https://images.unsplash.com/photo-1611224923853-80b023f02d71?auto=format&fit=crop&q=80&w=1200&h=800',
-      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=1200&h=800',
+      '/project-images/taskflow-dashboard.png',
     ]
   },
   {
@@ -133,8 +131,7 @@ export const projects = [
     featured: true,
     color: '#818cf8',
     images: [
-      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200&h=800',
-      'https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1200&h=800',
+      '/project-images/ledger-service.png',
     ]
   },
 ];
