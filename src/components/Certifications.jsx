@@ -15,7 +15,7 @@ export default function Certifications() {
           viewport={{ once: true, amount: 0.3 }}
           className="text-center mb-4"
         >
-          <p className="text-primary-light text-sm font-semibold tracking-widest uppercase mb-3">
+          <p className="text-text-muted text-sm font-semibold tracking-widest uppercase mb-3">
             Credentials
           </p>
           <h2 className="section-title gradient-text">Certifications</h2>

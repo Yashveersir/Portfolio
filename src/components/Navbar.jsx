@@ -44,19 +44,18 @@ export default function Navbar() {
         <motion.a
           href="#"
           className="flex items-center gap-3 text-xl font-bold no-underline group"
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.02 }}
           onClick={(e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         >
-          <div className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-[#080808] border border-white/10 group-hover:border-primary/50 transition-colors shadow-lg">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent rounded-xl" />
-            <span className="relative font-heading font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+          <div className="relative w-10 h-10 flex items-center justify-center rounded-[10px] bg-dark-100 border border-white/10 group-hover:border-white/30 transition-all duration-300 shadow-md">
+            <span className="relative font-heading font-black text-xl text-white tracking-tight drop-shadow-md">
               YS
             </span>
           </div>
-          <span className="gradient-text hidden sm:inline tracking-wide">Yashveer</span>
+          <span className="text-white font-black tracking-tight hidden sm:inline">Yashveer<span className="text-primary-light">.</span></span>
         </motion.a>
 
         {/* Desktop Nav */}

@@ -63,7 +63,7 @@ export default function Contact() {
           viewport={{ once: true, amount: 0.3 }}
           className="text-center mb-16"
         >
-          <p className="text-primary-light text-sm font-semibold tracking-widest uppercase mb-3">
+          <p className="text-text-muted text-sm font-semibold tracking-widest uppercase mb-3">
             Get In Touch
           </p>
           <h2 className="section-title gradient-text">Contact Me</h2>

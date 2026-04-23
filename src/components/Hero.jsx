@@ -7,12 +7,6 @@ import { fadeIn, textVariant } from '../utils/motion';
 
 export default function Hero() {
   const typingSequence = typingLines.flatMap((line) => [line, 2000]);
-  const heroStats = [
-    { label: 'Certifications', value: '13' },
-    { label: 'Response Time', value: '<24h' },
-  ];
-  const availability = ['Open to Internship', 'Full-time Roles', 'Freelance Projects'];
-
   return (
     <section
       id="hero"
@@ -22,16 +16,22 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           
           {/* Left Column - Text Content */}
-          <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1">
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1 relative">
+            {/* Background glowing orb for text */}
+            <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary opacity-10 rounded-full blur-[100px] pointer-events-none" />
+
             {/* Status badge */}
             <motion.div
               variants={fadeIn('down', 0)}
               initial="hidden"
               animate="show"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 text-sm"
+              className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-8 text-sm group cursor-default"
             >
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-text-muted">Available for opportunities</span>
+              <div className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+              </div>
+              <span className="text-text-muted font-medium tracking-wide group-hover:text-white transition-colors">Available for Opportunities</span>
             </motion.div>
 
             {/* Name */}
@@ -39,47 +39,37 @@ export default function Hero() {
               variants={textVariant(0.1)}
               initial="hidden"
               animate="show"
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
+              className="text-6xl sm:text-7xl md:text-8xl lg:text-[7.5rem] font-black mb-4 leading-[1.05] tracking-tight"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              <span className="text-white">Hi, I'm </span>
-              <span className="gradient-text-hero">Yashveer</span>
+              <span className="text-white drop-shadow-sm">HI, I'M </span>
+              <br className="hidden lg:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent animate-gradient bg-[length:200%_auto] pb-2 drop-shadow-md">YASHVEER</span>
             </motion.h1>
 
-            {/* Title */}
-            <motion.p
-              variants={fadeIn('up', 0.2)}
-              initial="hidden"
-              animate="show"
-              className="text-lg sm:text-xl md:text-2xl text-text-muted mb-5 font-medium"
-            >
-              Full-Stack Developer &nbsp;|&nbsp; MERN &nbsp;|&nbsp; Gen AI
-            </motion.p>
-
-            <motion.p
-              variants={fadeIn('up', 0.25)}
-              initial="hidden"
-              animate="show"
-              className="text-sm sm:text-base text-text-dim max-w-xl mb-9 leading-relaxed"
-            >
-              I build secure backends, polished user interfaces, and AI-powered product workflows that are ready for real users.
-            </motion.p>
+            {/* Futuristic divider */}
+            <motion.div
+               variants={fadeIn('up', 0.2)}
+               initial="hidden"
+               animate="show"
+               className="w-2/3 max-w-sm h-[2px] bg-gradient-to-r from-secondary via-primary to-transparent my-6 opacity-80"
+            />
 
             {/* Typing animation */}
             <motion.div
               variants={fadeIn('up', 0.3)}
               initial="hidden"
               animate="show"
-              className="h-10 mb-10 flex items-center justify-center lg:justify-start"
+              className="h-16 mb-12 flex items-center justify-center lg:justify-start w-full"
             >
-              <span className="text-lg sm:text-xl font-mono text-accent flex items-center">
-                <span className="mr-3">{'>'}</span>
+              <span className="text-xl sm:text-2xl md:text-3xl font-body flex items-center">
                 <TypeAnimation
                   sequence={typingSequence}
                   wrapper="span"
-                  speed={50}
+                  speed={60}
                   repeat={Infinity}
-                  className="text-primary-light"
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary animate-gradient bg-[length:200%_auto] font-semibold tracking-wide drop-shadow-[0_0_10px_rgba(0,223,216,0.3)]"
+                  cursor={true}
                 />
               </span>
             </motion.div>
@@ -102,39 +92,6 @@ export default function Hero() {
               <a href="#contact" className="btn-outline border-transparent hover:bg-white/5">
                 <span>Contact Me</span>
               </a>
-            </motion.div>
-
-            <motion.div
-              variants={fadeIn('up', 0.45)}
-              initial="hidden"
-              animate="show"
-              className="grid grid-cols-2 gap-3 sm:gap-4 w-full max-w-md mb-10"
-            >
-              {heroStats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="glass card-spacing rounded-xl text-center card-hover-lift"
-                >
-                  <p className="text-xl sm:text-2xl font-bold text-white mb-1">{stat.value}</p>
-                  <p className="text-[11px] sm:text-xs text-text-dim uppercase tracking-wider">{stat.label}</p>
-                </div>
-              ))}
-            </motion.div>
-
-            <motion.div
-              variants={fadeIn('up', 0.48)}
-              initial="hidden"
-              animate="show"
-              className="flex flex-wrap gap-2 mb-8 justify-center lg:justify-start"
-            >
-              {availability.map((item) => (
-                <span
-                  key={item}
-                  className="px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold border border-white/10 bg-white/[0.03] text-text-muted"
-                >
-                  {item}
-                </span>
-              ))}
             </motion.div>
 
             {/* Social Links */}
@@ -170,51 +127,71 @@ export default function Hero() {
             initial="hidden"
             animate="show"
             className="flex justify-center items-center order-1 lg:order-2"
+            style={{ perspective: '1500px' }}
           >
-            <div className="relative w-full max-w-sm aspect-[4/5] group">
-              {/* Outer Glow */}
-              <div className="absolute -inset-4 bg-gradient-to-tr from-primary via-secondary to-accent opacity-30 blur-2xl group-hover:opacity-50 transition-opacity duration-700" />
+            <div 
+              className="relative w-full max-w-sm aspect-[4/5] group transition-all duration-1000 ease-out hover:!transform-none"
+              style={{ transform: 'rotateY(-15deg) rotateX(10deg)', transformStyle: 'preserve-3d' }}
+            >
+              {/* Deep 3D Shadow Backdrop */}
+              <div 
+                className="absolute inset-0 bg-gradient-to-tr from-primary to-accent rounded-[2rem] opacity-30 blur-[40px] transition-all duration-1000 group-hover:opacity-50 group-hover:blur-[50px]"
+                style={{ transform: 'translateZ(-50px) translate(20px, 20px)' }}
+              />
+              
+              {/* Thick 3D Frame Base */}
+              <div 
+                className="absolute inset-0 bg-gradient-to-br from-white/10 to-black/80 rounded-[2rem]"
+                style={{ transform: 'translateZ(-10px)' }}
+              />
               
               {/* Image Container */}
-              <div className="relative w-full h-full rounded-[2rem] p-1 bg-gradient-to-bl from-white/20 to-white/5 overflow-hidden z-10">
+              <div 
+                className="relative w-full h-full rounded-[2rem] p-[2px] bg-gradient-to-br from-white/40 via-white/5 to-white/10 overflow-hidden z-10 shadow-2xl"
+                style={{ transform: 'translateZ(0px)', transformStyle: 'preserve-3d' }}
+              >
                 <div className="w-full h-full rounded-[1.8rem] overflow-hidden bg-[#0a0a0a]">
                   <img
                     src="/myImage.jpeg?v=2"
                     alt="Yashveer Singh"
-                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700"
                   />
                 </div>
               </div>
               
               {/* Floating Tech Orbits */}
               <motion.div 
-                className="absolute top-[10%] -left-8 w-14 h-14 rounded-xl glass border border-white/10 flex items-center justify-center text-[#61dafb] text-3xl z-20 shadow-2xl"
+                className="absolute top-[10%] -left-8 w-14 h-14 rounded-xl glass border border-white/10 flex items-center justify-center text-[#61dafb] text-3xl z-20 shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
                 animate={{ y: [-15, 15, -15], rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ transform: 'translateZ(80px)' }}
               >
                 <FaReact />
               </motion.div>
               
               <motion.div 
-                className="absolute top-[20%] -right-8 w-12 h-12 rounded-xl glass border border-white/10 flex items-center justify-center text-[#68a063] text-2xl z-20 shadow-2xl"
+                className="absolute top-[20%] -right-8 w-12 h-12 rounded-xl glass border border-white/10 flex items-center justify-center text-[#68a063] text-2xl z-20 shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
                 animate={{ y: [10, -10, 10], rotate: [0, -10, 10, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                style={{ transform: 'translateZ(60px)' }}
               >
                 <FaNodeJs />
               </motion.div>
 
               <motion.div 
-                className="absolute bottom-[20%] -left-6 w-12 h-12 rounded-xl glass border border-white/10 flex items-center justify-center text-[#4db33d] text-2xl z-20 shadow-2xl"
+                className="absolute bottom-[20%] -left-6 w-12 h-12 rounded-xl glass border border-white/10 flex items-center justify-center text-[#4db33d] text-2xl z-20 shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
                 animate={{ y: [-10, 15, -10], rotate: [0, 15, -15, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                style={{ transform: 'translateZ(40px)' }}
               >
                 <SiMongodb />
               </motion.div>
 
               <motion.div 
-                className="absolute bottom-[10%] -right-10 w-16 h-16 rounded-xl glass border border-white/10 flex items-center justify-center text-[#38b2ac] text-3xl z-20 shadow-2xl"
+                className="absolute bottom-[10%] -right-10 w-16 h-16 rounded-xl glass border border-white/10 flex items-center justify-center text-[#38b2ac] text-3xl z-20 shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
                 animate={{ y: [15, -15, 15], rotate: [0, -15, 15, 0] }}
                 transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+                style={{ transform: 'translateZ(90px)' }}
               >
                 <SiTailwindcss />
               </motion.div>

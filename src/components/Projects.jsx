@@ -110,13 +110,14 @@ function ProjectCard({ project, index }) {
             <p className="text-xs text-primary-light mb-4">{project.outcome}</p>
 
             {/* Description Bullets */}
-            <ul className="list-none m-0 p-0 mb-5 space-y-1">
+            <ul className="list-none m-0 p-0 mb-5 space-y-2">
               {(project.descriptionBullets || [project.description]).map((point) => (
                 <li
                   key={point}
-                  className="text-text-muted text-sm leading-relaxed pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-primary-light"
+                  className="text-text-muted text-sm leading-relaxed flex items-start gap-2"
                 >
-                  {point}
+                  <span className="text-primary-light font-bold mt-[2px] leading-none">•</span>
+                  <span>{point}</span>
                 </li>
               ))}
             </ul>
@@ -145,9 +146,10 @@ function ProjectCard({ project, index }) {
                 {project.features.map((f) => (
                   <li
                     key={f}
-                    className="text-text-dim text-xs py-1 pl-4 relative before:content-['▹'] before:absolute before:left-0 before:text-primary-light"
+                    className="text-text-dim text-xs py-1 flex items-start gap-2"
                   >
-                    {f}
+                    <span className="text-primary-light mt-[2px] leading-none">▹</span>
+                    <span>{f}</span>
                   </li>
                 ))}
               </motion.ul>
@@ -217,7 +219,7 @@ export default function Projects() {
           viewport={{ once: true, amount: 0.3 }}
           className="text-center mb-16"
         >
-          <p className="text-primary-light text-sm font-semibold tracking-widest uppercase mb-3">
+          <p className="text-text-muted text-sm font-semibold tracking-widest uppercase mb-3">
             What I've Built
           </p>
           <h2 className="section-title gradient-text">Featured Projects</h2>
