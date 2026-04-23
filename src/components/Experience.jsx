@@ -69,6 +69,15 @@ export default function Experience() {
               <p className="text-text-muted text-sm leading-relaxed m-0">
                 {exp.description}
               </p>
+              {exp.achievements?.length > 0 && (
+                <ul className="mt-3 mb-0 pl-4">
+                  {exp.achievements.map((achievement) => (
+                    <li key={achievement} className="text-text-dim text-xs leading-relaxed mb-1">
+                      {achievement}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </VerticalTimelineElement>
           ))}
         </VerticalTimeline>

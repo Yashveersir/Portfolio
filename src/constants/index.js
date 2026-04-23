@@ -77,6 +77,8 @@ export const projects = [
   {
     title: 'Green Valley Poultry Farm',
     subtitle: 'Full-Stack E-Commerce Platform',
+    role: 'Role: Full-Stack Developer',
+    outcome: 'Outcome: launched digital ordering flow with live inventory updates',
     description:
       'A complete e-commerce system with OTP-based authentication, real-time inventory management, and event-driven notification engine. Built with Node.js, Express, MongoDB, and vanilla JavaScript.',
     tags: ['Node.js', 'Express', 'MongoDB', 'JavaScript', 'REST API'],
@@ -97,6 +99,8 @@ export const projects = [
   {
     title: 'TaskFlow',
     subtitle: 'Real-Time Multi-Team Task Manager',
+    role: 'Role: Full-Stack Intern Engineer',
+    outcome: 'Outcome: improved team task visibility with real-time workflow updates',
     description:
       'A production-ready task management system with multi-tenant workspace architecture, real-time Kanban board, and WebSocket-powered collaboration. Built during internship at Vaidsys Technologies.',
     tags: ['React', 'Node.js', 'MongoDB', 'Socket.io', 'Tailwind CSS'],
@@ -117,6 +121,8 @@ export const projects = [
   {
     title: 'Ledger System',
     subtitle: 'Secure Financial REST API',
+    role: 'Role: Backend API Engineer',
+    outcome: 'Outcome: enabled secure transfers with automated transactional notifications',
     description:
       'Secure transaction REST API with JWT authentication, bcrypt password hashing, fund transfer system, and automated email notifications for every transaction.',
     tags: ['Node.js', 'Express', 'MongoDB', 'JWT', 'bcrypt'],
@@ -238,6 +244,11 @@ export const experiences = [
     organization: 'Vaidsys Technologies',
     description:
       'Building TaskFlow — a real-time multi-team task management system with WebSocket-powered Kanban board, multi-tenant workspace architecture, and JWT authentication. Deployed on Vercel + Render.',
+    achievements: [
+      'Designed modular workspace APIs for team-level data isolation',
+      'Built drag-and-drop status flow with real-time socket events',
+      'Shipped production deployment on Vercel + Render',
+    ],
     icon: '💼',
     date: 'Apr 2026 – May 2026',
     color: '#6366f1',
@@ -247,6 +258,11 @@ export const experiences = [
     organization: 'YugaYatra Retail (OPC) Pvt. Ltd.',
     description:
       'Working on web development using Cursor AI, Firebase Studio, and AI technologies. Developing websites/apps, freelancing projects, and collaborating with teams using Google Workspace.',
+    achievements: [
+      'Delivered client-facing web modules on strict timelines',
+      'Integrated AI-assisted development workflow for faster iteration',
+      'Collaborated in shared docs, reviews, and remote standups',
+    ],
     icon: '🚀',
     date: 'Apr 2026 – Jun 2026',
     color: '#8b5cf6',
@@ -256,6 +272,11 @@ export const experiences = [
     organization: 'CodeBird Coding Club',
     description:
       'Guided fellow students in competitive programming, data structures, and algorithm design. Conducted workshops and mentoring sessions.',
+    achievements: [
+      'Mentored peers on DSA fundamentals and contest strategy',
+      'Ran coding practice sessions with guided problem breakdowns',
+      'Supported beginners in improving coding confidence',
+    ],
     icon: '👨‍💻',
     date: 'Ongoing',
     color: '#06b6d4',
@@ -265,6 +286,11 @@ export const experiences = [
     organization: 'National Service Scheme',
     description:
       'Participated in community service initiatives, social awareness campaigns, and rural development programs.',
+    achievements: [
+      'Contributed to local outreach and awareness drives',
+      'Coordinated volunteer activities for community programs',
+      'Supported field events with planning and on-ground execution',
+    ],
     icon: '🤝',
     date: 'Ongoing',
     color: '#ec4899',

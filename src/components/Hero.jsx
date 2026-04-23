@@ -12,6 +12,7 @@ export default function Hero() {
     { label: 'Certifications', value: '13' },
     { label: 'Response Time', value: '<24h' },
   ];
+  const availability = ['Open to Internship', 'Full-time Roles', 'Freelance Projects'];
 
   return (
     <section
@@ -118,6 +119,22 @@ export default function Hero() {
                   <p className="text-xl sm:text-2xl font-bold text-white mb-1">{stat.value}</p>
                   <p className="text-[11px] sm:text-xs text-text-dim uppercase tracking-wider">{stat.label}</p>
                 </div>
+              ))}
+            </motion.div>
+
+            <motion.div
+              variants={fadeIn('up', 0.48)}
+              initial="hidden"
+              animate="show"
+              className="flex flex-wrap gap-2 mb-8 justify-center lg:justify-start"
+            >
+              {availability.map((item) => (
+                <span
+                  key={item}
+                  className="px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold border border-white/10 bg-white/[0.03] text-text-muted"
+                >
+                  {item}
+                </span>
               ))}
             </motion.div>
 

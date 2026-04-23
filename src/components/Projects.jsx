@@ -73,6 +73,9 @@ function ProjectCard({ project, index }) {
                 alt={`${project.title} preview`}
                 className="w-full h-44 object-cover transition-transform duration-700 group-hover:scale-105"
                 loading="lazy"
+                decoding="async"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                draggable="false"
               />
                 <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/65 to-transparent" />
                 <span
@@ -103,6 +106,8 @@ function ProjectCard({ project, index }) {
             <p className="text-sm font-medium mb-4" style={{ color: project.color }}>
               {project.subtitle}
             </p>
+            <p className="text-xs text-text-dim mb-1">{project.role}</p>
+            <p className="text-xs text-primary-light mb-4">{project.outcome}</p>
 
             {/* Description */}
             <p className="text-text-muted text-sm leading-relaxed mb-5">
@@ -142,7 +147,7 @@ function ProjectCard({ project, index }) {
             </div>
 
             {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="flex flex-wrap gap-2">
               {project.tags.map((tag) => (
                 <span
                   key={tag}
@@ -158,8 +163,11 @@ function ProjectCard({ project, index }) {
               ))}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 mt-auto">
+          </div>
+
+          {/* Card Footer Actions */}
+          <div className="border-t border-white/10 px-5 py-4 sm:px-6 min-h-[84px] flex items-center">
+            <div className="flex gap-3 w-full">
               <a
                 href={project.github}
                 target="_blank"
