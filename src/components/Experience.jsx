@@ -29,7 +29,10 @@ export default function Experience() {
         </motion.div>
 
         {/* Timeline */}
-        <VerticalTimeline lineColor="rgba(99, 102, 241, 0.2)">
+        <VerticalTimeline
+          layout="1-column-left"
+          lineColor="rgba(99, 102, 241, 0.2)"
+        >
           {experiences.map((exp) => (
             <VerticalTimelineElement
               key={exp.title}

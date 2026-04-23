@@ -35,7 +35,7 @@ export default function About() {
             whileInView="show"
             viewport={{ once: true, amount: 0.3 }}
           >
-            <div className="glass rounded-2xl p-8 neon-glow">
+            <div className="glass rounded-2xl card-spacing-lg neon-glow">
               <p className="text-text-muted leading-relaxed text-lg mb-8">
                 {aboutText}
               </p>
@@ -69,7 +69,7 @@ export default function About() {
             {highlights.map((h, i) => (
               <motion.div
                 key={h.title}
-                className="glass rounded-xl p-6 flex items-center gap-5 cursor-default gradient-border"
+                className="glass rounded-xl card-spacing flex items-center gap-5 cursor-default gradient-border"
                 whileHover={{
                   scale: 1.02,
                   boxShadow: '0 0 30px rgba(99, 102, 241, 0.15)',
@@ -79,7 +79,7 @@ export default function About() {
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-2xl text-primary-light shrink-0">
                   {h.icon}
                 </div>
-                <div>
+                <div className="min-w-0 text-left">
                   <h3
                     className="text-lg font-bold text-white mb-1"
                     style={{ fontFamily: 'var(--font-heading)' }}

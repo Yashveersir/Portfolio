@@ -65,7 +65,7 @@ function ProjectCard({ project, index }) {
             }}
           />
 
-          <div className="p-6 sm:p-8 flex flex-col flex-1">
+          <div className="card-spacing-lg flex flex-col flex-1">
             {/* Featured badge */}
             {project.featured && (
               <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-400 mb-3">

@@ -332,6 +332,27 @@ body {
   padding: 0 1.5rem;
 }
 
+/* ====== CARD SPACING UTILITIES ====== */
+.card-spacing {
+  padding: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .card-spacing {
+    padding: 1.5rem;
+  }
+}
+
+.card-spacing-lg {
+  padding: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .card-spacing-lg {
+    padding: 1.75rem;
+  }
+}
+
 @media (max-width: 640px) {
   .section-title {
     font-size: 2rem;

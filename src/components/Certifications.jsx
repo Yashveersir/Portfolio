@@ -59,7 +59,7 @@ export default function Certifications() {
             <motion.div
               key={cert.title}
               variants={fadeIn('up', i * 0.04)}
-              className="glass rounded-2xl p-5 cursor-default group gradient-border relative overflow-hidden"
+              className="glass rounded-2xl card-spacing cursor-default group gradient-border relative overflow-hidden"
               whileHover={{
                 scale: 1.03,
                 boxShadow: `0 0 35px ${cert.color}20`,

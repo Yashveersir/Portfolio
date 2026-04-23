@@ -88,7 +88,7 @@ export default function Contact() {
                 href={info.href}
                 target={info.label === 'Email' || info.label === 'Phone' ? '_self' : '_blank'}
                 rel="noopener noreferrer"
-                className="glass rounded-xl p-5 flex items-center gap-4 no-underline group gradient-border cursor-pointer"
+                className="glass rounded-xl card-spacing flex items-center gap-4 no-underline group gradient-border cursor-pointer"
                 whileHover={{
                   scale: 1.02,
                   boxShadow: '0 0 25px rgba(99, 102, 241, 0.12)',
@@ -97,7 +97,7 @@ export default function Contact() {
                 <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-primary-light text-lg shrink-0 group-hover:scale-110 transition-transform">
                   {info.icon}
                 </div>
-                <div>
+                <div className="min-w-0 text-left">
                   <p className="text-text-dim text-xs font-medium uppercase tracking-wider mb-0.5">
                     {info.label}
                   </p>
@@ -120,7 +120,7 @@ export default function Contact() {
             <form
               ref={formRef}
               onSubmit={handleSubmit}
-              className="glass rounded-2xl p-8 neon-glow"
+              className="glass rounded-2xl card-spacing-lg neon-glow"
             >
               <div className="flex flex-col gap-5">
                 {/* Name */}
