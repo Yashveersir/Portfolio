@@ -51,8 +51,8 @@ export default function Contact() {
   return (
     <section id="contact" className="relative section-padding">
       {/* Background glows */}
-      <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full bg-primary/[0.05] blur-[120px]" />
-      <div className="absolute top-1/4 right-0 w-[300px] h-[300px] rounded-full bg-accent/[0.04] blur-[100px]" />
+      <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full bg-primary/[0.05] blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 right-0 w-[300px] h-[300px] rounded-full bg-accent/[0.04] blur-[100px] pointer-events-none" />
 
       <div className="container-custom relative z-10">
         {/* Section Header */}

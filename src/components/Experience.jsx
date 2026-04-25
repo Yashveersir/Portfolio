@@ -8,7 +8,7 @@ export default function Experience() {
   return (
     <section id="experience" className="relative section-padding">
       {/* Background glow */}
-      <div className="absolute top-1/3 right-0 w-[300px] h-[300px] rounded-full bg-secondary/[0.04] blur-[100px]" />
+      <div className="absolute top-1/3 right-0 w-[300px] h-[300px] rounded-full bg-secondary/[0.04] blur-[100px] pointer-events-none" />
 
       <div className="container-custom relative z-10">
         {/* Section Header */}

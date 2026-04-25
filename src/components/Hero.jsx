@@ -198,12 +198,12 @@ export default function Hero() {
               
               {/* Floating Accents */}
               <motion.div 
-                className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-gradient-to-br from-primary to-transparent opacity-40 blur-xl"
+                className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-gradient-to-br from-primary to-transparent opacity-40 blur-xl pointer-events-none"
                 animate={{ y: [0, -15, 0], scale: [1, 1.1, 1] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               />
               <motion.div 
-                className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-gradient-to-tr from-secondary to-transparent opacity-30 blur-2xl"
+                className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-gradient-to-tr from-secondary to-transparent opacity-30 blur-2xl pointer-events-none"
                 animate={{ y: [0, 20, 0], scale: [1, 1.2, 1] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
               />

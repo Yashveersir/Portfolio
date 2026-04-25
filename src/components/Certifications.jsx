@@ -67,7 +67,7 @@ export default function Certifications() {
             >
               {/* Glow circle */}
               <div
-                className="absolute -top-8 -right-8 w-20 h-20 rounded-full blur-[35px] opacity-15 group-hover:opacity-35 transition-opacity duration-500"
+                className="absolute -top-8 -right-8 w-20 h-20 rounded-full blur-[35px] opacity-15 group-hover:opacity-35 transition-opacity duration-500 pointer-events-none"
                 style={{ background: cert.color }}
               />
 

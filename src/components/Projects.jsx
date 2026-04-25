@@ -176,7 +176,7 @@ function ProjectCard({ project, index }) {
           </div>
 
           {/* Card Footer Actions */}
-          <div className="border-t border-white/10 px-5 py-4 sm:px-6 min-h-[84px] flex items-center">
+          <div className="relative z-20 border-t border-white/10 px-5 py-4 sm:px-6 min-h-[84px] flex items-center">
             <div className="flex gap-3 w-full">
               <a
                 href={project.github}
@@ -184,7 +184,8 @@ function ProjectCard({ project, index }) {
                 rel="noopener noreferrer"
                 className="btn-outline !py-2 !px-4 !text-xs flex-1 justify-center whitespace-nowrap"
               >
-                <FaGithub /> GitHub
+                <FaGithub className="relative z-10" /> 
+                <span className="relative z-10">GitHub</span>
               </a>
               <a
                 href={project.demo}
@@ -192,7 +193,7 @@ function ProjectCard({ project, index }) {
                 rel="noopener noreferrer"
                 className="btn-primary !py-2 !px-4 !text-xs flex-1 justify-center whitespace-nowrap"
               >
-                <span>Live Demo</span>
+                <span className="relative z-10">Live Demo</span>
                 <FaExternalLinkAlt className="relative z-10 text-[10px]" />
               </a>
             </div>
@@ -208,8 +209,8 @@ export default function Projects() {
   return (
     <section id="projects" className="relative section-padding">
       {/* Background glow */}
-      <div className="absolute top-1/2 left-0 w-[300px] h-[300px] rounded-full bg-primary/[0.04] blur-[100px]" />
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-secondary/[0.04] blur-[120px]" />
+      <div className="absolute top-1/2 left-0 w-[300px] h-[300px] rounded-full bg-primary/[0.04] blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-secondary/[0.04] blur-[120px] pointer-events-none" />
 
       <div className="container-custom relative z-10">
         {/* Section Header */}
