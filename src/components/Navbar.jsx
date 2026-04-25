@@ -27,7 +27,20 @@ export default function Navbar() {
 
   const handleClick = (id) => {
     setMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    
+    setTimeout(() => {
+      const element = document.getElementById(id);
+      if (element) {
+        const offset = 80;
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - offset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
   };
 
   return (
@@ -47,6 +60,7 @@ export default function Navbar() {
           whileHover={{ scale: 1.02 }}
           onClick={(e) => {
             e.preventDefault();
+            setMenuOpen(false);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         >
@@ -96,7 +110,7 @@ export default function Navbar() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden text-xl text-text bg-transparent border-none cursor-pointer p-2"
+          className="md:hidden text-xl text-text bg-transparent border-none cursor-pointer p-2 z-50"
           aria-label="Toggle menu"
         >
           {menuOpen ? <FaTimes /> : <FaBars />}
@@ -107,38 +121,58 @@ export default function Navbar() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            className="md:hidden glass-strong mt-2 mx-4 rounded-2xl overflow-hidden"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
+            className="fixed inset-0 top-[70px] z-40 md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <ul className="list-none m-0 p-4 flex flex-col gap-3">
-              {navLinks.map((link, i) => (
-                <motion.li
-                  key={link.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <button
-                    onClick={() => handleClick(link.id)}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium border-none cursor-pointer transition-all duration-200 ${
-                      activeSection === link.id
-                        ? 'bg-white/[0.08] text-white'
-                        : 'bg-transparent text-text-muted hover:text-white hover:bg-white/[0.04]'
-                    }`}
+            {/* Backdrop */}
+            <div 
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+              onClick={() => setMenuOpen(false)}
+            />
+            
+            {/* Content */}
+            <motion.div
+              className="relative glass-strong mx-4 mt-2 rounded-2xl overflow-hidden border border-white/10"
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <ul className="list-none m-0 p-4 flex flex-col gap-2">
+                {navLinks.map((link, i) => (
+                  <motion.li
+                    key={link.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
                   >
-                    {link.title}
-                  </button>
-                </motion.li>
-              ))}
-              <li className="mt-2">
-                <a href="/Yashveer-Singh-Resume.pdf" target="_blank" rel="noopener noreferrer" className="btn-primary w-full justify-center !text-sm">
-                  <span>View Resume</span>
-                </a>
-              </li>
-            </ul>
+                    <button
+                      onClick={() => handleClick(link.id)}
+                      className={`w-full text-left px-5 py-4 rounded-xl text-base font-semibold border-none cursor-pointer transition-all duration-200 ${
+                        activeSection === link.id
+                          ? 'bg-primary/10 text-primary-light'
+                          : 'bg-transparent text-text-muted hover:text-white hover:bg-white/[0.05]'
+                      }`}
+                    >
+                      {link.title}
+                    </button>
+                  </motion.li>
+                ))}
+                <li className="mt-4 pt-4 border-t border-white/10">
+                  <a 
+                    href="/Yashveer-Singh-Resume.pdf" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="btn-primary w-full justify-center !py-4 !text-base"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <span>View Resume</span>
+                  </a>
+                </li>
+              </ul>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

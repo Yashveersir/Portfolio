@@ -98,7 +98,7 @@ export const projects = [
     featured: true,
     color: '#22d3ee',
     images: [
-      '/project-images/green-valley-home.png',
+      '/project-images/taskflow-dashboard.png',
     ]
   },
   {
@@ -125,7 +125,7 @@ export const projects = [
     featured: true,
     color: '#a855f7',
     images: [
-      '/project-images/taskflow-dashboard.png',
+      '/project-images/green-valley-home.png',
     ]
   },
   {
