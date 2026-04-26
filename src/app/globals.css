@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-purple-400: #c084fc;
+  --color-purple-500: #a855f7;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-amber-500: #ff6400;
+  --color-violet-500: #7c6fff;
+}
+
+:root {
+  --bg: #05050f;
+  --bg-shift: #07071a;
+  --amber: #ff6400;
+  --cyan: #22d3ee;
+  --violet: #7c6fff;
+}
+
+* {
+  cursor: url("data:image/svg+xml;charset=utf-8,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='5.5' fill='%2322d3ee' opacity='0.3' /%3E%3Ccircle cx='12' cy='12' r='4' fill='%2322d3ee' /%3E%3C/svg%3E") 12 12, auto;
+}
+
+a, button, [role="button"], input, select, textarea {
+  cursor: url("data:image/svg+xml;charset=utf-8,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='8' fill='%2322d3ee' opacity='0.3' /%3E%3Ccircle cx='12' cy='12' r='6' fill='%2322d3ee' /%3E%3C/svg%3E") 12 12, pointer !important;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  color: #fff;
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Global text readability boost ──
+   Dark halo behind all text so it stays legible over canvas animations */
+p, h1, h2, h3, h4, h5, h6, span, li, label, a {
+  text-shadow: 0 1px 10px rgba(0,0,0,0.65), 0 0 28px rgba(0,0,0,0.4);
+}
+h1, h2, h3 {
+  text-shadow: 0 2px 20px rgba(0,0,0,0.85), 0 0 40px rgba(0,0,0,0.5);
+}
+
+/* ── Boost Tailwind white/N opacity classes for better contrast ── */
+.text-white\/15  { color: rgba(255,255,255,0.28) !important; }
+.text-white\/20  { color: rgba(255,255,255,0.35) !important; }
+.text-white\/25  { color: rgba(255,255,255,0.42) !important; }
+.text-white\/30  { color: rgba(255,255,255,0.50) !important; }
+.text-white\/35  { color: rgba(255,255,255,0.56) !important; }
+.text-white\/40  { color: rgba(255,255,255,0.62) !important; }
+.text-white\/45  { color: rgba(255,255,255,0.68) !important; }
+.text-white\/50  { color: rgba(255,255,255,0.74) !important; }
+.text-white\/55  { color: rgba(255,255,255,0.78) !important; }
+.text-white\/60  { color: rgba(255,255,255,0.82) !important; }
+.text-white\/65  { color: rgba(255,255,255,0.86) !important; }
+.text-white\/70  { color: rgba(255,255,255,0.90) !important; }
+.text-white\/80  { color: rgba(255,255,255,0.94) !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #05050f; }
+::-webkit-scrollbar-thumb { background: #22d3ee80; border-radius: 9px; }
+::-webkit-scrollbar-thumb:hover { background: #22d3ee; }
+
+/* Blueprint grid for skills section */
+.blueprint-grid {
+  background-image:
+    linear-gradient(rgba(34,211,238,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Dot grid for hero */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Slow-drift animation for dot grid */
+@keyframes drift-up {
+  from { background-position: 0 0; }
+  to { background-position: 0 -280px; }
+}
+.dot-grid {
+  animation: drift-up 20s linear infinite;
+}
+
+/* Plus sign rotation */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.plus-spin {
+  animation: spin-slow 12s linear infinite;
+  display: inline-block;
+}
+
+/* SVG line draw animation */
+@keyframes draw-line {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
+}
+.draw-line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-line 2s ease forwards 0.5s;
+}
+
+/* Radar pulse for "open to work" badge */
+@keyframes radar-ring {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(3); opacity: 0; }
+}
+.radar-ring {
+  animation: radar-ring 2s ease-out infinite;
+}
+.radar-ring-2 {
+  animation: radar-ring 2s ease-out infinite 1s;
+}
+
+/* Drop cap */
+.drop-cap::first-letter {
+  float: left;
+  font-size: 4rem;
+  line-height: 0.8;
+  font-weight: 900;
+  color: var(--amber);
+  margin-right: 0.1em;
+  margin-top: 0.05em;
+  font-family: var(--font-syne);
+}
+
+/* Perspective for 3D card flips */
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+/* Mobile: no cursor override */
+@media (pointer: coarse) {
+  * { cursor: auto !important; }
+  a, button, [role="button"], input, select, textarea { cursor: pointer !important; }
+}
+
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Sleek float card effect */
+.hover-float-card {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.3s ease;
+  will-change: transform;
+}
+.hover-float-card:hover {
+  transform: translateY(-8px) scale(1.015);
+  box-shadow: 0 20px 40px -10px rgba(34, 211, 238, 0.15), 0 0 30px -5px rgba(124, 111, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Scroll-triggered section reveal */
+@keyframes section-fade-up {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.section-reveal {
+  opacity: 0;
+  animation: section-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-timeline: view();
+  animation-range: entry 0% entry 35%;
+}
