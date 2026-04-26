@@ -196,13 +196,11 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/contact';
     try {
       const formData = new FormData(e.currentTarget);
       const data = Object.fromEntries(formData.entries());
-      console.log('[Contact] Posting to:', apiUrl);
 
-      const response = await fetch(apiUrl, {
+      const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -218,7 +216,7 @@ export default function Contact() {
         setSubmitStatus('error');
       }
     } catch (err) {
-      console.error('[Contact] Network/fetch error. Is server running at', apiUrl, err);
+      console.error('[Contact] Network/fetch error:', err);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
