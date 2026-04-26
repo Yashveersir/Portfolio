@@ -205,6 +205,7 @@ export default function Hero() {
                     fontFamily: 'var(--font-syne)', fontWeight: 200,
                     fontSize: 'clamp(2.4rem, 6vw, 5.5rem)', lineHeight: 1.0,
                     color: 'rgba(255,255,255,0.7)', letterSpacing: '-0.03em',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   I Build
@@ -223,6 +224,7 @@ export default function Hero() {
                     background: 'linear-gradient(135deg, #fff 30%, #22d3ee 100%)',
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                     paddingRight: '0.1em',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   Things
@@ -238,6 +240,7 @@ export default function Hero() {
                     fontFamily: 'var(--font-syne)', fontWeight: 200,
                     fontSize: 'clamp(1.8rem, 4.5vw, 4rem)', lineHeight: 1.1,
                     color: 'rgba(255,255,255,0.6)', letterSpacing: '-0.02em',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   That Live Online.

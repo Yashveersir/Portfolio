@@ -420,18 +420,29 @@ function CharSplitHeading({ text }: { text: string }) {
         letterSpacing: '-0.03em',
       }}
     >
-      {text.split('').map((char, i) => (
-        <motion.span
-          key={i}
-          variants={{
-            hidden: { y: -60, opacity: 0, rotate: -8 },
-            visible: { y: 0, opacity: 1, rotate: 0, transition: { type: 'spring', stiffness: 200, damping: 12, delay: i * 0.04 } }
-          }}
-          style={{ display: 'inline-block', minWidth: char === ' ' ? '0.3em' : undefined }}
-        >
-          {char}
-        </motion.span>
-      ))}
+      {text.split(' ').map((word, wIdx, words) => {
+        const prevChars = words.slice(0, wIdx).join('').length + wIdx;
+        return (
+          <span key={wIdx} className="inline-block mr-[0.3em] whitespace-nowrap">
+            {word.split('').map((char, cIdx) => {
+              const i = prevChars + cIdx;
+              return (
+                <motion.span
+                  key={cIdx}
+                  custom={i}
+                  variants={{
+                    hidden: { y: -60, opacity: 0, rotate: -8 },
+                    visible: { y: 0, opacity: 1, rotate: 0, transition: { type: 'spring', stiffness: 200, damping: 12, delay: i * 0.04 } }
+                  }}
+                  style={{ display: 'inline-block' }}
+                >
+                  {char}
+                </motion.span>
+              );
+            })}
+          </span>
+        );
+      })}
     </motion.h2>
   );
 }

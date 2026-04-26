@@ -104,6 +104,11 @@ export default function Navbar() {
             <a
               key={link.id}
               href={`#${link.id}`}
+              onClick={(e) => {
+                e.preventDefault();
+                const target = document.getElementById(link.id);
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="relative cursor-pointer"
               style={{ color: active === link.id ? '#22d3ee' : 'rgba(255,255,255,0.55)' }}
             >
@@ -145,14 +150,19 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-b border-white/5 bg-black/95 backdrop-blur-xl md:hidden"
+            className="absolute top-full left-0 w-full overflow-hidden border-b border-white/5 bg-black/95 backdrop-blur-xl md:hidden"
           >
             <div className="flex flex-col items-center gap-7 py-10">
               {navLinks.map((link) => (
                 <a
                   key={link.id}
                   href={`#${link.id}`}
-                  onClick={() => setOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOpen(false);
+                    const target = document.getElementById(link.id);
+                    if (target) target.scrollIntoView({ behavior: 'smooth' });
+                  }}
                   className="text-sm uppercase tracking-widest transition-colors cursor-pointer"
                   style={{
                     color: active === link.id ? '#22d3ee' : 'rgba(255,255,255,0.6)',
