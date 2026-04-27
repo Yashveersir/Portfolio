@@ -70,16 +70,15 @@ export default function Navbar() {
   // Removed custom scrollTo since Lenis handles hash navigation
 
   return (
-    <motion.nav
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeInOut' }}
+    <nav
       className="fixed top-0 z-50 w-full"
       style={{
         background: scrolled || open ? 'rgba(5,5,15,0.95)' : 'transparent',
-        backdropFilter: scrolled || open ? 'blur(12px)' : 'none',
-        borderBottom: scrolled || open ? '1px solid rgba(34,211,238,0.06)' : 'none',
-        transition: 'background 0.4s, border-color 0.4s',
+        backdropFilter: scrolled || open ? 'blur(12px)' : 'blur(0px)',
+        WebkitBackdropFilter: scrolled || open ? 'blur(12px)' : 'blur(0px)',
+        borderBottom: scrolled || open ? '1px solid rgba(34,211,238,0.06)' : '1px solid transparent',
+        transition: 'background 0.4s, border-color 0.4s, backdrop-filter 0.4s',
+        transform: 'translateZ(0)',
       }}
     >
       <div className="relative z-50 mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -191,6 +190,6 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </nav>
   );
 }
