@@ -71,18 +71,18 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
       className="fixed top-0 z-50 w-full"
       style={{
-        background: scrolled ? 'rgba(5,5,15,0.85)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(34,211,238,0.06)' : 'none',
+        background: scrolled || open ? 'rgba(5,5,15,0.95)' : 'transparent',
+        backdropFilter: scrolled || open ? 'blur(12px)' : 'none',
+        borderBottom: scrolled || open ? '1px solid rgba(34,211,238,0.06)' : 'none',
         transition: 'background 0.4s, border-color 0.4s',
       }}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <div className="relative z-50 mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Logo */}
         <a
           href="#hero"
@@ -104,10 +104,8 @@ export default function Navbar() {
             <a
               key={link.id}
               href={`#${link.id}`}
-              onClick={(e) => {
-                e.preventDefault();
-                const target = document.getElementById(link.id);
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
+              onClick={() => {
+                setOpen(false);
               }}
               className="relative cursor-pointer"
               style={{ color: active === link.id ? '#22d3ee' : 'rgba(255,255,255,0.55)' }}
@@ -136,10 +134,10 @@ export default function Navbar() {
         {/* Mobile toggle */}
         <button
           onClick={() => setOpen(!open)}
-          className="text-white md:hidden"
+          className="relative z-50 text-white md:hidden p-2 -mr-2"
           aria-label="Toggle menu"
         >
-          {open ? <X size={22} /> : <Menu size={22} />}
+          {open ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
@@ -147,21 +145,18 @@ export default function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-b border-white/5 bg-black/95 backdrop-blur-xl md:hidden"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute left-0 top-full w-full h-screen overflow-y-auto border-t border-white/5 bg-black/95 backdrop-blur-xl md:hidden"
           >
-            <div className="flex flex-col items-center gap-7 py-10">
+            <div className="flex flex-col items-center gap-7 py-12 pb-32">
               {navLinks.map((link) => (
                 <a
                   key={link.id}
                   href={`#${link.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     setOpen(false);
-                    const target = document.getElementById(link.id);
-                    if (target) target.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className="text-sm uppercase tracking-widest transition-colors cursor-pointer"
                   style={{

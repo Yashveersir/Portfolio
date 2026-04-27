@@ -11,11 +11,11 @@ function CharSplitHeading({ text }: { text: string }) {
   return (
     <h2
       ref={ref}
-      className="flex flex-wrap overflow-hidden"
+      className="flex overflow-hidden"
       style={{
         fontFamily: 'var(--font-syne)',
         fontWeight: 900,
-        fontSize: 'clamp(2.4rem, 5vw, 4rem)',
+        fontSize: 'clamp(1.8rem, 8vw, 4rem)',
         lineHeight: 1,
         letterSpacing: '-0.03em',
       }}
