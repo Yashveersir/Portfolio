@@ -27,14 +27,14 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Yashveer Singh | Full-Stack & AI Engineer',
-  description: 'Portfolio of Yashveer Singh — Full-Stack Developer specializing in MERN stack, Generative AI, and secure backend systems. Open to work.',
-  keywords: ['Yashveer Singh', 'Full-Stack Developer', 'MERN Stack', 'Generative AI', 'Portfolio', 'React', 'Node.js', 'Backend Engineer', 'Web Developer India'],
+  title: 'Yashveer Singh | Full-Stack & AI Engineer Portfolio',
+  description: 'Explore the portfolio of Yashveer Singh, a Full-Stack Developer specializing in MERN stack, Generative AI, and secure backend systems. Based in Burdwan, West Bengal, India.',
+  keywords: ['Yashveer Singh', 'Yashveer Singh Portfolio', 'Full-Stack Developer', 'MERN Stack Developer India', 'AI Engineer', 'Generative AI Specialist', 'Burdwan Developer', 'Next.js Developer'],
   authors: [{ name: 'Yashveer Singh' }],
   creator: 'Yashveer Singh',
   metadataBase: new URL('https://yashveersingh.xyz'),
   alternates: {
-    canonical: '/',
+    canonical: 'https://yashveersingh.xyz',
   },
   icons: {
     icon: '/favicon.ico',
@@ -94,10 +94,21 @@ export default function RootLayout({
               "name": "Yashveer Singh",
               "url": "https://yashveersingh.xyz",
               "jobTitle": "Full-Stack & AI Engineer",
-              "image": "https://yashveersingh.xyz/myImage.jpeg",
+              "image": {
+                "@type": "ImageObject",
+                "url": "https://yashveersingh.xyz/myImage.jpeg",
+                "name": "Yashveer Singh"
+              },
+              "description": "Full-Stack Developer specializing in MERN stack, Generative AI, and secure backend systems.",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Burdwan",
+                "addressRegion": "West Bengal",
+                "addressCountry": "India"
+              },
               "sameAs": [
-                "https://github.com/yashveer-singh",
-                "https://www.linkedin.com/in/yashveer-singh-1b1a1b1b1",
+                "https://github.com/Yashveersir",
+                "https://www.linkedin.com/in/yashveer-singh-41bb36280"
               ],
               "knowsAbout": [
                 "Full-Stack Development",
@@ -105,7 +116,9 @@ export default function RootLayout({
                 "Generative AI",
                 "Backend Systems",
                 "React",
-                "Node.js"
+                "Node.js",
+                "JavaScript",
+                "TypeScript"
               ]
             })
           }}

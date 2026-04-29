@@ -455,7 +455,7 @@ export default function About() {
                 / ABOUT
               </span>
               <div>
-                <CharSplitHeading text="About Me" />
+                <CharSplitHeading text="About Yashveer" />
               </div>
             </div>
 
