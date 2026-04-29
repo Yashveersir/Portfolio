@@ -326,10 +326,10 @@ export default function Hero() {
               
               <a
                 href="#contact"
-                className="group relative px-10 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-theme-dim border border-theme overflow-hidden hover:text-theme transition-colors"
+                className="group relative px-10 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-theme border border-theme overflow-hidden hover:text-[var(--cyan)] transition-colors"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
-                <div className="absolute inset-0 bg-theme-card opacity-5 -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-[var(--cyan)]/5 -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
                 <span className="relative z-10">Contact</span>
               </a>
 
@@ -346,11 +346,11 @@ export default function Hero() {
                   document.body.removeChild(a);
                   URL.revokeObjectURL(url);
                 }}
-                className="group relative px-10 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-violet-500 border border-theme overflow-hidden hover:text-violet-400 transition-colors cursor-pointer"
+                className="group relative px-10 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--violet)] border border-[var(--violet)]/30 overflow-hidden hover:text-[var(--violet)] hover:border-[var(--violet)] transition-all cursor-pointer shadow-[0_0_15px_rgba(124,111,255,0.1)] hover:shadow-[0_0_20px_rgba(124,111,255,0.2)]"
                 style={{ fontFamily: 'var(--font-mono)' }}
                 aria-label="Download my resume"
               >
-                <div className="absolute inset-0 bg-violet-500/5 -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-[var(--violet)]/5 -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
                 <span className="relative z-10">↓ Resume</span>
               </button>
             </motion.div>
