@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://yashveersingh.xyz/sitemap.xml
