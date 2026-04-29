@@ -174,10 +174,10 @@ export default function Navbar() {
             href="/Yashveer-Singh-Resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden md:block group relative px-4 py-2 overflow-hidden border border-cyan-400/40 text-[9px] font-bold uppercase tracking-[0.2em] text-cyan-400 transition-all hover:text-black"
+            className="hidden md:block group relative px-4 py-2 overflow-hidden border border-amber-500/40 text-[9px] font-bold uppercase tracking-[0.2em] text-amber-500 transition-all hover:text-black"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
-            <div className="absolute inset-0 bg-cyan-400 -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+            <div className="absolute inset-0 bg-amber-500 -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
             <span className="relative z-10">Resume</span>
           </a>
 
@@ -233,7 +233,7 @@ export default function Navbar() {
                 href="/Yashveer-Singh-Resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 border border-cyan-400/40 px-10 py-4 text-[11px] font-bold uppercase tracking-widest text-cyan-400 rounded-full hover:bg-cyan-400/10 transition-colors"
+                className="mt-4 border border-amber-500/40 px-10 py-4 text-[11px] font-bold uppercase tracking-widest text-amber-500 rounded-full hover:bg-amber-500/10 transition-colors"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 Resume

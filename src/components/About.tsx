@@ -454,8 +454,13 @@ export default function About() {
               >
                 / ABOUT
               </span>
-              <div>
-                <CharSplitHeading text="About Yashveer" />
+              <div className="flex flex-col gap-0">
+                <CharSplitHeading text="IDENTITY" />
+                <CharSplitHeading 
+                  text="//YASHVEER" 
+                  fontSize="clamp(1.8rem, 4vw, 3rem)" 
+                  className="text-theme-dim -mt-2"
+                />
               </div>
             </div>
 

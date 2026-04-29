@@ -7,7 +7,7 @@ import {
 
 /* ========== NAV LINKS ========== */
 export const navLinks = [
-  { id: 'about', title: 'About' },
+  { id: 'about', title: 'Identity' },
   { id: 'skills', title: 'Skills' },
   { id: 'projects', title: 'Projects' },
   { id: 'certifications', title: 'Certifications' },
