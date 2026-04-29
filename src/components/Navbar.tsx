@@ -101,7 +101,10 @@ export default function Navbar() {
   // Removed custom scrollTo since Lenis handles hash navigation
 
   return (
-    <nav
+    <motion.nav
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.8 }}
       className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-in-out ${
         scrolled || open ? 'w-[90%] md:w-auto' : 'w-full px-6'
       }`}
@@ -234,6 +237,6 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </motion.nav>
   );
 }

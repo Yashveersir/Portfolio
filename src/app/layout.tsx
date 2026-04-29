@@ -5,6 +5,7 @@ import CustomCursor from '@/components/CustomCursor';
 import ScrollProgress from '@/components/ScrollProgress';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import PageLoader from '@/components/PageLoader';
 import { Analytics } from "@vercel/analytics/next";
 
 const syne = Syne({
@@ -110,6 +111,7 @@ export default function RootLayout({
           }}
         />
         <div className="noise-overlay" />
+        <PageLoader />
         <CustomCursor />
         <ScrollProgress />
         <Navbar />
