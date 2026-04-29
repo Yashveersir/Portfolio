@@ -348,15 +348,25 @@ export default function Hero() {
               >
                 Let&apos;s Talk
               </a>
-              <a
-                href="/Yashveer-Singh-Resume.pdf"
-                download="Yashveer-Singh-Resume.pdf"
+              <button
+                onClick={async () => {
+                  const res = await fetch('/Yashveer-Singh-Resume.pdf');
+                  const blob = await res.blob();
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'Yashveer-Singh-Resume.pdf';
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                }}
                 className="border border-violet-500/40 px-8 py-3 text-sm font-bold uppercase tracking-widest text-violet-400/80 transition-all hover:border-violet-400 hover:text-violet-300 hover:bg-violet-500/5 cursor-pointer"
                 style={{ fontFamily: 'var(--font-mono)' }}
                 aria-label="Download my resume"
               >
                 ↓ Resume
-              </a>
+              </button>
             </motion.div>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="mt-12 flex gap-8">
