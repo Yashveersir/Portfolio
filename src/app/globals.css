@@ -14,17 +14,34 @@
 :root {
   --bg: #05050f;
   --bg-shift: #07071a;
+  --text: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.5);
+  --text-muted: rgba(255, 255, 255, 0.3);
   --amber: #ff6400;
   --cyan: #22d3ee;
   --violet: #7c6fff;
+  --card-bg: rgba(10, 10, 20, 0.6);
+  --card-border: rgba(255, 255, 255, 0.06);
+  --selection: rgba(34, 211, 238, 0.3);
+}
+
+[data-theme='light'] {
+  --bg: #f8fafc;
+  --bg-shift: #f1f5f9;
+  --text: #0f172a;
+  --text-dim: rgba(15, 23, 42, 0.6);
+  --text-muted: rgba(15, 23, 42, 0.4);
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(15, 23, 42, 0.1);
+  --selection: rgba(34, 211, 238, 0.2);
 }
 
 * {
   cursor: url("data:image/svg+xml;charset=utf-8,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='5.5' fill='%2322d3ee' opacity='0.3' /%3E%3Ccircle cx='12' cy='12' r='4' fill='%2322d3ee' /%3E%3C/svg%3E") 12 12, auto;
 }
 
-a, button, [role="button"], input, select, textarea {
-  cursor: url("data:image/svg+xml;charset=utf-8,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='8' fill='%2322d3ee' opacity='0.3' /%3E%3Ccircle cx='12' cy='12' r='6' fill='%2322d3ee' /%3E%3C/svg%3E") 12 12, pointer !important;
+.transition-theme {
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html {
@@ -32,55 +49,62 @@ html {
 }
 
 body {
-  color: #fff;
+  color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/* ── Global text readability boost ──
-   Subtle halo for legibility over animations.
-   Reduced spread and blur to improve scroll performance. */
-p, h1, h2, h3, h4, h5, h6, span, li, label, a {
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-}
-h1, h2, h3 {
-  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+::selection {
+  background: var(--selection);
 }
 
-/* ── Boost Tailwind white/N opacity classes for better contrast ── */
-.text-white\/15  { color: rgba(255,255,255,0.28) !important; }
-.text-white\/20  { color: rgba(255,255,255,0.35) !important; }
-.text-white\/25  { color: rgba(255,255,255,0.42) !important; }
-.text-white\/30  { color: rgba(255,255,255,0.50) !important; }
-.text-white\/35  { color: rgba(255,255,255,0.56) !important; }
-.text-white\/40  { color: rgba(255,255,255,0.62) !important; }
-.text-white\/45  { color: rgba(255,255,255,0.68) !important; }
-.text-white\/50  { color: rgba(255,255,255,0.74) !important; }
-.text-white\/55  { color: rgba(255,255,255,0.78) !important; }
-.text-white\/60  { color: rgba(255,255,255,0.82) !important; }
-.text-white\/65  { color: rgba(255,255,255,0.86) !important; }
-.text-white\/70  { color: rgba(255,255,255,0.90) !important; }
-.text-white\/80  { color: rgba(255,255,255,0.94) !important; }
+/* ── Theme-aware opacity classes (Utility) ── */
+.text-theme { color: var(--text); }
+.text-theme-dim { color: var(--text-dim); }
+.text-theme-muted { color: var(--text-muted); }
+.bg-theme-card { background-color: var(--card-bg); }
+.border-theme { border-color: var(--card-border); }
+
+/* ── Global text readability boost ── */
+h1, h2, h3, h4, h5, h6, .text-glow {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+[data-theme='dark'] h1, 
+[data-theme='dark'] h2, 
+[data-theme='dark'] h3 {
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* ── Theme-aware opacity classes ── */
+.text-theme-15 { color: color-mix(in srgb, var(--text), transparent 85%); }
+.text-theme-20 { color: color-mix(in srgb, var(--text), transparent 80%); }
+.text-theme-30 { color: color-mix(in srgb, var(--text), transparent 70%); }
+.text-theme-40 { color: color-mix(in srgb, var(--text), transparent 60%); }
+.text-theme-50 { color: color-mix(in srgb, var(--text), transparent 50%); }
+.text-theme-60 { color: color-mix(in srgb, var(--text), transparent 40%); }
+.text-theme-70 { color: color-mix(in srgb, var(--text), transparent 30%); }
+.text-theme-80 { color: color-mix(in srgb, var(--text), transparent 20%); }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #05050f; }
-::-webkit-scrollbar-thumb { background: #22d3ee80; border-radius: 9px; }
-::-webkit-scrollbar-thumb:hover { background: #22d3ee; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--cyan), transparent 50%); border-radius: 9px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
 
 /* Blueprint grid for skills section */
 .blueprint-grid {
   background-image:
-    linear-gradient(rgba(34,211,238,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34,211,238,0.04) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--cyan), transparent 96%) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--cyan), transparent 96%) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 /* Dot grid for hero */
 .dot-grid {
-  background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--text), transparent 92%) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
@@ -156,22 +180,90 @@ h1, h2, h3 {
 /* Styled scrollbar for certifications */
 .cert-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(34, 211, 238, 0.3) rgba(255, 255, 255, 0.03);
+  scrollbar-color: color-mix(in srgb, var(--cyan), transparent 70%) color-mix(in srgb, var(--text), transparent 97%);
 }
 .cert-scrollbar::-webkit-scrollbar {
   height: 6px;
 }
 .cert-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in srgb, var(--text), transparent 97%);
   border-radius: 3px;
 }
 .cert-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(34, 211, 238, 0.25);
+  background: color-mix(in srgb, var(--cyan), transparent 75%);
   border-radius: 3px;
   transition: background 0.3s;
 }
 .cert-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 211, 238, 0.5);
+  background: color-mix(in srgb, var(--cyan), transparent 50%);
+}
+
+/* ── Pixel border utilities ── */
+.pixel-border {
+  /* position: relative; Removed to avoid overriding fixed position */
+}
+.pixel-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(90deg, var(--cyan) 25%, transparent 25%, transparent 75%, var(--cyan) 75%) 0 0 / 100% 1px,
+              linear-gradient(90deg, var(--cyan) 25%, transparent 25%, transparent 75%, var(--cyan) 75%) 0 100% / 100% 1px,
+              linear-gradient(0deg, var(--cyan) 25%, transparent 25%, transparent 75%, var(--cyan) 75%) 0 0 / 1px 100%,
+              linear-gradient(0deg, var(--cyan) 25%, transparent 25%, transparent 75%, var(--cyan) 75%) 100% 0 / 1px 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+  z-index: -1; /* Ensure it stays behind content if needed, but inset -1px should be fine */
+}
+.pixel-border:hover::before {
+  opacity: 0.6;
+}
+
+/* ── Scanline effect ── */
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+.scanline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    transparent 50%,
+    rgba(34, 211, 238, 0.05) 50%,
+    rgba(34, 211, 238, 0.05)
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ── Noise texture ── */
+.noise-overlay {
+  position: fixed;
+  inset: -200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
+  animation: noise-move 8s steps(10) infinite;
+}
+
+@keyframes noise-move {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -5%); }
+  20% { transform: translate(-10%, 5%); }
+  30% { transform: translate(5%, -10%); }
+  40% { transform: translate(-5%, 15%); }
+  50% { transform: translate(-10%, 5%); }
+  60% { transform: translate(15%, 0); }
+  70% { transform: translate(0, 10%); }
+  80% { transform: translate(-15%, 0); }
+  90% { transform: translate(10%, 5%); }
+  100% { transform: translate(0, 0); }
 }
 
 /* Sleek float card effect */
@@ -181,6 +273,6 @@ h1, h2, h3 {
 }
 .hover-float-card:hover {
   transform: translateY(-8px) scale(1.015);
-  box-shadow: 0 20px 40px -10px rgba(34, 211, 238, 0.15), 0 0 30px -5px rgba(124, 111, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 40px -10px color-mix(in srgb, var(--cyan), transparent 85%), 0 0 30px -5px color-mix(in srgb, var(--violet), transparent 90%);
+  border-color: color-mix(in srgb, var(--text), transparent 85%);
 }

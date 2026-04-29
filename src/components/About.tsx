@@ -5,11 +5,10 @@ import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'fra
 import CharSplitHeading from './CharSplitHeading';
 
 const BIO_WORDS = [
-  'Computer', 'Science', 'Engineering', 'student', 'with', '8.6', 'CGPA,',
-  'specializing', 'in', 'MERN', 'stack', 'and', 'Generative', 'AI.',
-  'Experienced', 'in', 'building', 'secure', 'REST', 'APIs,', 'scalable',
-  'applications,', 'and', 'integrating', 'AI', 'into', 'modern',
-  'web', 'architecture.',
+  'I', 'am', 'a', 'Software', 'Engineer', 'and', 'Designer', 'dedicated', 'to',
+  'crafting', 'high-performance', 'web', 'experiences.', 'My', 'work', 'merges',
+  'technical', 'precision', 'with', 'minimalist', 'aesthetics,', 'specializing',
+  'in', 'full-stack', 'systems', 'and', 'Generative', 'AI', 'integration.',
 ];
 
 // Hand-drawn SVG underline for "Generative AI"
@@ -34,20 +33,25 @@ function HandUnderline() {
 }
 
 function WordReveal() {
+  const [mounted, setMounted] = useState(false);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-10% 0px -10% 0px' });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <motion.p
       ref={ref}
       initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      className="drop-cap text-lg md:text-xl leading-relaxed text-white/85 font-light"
+      animate={mounted && isInView ? "visible" : "hidden"}
+      className="drop-cap text-lg md:text-xl leading-relaxed text-theme-dim font-light"
       style={{ maxWidth: '520px' }}
     >
       {BIO_WORDS.map((word, i) => {
         // Mark "Generative AI" words for underline
-        const isHighlight = i === 12 || i === 13;
+        const isHighlight = i === 26 || i === 27;
         return (
           <motion.span
             key={i}
@@ -59,7 +63,7 @@ function WordReveal() {
             style={{ marginRight: '0.35em' }}
           >
             {word}
-            {isHighlight && i === 13 && <HandUnderline />}
+            {isHighlight && i === 27 && <HandUnderline />}
           </motion.span>
         );
       })}
@@ -173,11 +177,12 @@ function NeuralBg() {
       ctx.fillStyle = o2; ctx.fillRect(0, 0, w, h);
       ctx.globalCompositeOperation = 'source-over';
 
-      // ── Dot grid — slightly brighter ──
+      // ── Dot grid — theme aware ──
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
       const gs = 55;
       const gox = ((mx * 14) % gs + gs) % gs;
       const goy = ((my * 14) % gs + gs) % gs;
-      ctx.fillStyle = 'rgba(255,255,255,0.035)';
+      ctx.fillStyle = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.035)';
       for (let gx = gox - gs; gx < w + gs; gx += gs) {
         for (let gy = goy - gs; gy < h + gs; gy += gs) {
           ctx.beginPath(); ctx.arc(gx, gy, 0.9, 0, Math.PI * 2); ctx.fill();
@@ -306,9 +311,14 @@ function NeuralBg() {
 }
 
 function Terminal() {
+  const [mounted, setMounted] = useState(false);
   const terminalRef = useRef<HTMLDivElement>(null);
   const isTerminalInView = useInView(terminalRef, { once: true, margin: '-50px' });
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const copyEmail = () => {
     navigator.clipboard.writeText('singhyash9631@gmail.com');
@@ -320,7 +330,7 @@ function Terminal() {
     <motion.div
       ref={terminalRef}
       initial="hidden"
-      animate={isTerminalInView ? "visible" : "hidden"}
+      animate={mounted && isTerminalInView ? "visible" : "hidden"}
       variants={{
         hidden: { opacity: 0, x: 40 },
         visible: { 
@@ -333,15 +343,15 @@ function Terminal() {
           }
         }
       }}
-      className="group relative rounded-xl border border-white/8 bg-[#0a0a14]/80 backdrop-blur-xl overflow-hidden shadow-2xl"
+      className="group relative rounded-xl border border-theme bg-theme-card backdrop-blur-xl overflow-hidden shadow-2xl"
     >
       {/* Window bar */}
-      <div className="flex items-center gap-1.5 border-b border-white/5 bg-white/3 px-4 py-3">
+      <div className="flex items-center gap-1.5 border-b border-theme bg-theme-card px-4 py-3">
         <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
         <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
         <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
         <span
-          className="ml-auto text-[10px] text-white/20"
+          className="ml-auto text-[10px] text-theme-muted"
           style={{ fontFamily: 'var(--font-mono)' }}
         >
           yashveer.ts
@@ -349,7 +359,7 @@ function Terminal() {
       </div>
 
       <div className="p-6" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', lineHeight: 1.8 }}>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}><span className="text-[#c084fc]">const</span> <span className="text-[#60a5fa]">developer</span> <span className="text-white/50">=</span> {'{'}</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}><span className="text-[#c084fc]">const</span> <span className="text-[#60a5fa]">developer</span> <span className="text-theme-muted">=</span> {'{'}</motion.p>
         <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">name:</span> <span className="text-[#fbbf24]">&apos;Yashveer Singh&apos;</span>,</motion.p>
         <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">role:</span> <span className="text-[#fbbf24]">&apos;Full-Stack &amp; AI Engineer&apos;</span>,</motion.p>
         <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">location:</span> <span className="text-[#fbbf24]">&apos;Burdwan, WB, India&apos;</span>,</motion.p>
@@ -357,7 +367,7 @@ function Terminal() {
         <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">stack:</span> [<span className="text-[#22d3ee]">&apos;React&apos;</span>, <span className="text-[#22d3ee]">&apos;Node&apos;</span>, <span className="text-[#22d3ee]">&apos;AI&apos;</span>],</motion.p>
         <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">openToWork:</span> <span className="text-[#c084fc]">true</span>,</motion.p>
         <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>{'}'}</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="mt-3 text-white/20 animate-pulse">▌</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="mt-3 text-theme-muted animate-pulse">▌</motion.p>
       </div>
 
       {/* Hover Copy Button */}
@@ -369,7 +379,7 @@ function Terminal() {
         >
           <button
             onClick={copyEmail}
-            className="flex items-center gap-2 px-3 py-1.5 border border-white/10 bg-white/5 backdrop-blur hover:bg-white/10 transition-colors text-[10px] uppercase tracking-widest text-white/60"
+            className="flex items-center gap-2 px-3 py-1.5 border border-theme bg-theme-card backdrop-blur hover:bg-cyan-400/10 transition-colors text-[10px] uppercase tracking-widest text-theme-dim"
             style={{ fontFamily: 'var(--font-mono)' }}
             aria-label="Copy email address"
           >
@@ -382,12 +392,16 @@ function Terminal() {
 }
 
 export default function About() {
+  const [mounted, setMounted] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const locationRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '6%']);
 
   const isStatsInView = useInView(statsRef, { once: true, margin: '-50px' });
   const isLocationInView = useInView(locationRef, { once: true, margin: '-50px' });
@@ -435,7 +449,7 @@ export default function About() {
             {/* Rotated section label */}
             <div className="flex items-center gap-6 mb-10">
               <span
-                className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-white/30 -rotate-90 origin-left whitespace-nowrap"
+                className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-theme-muted -rotate-90 origin-left whitespace-nowrap"
                 style={{ fontFamily: 'var(--font-mono)', marginTop: 24 }}
               >
                 / ABOUT
@@ -447,24 +461,23 @@ export default function About() {
 
             <WordReveal />
 
-            {/* Stats grid */}
-            <div ref={statsRef} className="grid grid-cols-2 gap-4 mt-10">
+            <div ref={statsRef} className="grid grid-cols-2 gap-4 mt-12">
               {STATS.map((s, i) => (
                 <motion.div
                   key={s.label}
-                  initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
-                  animate={isStatsInView ? { opacity: 1, x: 0 } : { opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={mounted && isStatsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                   transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="group p-5 border border-white/5 bg-white/3 hover:bg-white/6 hover:border-white/10 transition-all cursor-default"
-                  style={{ borderLeft: `2px solid ${s.color}40` }}
+                  className="group relative p-4 sm:p-6 border border-theme bg-theme-shift/30 hover:bg-cyan-400/[0.03] transition-all cursor-default overflow-hidden"
                 >
+                  <div className="absolute top-0 left-0 w-1 h-full bg-cyan-400/20 group-hover:bg-cyan-400 transition-colors" />
                   <p
-                    className="text-3xl font-black mb-1 group-hover:scale-110 origin-left transition-transform duration-300"
-                    style={{ color: s.color, fontFamily: 'var(--font-syne)' }}
+                    className="text-3xl font-black mb-1 text-theme group-hover:scale-105 origin-left transition-transform duration-300"
+                    style={{ fontFamily: 'var(--font-syne)' }}
                   >
                     {s.value}
                   </p>
-                  <p className="text-xs text-white/60 uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)' }}>
+                  <p className="text-[10px] text-theme-muted uppercase tracking-[0.2em] font-bold" style={{ fontFamily: 'var(--font-mono)' }}>
                     {s.label}
                   </p>
                 </motion.div>
@@ -486,7 +499,7 @@ export default function About() {
             >
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               <p
-                className="text-xs text-white/30 uppercase tracking-widest"
+                className="text-xs text-theme-muted uppercase tracking-widest"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 Burdwan, West Bengal, India · Remote-friendly

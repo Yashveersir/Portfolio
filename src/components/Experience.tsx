@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useTransform } from 'framer-motion';
 import { experiences } from '@/lib/constants';
 import { useMousePosition } from '@/hooks/useMousePosition';
 import CharSplitHeading from './CharSplitHeading';
@@ -43,64 +43,61 @@ function PathFlowBg() {
     let paths: Path[] = [];
     const PALETTE: [number,number,number][] = [[34,211,238],[124,111,255],[168,85,247]];
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = canvas.parentElement?.clientHeight || window.innerHeight;
-      w = canvas.width; h = canvas.height;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = (canvas.parentElement?.clientHeight || window.innerHeight) * dpr;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${canvas.parentElement?.clientHeight || window.innerHeight}px`;
+      ctx.scale(dpr, dpr);
+      w = window.innerWidth; h = canvas.parentElement?.clientHeight || window.innerHeight;
+      
       paths = [];
-      const n = Math.floor(w / 65);
+      const n = Math.floor(w / 100); // Fewer paths
       for (let i = 0; i < n; i++) {
-        paths.push({ x: (i/n)*w + Math.random()*40, speed: 0.7+Math.random()*1.2, pulseY: Math.random()*h,
-          color: PALETTE[Math.floor(Math.random()*PALETTE.length)], alpha: 0.22+Math.random()*0.28,
-          length: 90+Math.random()*120, width: 1+Math.random()*1.5 });
+        paths.push({ x: (i/n)*w + Math.random()*40, speed: 0.5+Math.random()*0.8, pulseY: Math.random()*h,
+          color: PALETTE[Math.floor(Math.random()*PALETTE.length)], alpha: 0.15+Math.random()*0.2,
+          length: 70+Math.random()*100, width: 1 });
       }
     };
     window.addEventListener('resize', resize); resize();
-    let time = 0;
     const draw = () => {
-      time += 0.004;
       ctx.clearRect(0, 0, w, h);
-      const breath = Math.sin(time * 1.1) * 0.5 + 0.5;
-      ctx.globalCompositeOperation = 'screen';
-      [[w*0.15,h*0.4,320,'34,211,238',0.05+breath*0.03],[w*0.85,h*0.6,280,'124,111,255',0.045+breath*0.025]].forEach(([cx,cy,r,col,a]) => {
-        const g = ctx.createRadialGradient(cx as number,cy as number,0,cx as number,cy as number,r as number);
-        g.addColorStop(0,`rgba(${col},${a})`); g.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-      });
-      ctx.globalCompositeOperation = 'source-over';
+      
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      
+      // Draw grid only once or simplified
       ctx.lineWidth = 0.5;
       for (let i = 0; i <= 6; i++) {
         const gy = (h/6)*i;
-        ctx.strokeStyle = `rgba(34,211,238,${0.03+(i%2===0?0.012:0)})`;
+        ctx.strokeStyle = isLight ? `rgba(34,211,238,0.015)` : `rgba(34,211,238,0.025)`;
         ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke();
       }
-      const {x:mx,y:my} = mouseRef.current;
-      if (mx>0) {
-        const mg = ctx.createRadialGradient(mx,my,0,mx,my,250);
-        mg.addColorStop(0,'rgba(34,211,238,0.06)'); mg.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.fillStyle=mg; ctx.fillRect(0,0,w,h);
-      }
+
       paths.forEach(p => {
         const [r,g,b]=p.color;
+        
+        // Background line
         ctx.beginPath(); ctx.moveTo(p.x,0); ctx.lineTo(p.x,h);
-        ctx.strokeStyle=`rgba(${r},${g},${b},0.03)`; ctx.lineWidth=1; ctx.stroke();
+        ctx.strokeStyle=`rgba(${r},${g},${b},0.02)`; ctx.lineWidth=1; ctx.stroke();
+        
         p.pulseY += p.speed;
-        if (p.pulseY > h+p.length) { p.pulseY=-p.length; p.x=Math.random()*w; p.speed=0.7+Math.random()*1.2; p.color=PALETTE[Math.floor(Math.random()*3)]; }
+        if (p.pulseY > h+p.length) { p.pulseY=-p.length; p.x=Math.random()*w; }
+        
         const py0=p.pulseY-p.length, py1=p.pulseY+p.length;
+        
+        // Simplified gradient pulse
+        ctx.beginPath(); ctx.moveTo(p.x,Math.max(0,py0)); ctx.lineTo(p.x,Math.min(h,py1));
         const gr=ctx.createLinearGradient(0,py0,0,py1);
         gr.addColorStop(0,`rgba(${r},${g},${b},0)`);
-        gr.addColorStop(0.45,`rgba(${r},${g},${b},${p.alpha*0.5})`);
         gr.addColorStop(0.5,`rgba(${r},${g},${b},${p.alpha})`);
-        gr.addColorStop(0.55,`rgba(${r},${g},${b},${p.alpha*0.5})`);
         gr.addColorStop(1,`rgba(${r},${g},${b},0)`);
-        ctx.beginPath(); ctx.moveTo(p.x,Math.max(0,py0)); ctx.lineTo(p.x,Math.min(h,py1));
         ctx.strokeStyle=gr; ctx.lineWidth=p.width; ctx.stroke();
-        const hg=ctx.createRadialGradient(p.x,p.pulseY,0,p.x,p.pulseY,18);
-        hg.addColorStop(0,`rgba(${r},${g},${b},${p.alpha*0.6})`); hg.addColorStop(1,`rgba(${r},${g},${b},0)`);
-        ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(p.x,p.pulseY,18,0,Math.PI*2); ctx.fill();
-        if (Math.abs(p.pulseY%55-27)<1.8) {
-          ctx.strokeStyle=`rgba(${r},${g},${b},0.5)`; ctx.lineWidth=1.2;
-          ctx.beginPath(); ctx.moveTo(p.x-5,p.pulseY); ctx.lineTo(p.x+5,p.pulseY); ctx.stroke();
-        }
+
+        // Smaller glow
+        const glowR = 12;
+        const hg=ctx.createRadialGradient(p.x,p.pulseY,0,p.x,p.pulseY,glowR);
+        hg.addColorStop(0,`rgba(${r},${g},${b},${p.alpha*0.4})`); hg.addColorStop(1,`rgba(${r},${g},${b},0)`);
+        ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(p.x,p.pulseY,glowR,0,Math.PI*2); ctx.fill();
       });
       animationFrameId = requestAnimationFrame(draw);
     };
@@ -120,13 +117,12 @@ export default function Experience() {
     <section
       id="experience"
       className="relative py-28 md:py-40 overflow-hidden"
-      style={{ background: '#030409' }}
     >
       <PathFlowBg />
       {/* Corner bracket decoration */}
       <div
-        className="pointer-events-none absolute bottom-12 left-6 select-none text-white/[0.025]"
-        style={{ fontFamily: 'var(--font-syne)', fontWeight: 900, fontSize: '12rem', lineHeight: 1 }}
+        className="pointer-events-none absolute bottom-12 left-6 select-none text-theme"
+        style={{ fontFamily: 'var(--font-syne)', fontWeight: 900, fontSize: '12rem', lineHeight: 1, opacity: 0.03 }}
       >
         {'{'}
       </div>
@@ -134,14 +130,14 @@ export default function Experience() {
       <div className="mx-auto max-w-7xl px-6 relative z-10">
         <div className="flex items-start gap-6 mb-16">
           <span
-            className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-white/25 -rotate-90 origin-left whitespace-nowrap pt-8"
+            className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-theme-muted -rotate-90 origin-left whitespace-nowrap pt-8"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
             / EXP
           </span>
           <div>
             <CharSplitHeading text="Experience" />
-            <p className="mt-3 text-sm text-white/35 max-w-md" style={{ fontFamily: 'var(--font-mono)' }}>
+            <p className="mt-3 text-sm text-theme-muted max-w-md" style={{ fontFamily: 'var(--font-mono)' }}>
               Work, community, and things that actually happened.
             </p>
           </div>
@@ -170,10 +166,16 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '-60px' });
-  const { mousePos, handleMouseMove } = useMousePosition(ref);
+  const { mouseX, mouseY, handleMouseMove } = useMousePosition(ref);
 
   const isEven = index % 2 === 0;
   const isOngoing = exp.date.toLowerCase().includes('ongoing');
+
+  // Motion values for radial gradient
+  const background = useTransform(
+    [mouseX, mouseY],
+    ([latestX, latestY]) => `radial-gradient(400px circle at ${latestX}px ${latestY}px, ${exp.color}08, transparent 40%)`
+  );
 
   return (
     <motion.div
@@ -209,35 +211,47 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
         <div
           ref={ref}
           onMouseMove={handleMouseMove}
-          className="bg-[#0a0a14]/60 backdrop-blur-xl p-7 relative overflow-hidden transition-all hover-float-card border border-white/6 group-hover:border-white/15"
+          className="bg-theme-card backdrop-blur-xl p-8 relative overflow-hidden transition-all border border-theme hover:border-cyan-400/30 group/expcard"
+          style={{ willChange: 'transform' }}
         >
+          {/* HUD details: Corner markers */}
+          <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-theme opacity-30" />
+          <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-theme opacity-30" />
+          <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-theme opacity-30" />
+          <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-theme opacity-30" />
+
+          {/* HUD detail: Hex timestamp */}
+          <div className="absolute top-3 right-4 opacity-10 group-hover/expcard:opacity-30 transition-opacity">
+            <span className="text-[7px] font-mono tracking-widest text-theme uppercase">LOC_COORD: 23.23N 87.86E</span>
+          </div>
+
           {/* Highlight line */}
           <div 
-             className={`absolute inset-y-0 w-[2.5px] pointer-events-none left-0 ${isEven ? 'md:left-auto md:right-0' : ''}`}
-             style={{ backgroundColor: `${exp.color}60` }}
+             className={`absolute inset-y-0 w-[1px] pointer-events-none left-0 ${isEven ? 'md:left-auto md:right-0' : ''}`}
+             style={{ backgroundColor: `${exp.color}40` }}
           />
         
         {/* Dynamic glow tracking cursor */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{ 
-            background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${exp.color}15, transparent 40%)` 
-          }}
+        <motion.div
+          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+          style={{ background }}
         />
 
         {/* Header row */}
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl group-hover:scale-125 transition-transform duration-500" role="img" aria-hidden="true">{exp.icon}</span>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 flex items-center justify-center bg-theme-shift border border-theme group-hover/expcard:border-cyan-400/30 transition-colors">
+              <span className="text-xl" role="img" aria-hidden="true">{exp.icon}</span>
+            </div>
             <div>
               <h3
-                className="text-base font-bold group-hover:translate-x-1 transition-transform"
+                className="text-lg font-bold group-hover/expcard:translate-x-1 transition-transform"
                 style={{ fontFamily: 'var(--font-syne)', color: exp.color }}
               >
                 {exp.title}
               </h3>
               <p
-                className="text-[10px] uppercase tracking-widest text-white/60"
+                className="text-[10px] uppercase tracking-[0.25em] text-theme-muted font-bold"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 {exp.organization}
@@ -245,7 +259,7 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
             </div>
           </div>
           <span
-            className="text-[10px] uppercase tracking-widest text-white/25 whitespace-nowrap bg-white/5 px-2 py-0.5"
+            className="text-[9px] uppercase tracking-[0.2em] text-theme-dim whitespace-nowrap border border-theme px-3 py-1.5 bg-theme-card backdrop-blur-sm"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
             {exp.date}
@@ -253,23 +267,31 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
         </div>
 
         {/* Description */}
-        <p className="text-sm text-white/80 leading-relaxed mb-5">
+        <p className="text-[13px] text-theme-dim leading-relaxed mb-6" style={{ fontFamily: 'var(--font-dm-sans)' }}>
           {exp.description}
         </p>
 
         {/* Achievements */}
-        <ul className="flex flex-col gap-2.5">
+        <ul className="flex flex-col gap-3">
           {exp.achievements.map((a, ai) => (
             <li
               key={ai}
-              className="flex items-start gap-2.5 text-xs text-white/65 group-hover:text-white/80 transition-colors"
+              className="flex items-start gap-3 text-[11px] text-theme-muted group-hover/expcard:text-theme-dim transition-colors"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
-              <span style={{ color: exp.color, marginTop: 2, flexShrink: 0 }} className="group-hover:translate-x-1 transition-transform" aria-hidden="true">›</span>
-              {a}
+              <span style={{ color: exp.color, marginTop: 1, flexShrink: 0 }} className="group-hover/expcard:translate-x-1 transition-transform" aria-hidden="true">»</span>
+              <span className="leading-relaxed">{a}</span>
             </li>
           ))}
         </ul>
+
+        {/* Card footer detail */}
+        <div className="mt-8 pt-4 border-t border-theme flex justify-between items-center">
+          <div className="flex gap-1">
+             {[0,1,2].map(i => <div key={i} className="w-1 h-1 bg-theme-muted opacity-20" />)}
+          </div>
+          <span className="text-[7px] font-mono text-theme-muted opacity-30 tracking-[0.4em]">SYSTEM_VERIFIED_LOG_0x{index.toString(16).toUpperCase()}</span>
+        </div>
       </div>
       </div>
     </motion.div>

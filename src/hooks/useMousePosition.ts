@@ -1,18 +1,18 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useMotionValue } from 'framer-motion';
 
 export function useMousePosition(ref: React.RefObject<HTMLElement | null>) {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  }, [ref]);
+    x.set(e.clientX - rect.left);
+    y.set(e.clientY - rect.top);
+  }, [ref, x, y]);
 
-  return { mousePos, handleMouseMove };
+  return { mouseX: x, mouseY: y, handleMouseMove };
 }

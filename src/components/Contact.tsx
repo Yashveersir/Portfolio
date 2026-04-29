@@ -5,6 +5,7 @@ import { motion, useInView } from 'framer-motion';
 import { socialLinks } from '@/lib/constants';
 import { Mail, ArrowRight } from 'lucide-react';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
+import CharSplitHeading from './CharSplitHeading';
 
 function NetworkBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -93,11 +94,12 @@ function NetworkBg() {
       });
       ctx.globalCompositeOperation = 'source-over';
 
-      // Mouse-following glow — stronger
+      // Mouse-following glow — theme aware
       const mx = mouseRef.current.x, my = mouseRef.current.y;
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
       if (mx>0 && my>0) {
         const mg = ctx.createRadialGradient(mx,my,0,mx,my,320);
-        mg.addColorStop(0,'rgba(34,211,238,0.09)'); mg.addColorStop(1,'rgba(0,0,0,0)');
+        mg.addColorStop(0, isLight ? 'rgba(34,211,238,0.06)' : 'rgba(34,211,238,0.09)'); mg.addColorStop(1,'rgba(0,0,0,0)');
         ctx.fillStyle=mg; ctx.fillRect(0,0,w,h);
       }
 
@@ -163,50 +165,7 @@ function NetworkBg() {
   );
 }
 
-function CharSplitHeading({ text }: { text: string }) {
-  const ref = useRef<HTMLHeadingElement>(null);
-  const isInView = useInView(ref, { once: true });
-  
-  const words = text.split(' ');
-  let charIndex = 0;
 
-  return (
-    <h2
-      ref={ref}
-      className="flex flex-wrap overflow-hidden"
-      aria-label={text}
-      style={{
-        fontFamily: 'var(--font-syne)',
-        fontWeight: 900,
-        fontSize: 'clamp(2.4rem, 5vw, 3.5rem)',
-        lineHeight: 1.05,
-        letterSpacing: '-0.03em',
-        paddingRight: '0.1em',
-        paddingBottom: '0.1em',
-      }}
-    >
-      {words.map((word, wordIdx) => (
-        <span key={wordIdx} className="flex whitespace-nowrap" style={{ marginRight: wordIdx !== words.length - 1 ? '0.3em' : '0' }}>
-          {word.split('').map((char, i) => {
-            const currentIdx = charIndex++;
-            return (
-              <motion.span
-                key={i}
-                initial={{ y: -60, opacity: 0, rotate: -8 }}
-                animate={isInView ? { y: 0, opacity: 1, rotate: 0 } : {}}
-                transition={{ type: 'spring', stiffness: 200, damping: 12, delay: currentIdx * 0.035 }}
-                style={{ display: 'inline-block' }}
-                aria-hidden="true"
-              >
-                {char}
-              </motion.span>
-            );
-          })}
-        </span>
-      ))}
-    </h2>
-  );
-}
 
 export default function Contact() {
   const [name, setName] = useState('');
@@ -255,7 +214,7 @@ export default function Contact() {
   const dynamicHeading = name.trim() ? `Let's Talk, ${name.trim()}.` : "Let's build\nsomething great.";
 
   return (
-    <section id="contact" className="relative py-28 md:py-40 overflow-hidden" style={{ background: '#030409' }}>
+    <section id="contact" className="relative py-28 md:py-40 overflow-hidden">
       <NetworkBg />
       {/* Decorative bracket */}
       <div
@@ -263,7 +222,8 @@ export default function Contact() {
         style={{
           fontFamily: 'var(--font-syne)',
           fontSize: 'clamp(6rem, 18vw, 14rem)',
-          color: 'rgba(34,211,238,0.03)',
+          color: 'var(--cyan)',
+          opacity: 0.03,
           fontWeight: 900,
           lineHeight: 1,
         }}
@@ -277,7 +237,7 @@ export default function Contact() {
           <div className="w-full lg:w-1/2">
             <div className="flex items-start gap-6 mb-8">
               <span
-                className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-white/25 -rotate-90 origin-left whitespace-nowrap pt-8"
+                className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-theme-muted -rotate-90 origin-left whitespace-nowrap pt-8"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 / CONTACT
@@ -285,10 +245,10 @@ export default function Contact() {
               <div>
                 {/* Live-updating headline as user types their name */}
                 <div className="min-h-[120px]">
-                  <CharSplitHeading text={dynamicHeading.split('\n')[0]} />
+                  <CharSplitHeading text={dynamicHeading.split('\n')[0]} fontSize="clamp(2.4rem, 5vw, 3.5rem)" lineHeight={1.05} />
                   {dynamicHeading.includes('\n') && (
                     <div className="mt-1">
-                      <CharSplitHeading text={dynamicHeading.split('\n')[1]} />
+                      <CharSplitHeading text={dynamicHeading.split('\n')[1]} fontSize="clamp(2.4rem, 5vw, 3.5rem)" lineHeight={1.05} />
                     </div>
                   )}
                 </div>
@@ -300,7 +260,7 @@ export default function Contact() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="text-white/80 text-base leading-relaxed max-w-sm mb-10"
+              className="text-theme-dim text-base leading-relaxed max-w-sm mb-10"
               style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}
             >
               Currently open for new opportunities. Whether you have a project, a question, or just want to say hi — I&apos;ll get back to you.
@@ -316,15 +276,15 @@ export default function Contact() {
             >
               <a
                 href={`mailto:${socialLinks.email}`}
-                className="group flex items-center gap-4 text-white/75 hover:text-cyan-400 transition-colors cursor-pointer"
+                className="group flex items-center gap-4 text-theme-dim hover:text-cyan-400 transition-colors cursor-pointer"
                 aria-label={`Send an email to ${socialLinks.email}`}
               >
-                <div className="w-10 h-10 border border-white/8 bg-white/3 flex items-center justify-center group-hover:border-cyan-400/40 group-hover:bg-cyan-400/8 transition-all">
+                <div className="w-10 h-10 border border-theme bg-theme-card flex items-center justify-center group-hover:border-cyan-400/40 group-hover:bg-cyan-400/8 transition-all">
                   <Mail size={16} aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-white/55 mb-0.5" style={{ fontFamily: 'var(--font-mono)' }}>Email</p>
-                  <p className="text-sm font-medium text-white/70 group-hover:text-cyan-400 group-hover:underline underline-offset-4 transition-colors">{socialLinks.email}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-theme-muted mb-0.5" style={{ fontFamily: 'var(--font-mono)' }}>Email</p>
+                  <p className="text-sm font-medium text-theme group-hover:text-cyan-400 group-hover:underline underline-offset-4 transition-colors">{socialLinks.email}</p>
                 </div>
               </a>
 
@@ -333,7 +293,7 @@ export default function Contact() {
                   href={socialLinks.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 border border-white/8 bg-white/3 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all"
+                  className="w-10 h-10 border border-theme bg-theme-card flex items-center justify-center text-theme-muted hover:text-theme hover:border-theme transition-all"
                   aria-label="GitHub Profile"
                 >
                   <FaGithub size={16} aria-hidden="true" />
@@ -342,7 +302,7 @@ export default function Contact() {
                   href={socialLinks.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 border border-white/8 bg-white/3 flex items-center justify-center text-white/40 hover:text-blue-400 hover:border-blue-400/30 transition-all"
+                  className="w-10 h-10 border border-theme bg-theme-card flex items-center justify-center text-theme-muted hover:text-blue-400 hover:border-blue-400/30 transition-all"
                   aria-label="LinkedIn Profile"
                 >
                   <FaLinkedin size={16} aria-hidden="true" />
@@ -358,7 +318,7 @@ export default function Contact() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
-              className="border border-white/6 bg-[#0a0a14]/60 backdrop-blur-xl p-8 relative overflow-hidden tilt-card"
+              className="border border-theme bg-theme-card backdrop-blur-xl p-8 relative overflow-hidden tilt-card"
             >
               {/* Cyan glow top-right */}
               <div className="absolute top-0 right-0 w-60 h-60 rounded-full pointer-events-none"
@@ -370,7 +330,7 @@ export default function Contact() {
                 <div className="flex flex-col gap-1.5">
                   <label
                     htmlFor="name"
-                    className="text-[10px] uppercase tracking-widest text-white/35"
+                    className="text-[10px] uppercase tracking-widest text-theme-muted"
                     style={{ fontFamily: 'var(--font-mono)' }}
                   >
                     Name
@@ -383,7 +343,7 @@ export default function Contact() {
                     maxLength={100}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-black/40 border border-white/8 px-4 py-3 text-white text-sm placeholder-white/15 focus:outline-none focus:border-cyan-400/50 transition-colors"
+                    className="bg-theme-card border border-theme px-4 py-3 text-theme text-sm placeholder-theme-muted focus:outline-none focus:border-cyan-400/50 transition-colors"
                     style={{ fontFamily: 'var(--font-mono)' }}
                     placeholder="John Doe"
                   />
@@ -393,7 +353,7 @@ export default function Contact() {
                 <div className="flex flex-col gap-1.5">
                   <label
                     htmlFor="email"
-                    className="text-[10px] uppercase tracking-widest text-white/35"
+                    className="text-[10px] uppercase tracking-widest text-theme-muted"
                     style={{ fontFamily: 'var(--font-mono)' }}
                   >
                     Email
@@ -404,7 +364,7 @@ export default function Contact() {
                     name="email"
                     required
                     maxLength={254}
-                    className="bg-black/40 border border-white/8 px-4 py-3 text-white text-sm placeholder-white/15 focus:outline-none focus:border-cyan-400/50 transition-colors"
+                    className="bg-theme-card border border-theme px-4 py-3 text-theme text-sm placeholder-theme-muted focus:outline-none focus:border-cyan-400/50 transition-colors"
                     style={{ fontFamily: 'var(--font-mono)' }}
                     placeholder="john@example.com"
                   />
@@ -414,7 +374,7 @@ export default function Contact() {
                 <div className="flex flex-col gap-1.5">
                   <label
                     htmlFor="message"
-                    className="text-[10px] uppercase tracking-widest text-white/35"
+                    className="text-[10px] uppercase tracking-widest text-theme-muted"
                     style={{ fontFamily: 'var(--font-mono)' }}
                   >
                     Message
@@ -426,7 +386,7 @@ export default function Contact() {
                     rows={4}
                     minLength={10}
                     maxLength={2000}
-                    className="bg-black/40 border border-white/8 px-4 py-3 text-white text-sm placeholder-white/15 focus:outline-none focus:border-cyan-400/50 transition-colors resize-none"
+                    className="bg-theme-card border border-theme px-4 py-3 text-theme text-sm placeholder-theme-muted focus:outline-none focus:border-cyan-400/50 transition-colors resize-none"
                     style={{ fontFamily: 'var(--font-mono)' }}
                     placeholder="What are we building together?"
                   />
@@ -435,7 +395,7 @@ export default function Contact() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="group mt-2 w-full border border-cyan-400 bg-cyan-400 px-6 py-3 text-sm font-bold uppercase tracking-widest text-black transition-all hover:bg-transparent hover:text-cyan-400 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="group mt-2 w-full border border-cyan-400 bg-cyan-400 px-6 py-3 text-sm font-bold uppercase tracking-widest text-black transition-all hover:bg-transparent hover:text-cyan-400 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed dark:text-black dark:hover:text-cyan-400"
                   style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   {isSubmitting ? (

@@ -45,26 +45,29 @@ function BentoCell({
       ? { scale: 0.8, opacity: 0 }
       : { y: 50, opacity: 0 };
 
-  const borderStyle = { borderTop: `1.5px solid ${color}30` } as React.CSSProperties;
-
   return (
     <motion.div
       ref={ref}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      style={{ rotateX: rotX, rotateY: rotY, transformStyle: 'preserve-3d', rotate, ...borderStyle }}
+      style={{ rotateX: rotX, rotateY: rotY, transformStyle: 'preserve-3d', rotate }}
       initial={initAnim}
       animate={isInView ? { x: 0, y: 0, scale: 1, opacity: 1 } : initAnim}
       transition={{ type: 'spring' as const, stiffness: 100, damping: 18, delay }}
-      className={`relative border border-white/6 bg-[#0a0a14]/80 backdrop-blur-xl overflow-hidden group ${className}`}
+      className={`relative border border-theme bg-theme-card backdrop-blur-xl overflow-hidden group scanline pixel-border ${className}`}
     >
       {/* Color glow on hover */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{ background: `radial-gradient(circle at 50% 0%, ${color}12, transparent 60%)` }}
+        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+        style={{ background: `radial-gradient(circle at 50% 0%, ${color}15, transparent 70%)` }}
       />
+      {/* HUD readout detail */}
+      <div className="absolute top-2 right-2 flex gap-1 opacity-20 group-hover:opacity-40 transition-opacity">
+        <div className="w-1 h-1 bg-current" />
+        <div className="w-4 h-1 bg-current" />
+      </div>
       {/* Content at z30 for 3D depth */}
-      <div className="relative z-10 h-full" style={{ transform: 'translateZ(20px)' }}>
+      <div className="relative z-10 h-full" style={{ transform: 'translateZ(30px)' }}>
         {children}
       </div>
     </motion.div>
@@ -170,8 +173,9 @@ function CoreSystemBg() {
       const pulse = Math.sin(time * 2) * 0.5 + 0.5;
 
       // ── Background concentric rings ──
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
       for (let i = 1; i <= 6; i++) {
-        ctx.strokeStyle = `rgba(34,211,238,${0.025 + (i === 3 ? 0.02 : 0)})`;
+        ctx.strokeStyle = isLight ? `rgba(34,211,238,${0.015 + (i === 3 ? 0.01 : 0)})` : `rgba(34,211,238,${0.025 + (i === 3 ? 0.02 : 0)})`;
         ctx.lineWidth = 0.5;
         ctx.setLineDash([]);
         ctx.beginPath(); ctx.arc(0, 0, i * 100, 0, Math.PI * 2); ctx.stroke();
@@ -180,21 +184,21 @@ function CoreSystemBg() {
       // ── Main tech rings ──
       // Inner — violet dashes, slow CW
       ctx.save(); ctx.rotate(time * 0.22);
-      ctx.strokeStyle = `rgba(124,111,255,${0.35 + pulse * 0.15})`;
+      ctx.strokeStyle = isLight ? `rgba(124,111,255,${0.25 + pulse * 0.1})` : `rgba(124,111,255,${0.35 + pulse * 0.15})`;
       ctx.lineWidth = 1.5; ctx.setLineDash([6, 14, 40, 14]);
       ctx.beginPath(); ctx.arc(0, 0, 180, 0, Math.PI * 2); ctx.stroke();
       ctx.restore();
 
       // Middle — cyan dashes, slow CCW
       ctx.save(); ctx.rotate(-time * 0.14);
-      ctx.strokeStyle = `rgba(34,211,238,${0.4 + pulse * 0.1})`;
+      ctx.strokeStyle = isLight ? `rgba(34,211,238,${0.2 + pulse * 0.08})` : `rgba(34,211,238,${0.4 + pulse * 0.1})`;
       ctx.lineWidth = 1.2; ctx.setLineDash([90, 45, 3, 10, 3, 10]);
       ctx.beginPath(); ctx.arc(0, 0, 270, 0, Math.PI * 2); ctx.stroke();
       ctx.restore();
 
       // Outer — thin cyan, very slow CW
       ctx.save(); ctx.rotate(time * 0.08);
-      ctx.strokeStyle = `rgba(34,211,238,0.12)`;
+      ctx.strokeStyle = isLight ? `rgba(34,211,238,0.08)` : `rgba(34,211,238,0.12)`;
       ctx.lineWidth = 1.8; ctx.setLineDash([200, 120]);
       ctx.beginPath(); ctx.arc(0, 0, 360, 0, Math.PI * 2); ctx.stroke();
       ctx.restore();
@@ -202,7 +206,7 @@ function CoreSystemBg() {
       ctx.setLineDash([]);
 
       // ── Radial spokes ──
-      ctx.strokeStyle = `rgba(124,111,255,0.06)`;
+      ctx.strokeStyle = isLight ? `rgba(124,111,255,0.04)` : `rgba(124,111,255,0.06)`;
       ctx.lineWidth = 0.8;
       for (let i = 0; i < 16; i++) {
         const angle = (i / 16) * Math.PI * 2 + time * 0.04;
@@ -298,14 +302,14 @@ export default function Skills() {
         {/* Header */}
         <div className="flex items-start gap-6 mb-16">
           <span
-            className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-white/25 -rotate-90 origin-left whitespace-nowrap pt-8"
+            className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-theme-muted -rotate-90 origin-left whitespace-nowrap pt-8"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
             / SKILLS
           </span>
           <div>
             <CharSplitHeading text="Tech Stack" />
-            <p className="mt-3 text-sm text-white/35 max-w-md" style={{ fontFamily: 'var(--font-mono)' }}>
+            <p className="mt-3 text-sm text-theme-muted max-w-md" style={{ fontFamily: 'var(--font-mono)' }}>
               Tools I think in, not just tools I&apos;ve touched.
             </p>
           </div>
@@ -378,14 +382,17 @@ function CellContent({
 }) {
   return (
     <>
-      <div className="flex items-center gap-2 mb-5">
-        <span className="w-1.5 h-1.5 rounded-full" style={{ background: category.color }} />
-        <h3
-          className="text-xs uppercase tracking-widest font-bold"
-          style={{ color: category.color, fontFamily: 'var(--font-mono)' }}
-        >
-          {category.title}
-        </h3>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-2" style={{ background: category.color, boxShadow: `0 0 10px ${category.color}80` }} />
+          <h3
+            className="text-[10px] uppercase tracking-[0.3em] font-bold"
+            style={{ color: category.color, fontFamily: 'var(--font-mono)' }}
+          >
+            {category.title}
+          </h3>
+        </div>
+        <span className="text-[8px] text-theme-muted font-mono tracking-widest uppercase">MODULE_v4.2</span>
       </div>
       <div className={`flex flex-wrap ${tight ? 'gap-2' : 'gap-3'}`}>
         {category.skills.map((skill) => {
@@ -394,23 +401,23 @@ function CellContent({
           return (
             <motion.div
               key={skill.name}
-              className="flex items-center gap-2 border border-white/6 px-3 py-2 cursor-default transition-colors"
+              className="flex items-center gap-2 border border-theme bg-theme-card px-3 py-2 cursor-pointer transition-all hover:bg-theme-shift"
               onHoverStart={() => setHoveredSkill(skill.name)}
               onHoverEnd={() => setHoveredSkill(null)}
+              whileHover={{ y: -2 }}
               animate={{
-                borderColor: isGlowing ? `${category.color}80` : 'rgba(255,255,255,0.06)',
-                opacity: isFaded ? 0.4 : 1,
-                boxShadow: isGlowing ? `0 0 12px ${category.color}30` : 'none',
+                borderColor: isGlowing ? `${category.color}40` : 'var(--card-border)',
+                opacity: isFaded ? 0.3 : 1,
               }}
               transition={{ duration: 0.2 }}
             >
               {skill.image ? (
-                <img src={skill.image} alt={skill.name} className="w-4 h-4 object-contain" />
+                <img src={skill.image} alt={skill.name} className="w-4 h-4 object-contain grayscale group-hover:grayscale-0 transition-all" />
               ) : (
-                <span className="w-1 h-1 rounded-full" style={{ background: category.color }} />
+                <div className="w-1.5 h-1.5 rotate-45" style={{ background: category.color }} />
               )}
               <span
-                className="text-xs text-white/65 whitespace-nowrap"
+                className="text-[10px] text-theme-dim font-bold uppercase tracking-widest whitespace-nowrap"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 {skill.name}

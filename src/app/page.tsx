@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
 import Skills from '@/components/Skills';
+import ByTheNumbers from '@/components/ByTheNumbers';
 import ScrollReveal from '@/components/ScrollReveal';
 import SectionBg from '@/components/SectionBg';
 
@@ -27,7 +28,7 @@ export default function Home() {
     });
 
     // Expose lenis to window for use in other components (e.g., Footer)
-    (window as any).lenis = lenis;
+    (window as unknown as { lenis: Lenis }).lenis = lenis;
 
     function raf(time: number) {
       lenis.raf(time);
@@ -42,7 +43,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen" suppressHydrationWarning>
       {/* Hero — no scroll reveal, has its own canvas bg */}
       <Hero />
 
@@ -54,6 +55,11 @@ export default function Home() {
       {/* Skills */}
       <ScrollReveal direction="scale">
         <Skills />
+      </ScrollReveal>
+
+      {/* By the Numbers */}
+      <ScrollReveal direction="up">
+        <ByTheNumbers />
       </ScrollReveal>
 
       {/* Projects */}

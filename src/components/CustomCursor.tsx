@@ -1,94 +1,154 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { motion, useSpring, useMotionValue, AnimatePresence } from 'framer-motion';
 
 export default function CustomCursor() {
-  const ringRef = useRef<HTMLDivElement>(null);
-
-  const pos = useRef({ x: -100, y: -100 });
-  const ringPos = useRef({ x: -100, y: -100 });
-  const scale = useRef(1);
-  
-  const isHoverRef = useRef(false);
   const [mounted, setMounted] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const [cursorText, setCursorText] = useState('');
   const [isMobile, setIsMobile] = useState(false);
 
-  // First effect: mark as mounted (avoids hydration mismatch)
+  // Mouse positions
+  const mouseX = useMotionValue(-100);
+  const mouseY = useMotionValue(-100);
+
+  // Spring physics for smooth trailing
+  const springConfig = { stiffness: 400, damping: 28, mass: 0.5 };
+  const trailX = useSpring(mouseX, springConfig);
+  const trailY = useSpring(mouseY, springConfig);
+
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    const mobile = window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches;
-    setIsMobile(mobile);
-    if (mobile) return;
-
-    const onMove = (e: MouseEvent) => {
-      pos.current = { x: e.clientX, y: e.clientY };
-
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-      
-      // Check if hovering over clickable elements
-      const isPointer = 
-        target.tagName === 'A' || 
-        target.tagName === 'BUTTON' || 
-        target.closest('a') !== null ||
-        target.closest('button') !== null;
-      
-      isHoverRef.current = isPointer;
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches);
     };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
 
-    let raf: number;
-    const animate = () => {
-      if (document.visibilityState === 'hidden') {
-        raf = requestAnimationFrame(animate);
-        return;
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+
+      const target = e.target as HTMLElement;
+      const clickable = target.closest('a, button, [role="button"], input, select, textarea');
+      const projectCard = target.closest('[data-project-card="true"]');
+      const heroHeadline = target.closest('[data-hero-headline="true"]');
+
+      let newIsHovering = false;
+      let newCursorText = '';
+
+      if (clickable) {
+        newIsHovering = true;
+      } else if (projectCard) {
+        newIsHovering = true;
+        newCursorText = 'VIEW';
+      } else if (heroHeadline) {
+        newIsHovering = true;
+        newCursorText = 'HI';
       }
 
-      // Lerp ring position (smooth trailing)
-      const dx = pos.current.x - ringPos.current.x;
-      const dy = pos.current.y - ringPos.current.y;
-      
-      // Slightly increased lerp factor for tighter, more responsive tracking
-      ringPos.current.x += dx * 0.2;
-      ringPos.current.y += dy * 0.2;
-
-      // Lerp scale for hover effect
-      const targetScale = isHoverRef.current ? 1.6 : 1;
-      scale.current += (targetScale - scale.current) * 0.2;
-
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate3d(${ringPos.current.x}px, ${ringPos.current.y}px, 0) scale(${scale.current})`;
-      }
-
-      raf = requestAnimationFrame(animate);
+      // Only update state if something changed to save renders
+      setIsHovering((prev) => (prev !== newIsHovering ? newIsHovering : prev));
+      setCursorText((prev) => (prev !== newCursorText ? newCursorText : prev));
     };
 
-    window.addEventListener('mousemove', onMove, { passive: true });
-    raf = requestAnimationFrame(animate);
+    if (!isMobile) {
+      window.addEventListener('mousemove', handleMouseMove);
+    }
 
     return () => {
-      window.removeEventListener('mousemove', onMove);
-      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [mounted]);
+  }, [mouseX, mouseY, isMobile]);
 
-  // Server and initial client render: return null (matches on both sides)
   if (!mounted || isMobile) return null;
 
   return (
-    <div
-      ref={ringRef}
-      className="pointer-events-none fixed top-0 left-0 z-[9998] w-8 h-8 rounded-full border border-cyan-400/30"
-      suppressHydrationWarning
-      style={{
-        willChange: 'transform',
-        marginLeft: '-16px', // Center offset
-        marginTop: '-16px',
-      }}
-    />
+    <>
+      {/* Primary HUD Point */}
+      <motion.div
+        className="fixed top-0 left-0 w-1 h-1 bg-cyan-400 z-[9999] pointer-events-none"
+        style={{
+          x: mouseX,
+          y: mouseY,
+          translateX: '-50%',
+          translateY: '-50%',
+        }}
+      />
+
+      {/* HUD Trailing Crosshair */}
+      <motion.div
+        className="fixed top-0 left-0 z-[9998] pointer-events-none flex items-center justify-center"
+        style={{
+          x: trailX,
+          y: trailY,
+          translateX: '-50%',
+          translateY: '-50%',
+          width: isHovering ? 60 : 32,
+          height: isHovering ? 60 : 32,
+        }}
+      >
+        {/* Corner Brackets */}
+        {[
+          { t: 0, l: 0, r: '0deg' },
+          { t: 0, right: 0, r: '90deg' },
+          { b: 0, right: 0, r: '180deg' },
+          { b: 0, l: 0, r: '270deg' },
+        ].map((p, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 border-t border-l border-cyan-400/60"
+            style={{
+              top: p.t, left: p.l, right: (p as { right?: number }).right, bottom: (p as { b?: number }).b,
+              transform: `rotate(${p.r})`,
+            }}
+            animate={{
+              scale: isHovering ? 1.5 : 1,
+              borderColor: isHovering ? 'rgba(34,211,238,1)' : 'rgba(34,211,238,0.6)',
+            }}
+          />
+        ))}
+
+        {/* Center Cross Lines */}
+        <motion.div 
+          className="absolute w-full h-[1px] bg-cyan-400/10"
+          animate={{ scaleX: isHovering ? 1.2 : 0.4 }}
+        />
+        <motion.div 
+          className="absolute h-full w-[1px] bg-cyan-400/10"
+          animate={{ scaleY: isHovering ? 1.2 : 0.4 }}
+        />
+
+        <AnimatePresence>
+          {cursorText && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="absolute -bottom-8 bg-theme-card border border-cyan-400/30 px-2 py-0.5 backdrop-blur-sm"
+            >
+              <span className="text-[8px] font-bold tracking-[0.2em] text-cyan-400 uppercase font-mono">
+                {cursorText}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Reactive Glow */}
+      <motion.div
+        className="fixed top-0 left-0 w-48 h-48 rounded-full pointer-events-none z-[9997]"
+        style={{
+          x: trailX,
+          y: trailY,
+          translateX: '-50%',
+          translateY: '-50%',
+          background: 'radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 70%)',
+          opacity: isHovering ? 0.3 : 0.1,
+        }}
+      />
+    </>
   );
 }

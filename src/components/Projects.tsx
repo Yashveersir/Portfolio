@@ -1,66 +1,30 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
+import { motion, useInView, useTransform } from 'framer-motion';
 import { projects } from '@/lib/constants';
 import { FaGithub } from 'react-icons/fa';
 import { ExternalLink } from 'lucide-react';
 import Image from 'next/image';
+import { useMousePosition } from '@/hooks/useMousePosition';
+import CharSplitHeading from './CharSplitHeading';
 
 // Per-project accent colors from spec
 const PROJECT_ACCENTS = ['#22d3ee', '#ff6400', '#7c6fff'];
-
-// Tag styles — mix of outlined, filled, plain text
-function Tag({ label, index }: { label: string; index: number }) {
-  const variant = index % 3;
-  if (variant === 0) {
-    return (
-      <span
-        className="border border-current px-2.5 py-0.5 text-[10px] uppercase tracking-widest"
-        style={{ color: 'rgba(255,255,255,0.45)', fontFamily: 'var(--font-mono)' }}
-      >
-        {label}
-      </span>
-    );
-  }
-  if (variant === 1) {
-    return (
-      <span
-        className="bg-white/8 px-2.5 py-0.5 text-[10px] uppercase tracking-widest text-white/60"
-        style={{ fontFamily: 'var(--font-mono)' }}
-      >
-        {label}
-      </span>
-    );
-  }
-  return (
-    <span
-      className="text-[10px] uppercase tracking-widest text-white/35"
-      style={{ fontFamily: 'var(--font-mono)' }}
-    >
-      {label}
-    </span>
-  );
-}
 
 function ProjectCard({ project, index }: { project: typeof projects[0]; index: number }) {
   const accent = PROJECT_ACCENTS[index % PROJECT_ACCENTS.length];
   const num = String(index + 1).padStart(2, '0');
 
-  const isFirst = index === 0;
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
   
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const { mouseX, mouseY, handleMouseMove } = useMousePosition(ref);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
+  const background = useTransform(
+    [mouseX, mouseY],
+    ([latestX, latestY]) => `radial-gradient(500px circle at ${latestX}px ${latestY}px, ${accent}10, transparent 40%)`
+  );
 
   return (
     <motion.div
@@ -68,137 +32,112 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
       onMouseMove={handleMouseMove}
       data-project-card="true"
       className="relative group/card"
-      initial={{ y: 40, opacity: 0 }}
-      animate={isInView ? { y: 0, opacity: 1 } : { y: 40, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: index * 0.15 }}
+      initial={{ y: 50, opacity: 0 }}
+      animate={isInView ? { y: 0, opacity: 1 } : { y: 50, opacity: 0 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: index * 0.1 }}
     >
-      {/* Faded large number texture behind card */}
-      <div
-        className="pointer-events-none absolute select-none"
-        style={{
-          fontFamily: 'var(--font-syne)',
-          fontSize: '22vw',
-          fontWeight: 900,
-          color: accent,
-          opacity: 0.04,
-          top: '-15%',
-          left: '-5%',
-          lineHeight: 1,
-          zIndex: 0,
-          userSelect: 'none',
-        }}
-      >
-        {num}
+      {/* HUD-style number label */}
+      <div className="absolute -top-3 -left-3 z-30 pointer-events-none">
+        <div className="flex items-center gap-2 bg-theme-card border border-theme px-3 py-1 pixel-border">
+          <span className="text-[10px] font-bold tracking-widest text-theme-muted" style={{ fontFamily: 'var(--font-mono)' }}>ID:</span>
+          <span className="text-[10px] font-bold tracking-widest text-cyan-400" style={{ fontFamily: 'var(--font-mono)' }}>{num}</span>
+        </div>
       </div>
 
-      {/* Diagonal dog-ear on card 01 */}
-      {isFirst && (
-        <svg
-          className="absolute top-0 right-0 pointer-events-none z-20"
-          width="48"
-          height="48"
-          viewBox="0 0 48 48"
-        >
-          <line x1="0" y1="0" x2="48" y2="48" stroke={accent} strokeWidth="0.8" strokeOpacity="0.5" />
-        </svg>
-      )}
-
       <div
-        className="relative z-10 border border-white/6 bg-[#0a0a14] overflow-hidden hover-float-card"
+        className="relative z-10 border border-theme bg-theme-card backdrop-blur-lg overflow-hidden shadow-2xl transition-all duration-500 hover:border-cyan-400/30"
         style={{
-          minHeight: index === 1 ? 380 : 340,
-          borderTop: `1.5px solid ${accent}30`,
+          minHeight: 420,
         }}
       >
         {/* Dynamic glow tracking cursor */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"
-          style={{ 
-            background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, ${accent}15, transparent 40%)` 
-          }}
+        <motion.div
+          className="pointer-events-none absolute inset-0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-700"
+          style={{ background }}
         />
 
-        {/* Glow top edge */}
-        <div
-          className="absolute top-0 left-0 right-0 h-[1px]"
-          style={{ background: `linear-gradient(90deg, transparent, ${accent}60, transparent)` }}
-        />
-
-        {/* Number label */}
-        <div className="flex items-start justify-between p-7 pb-4">
-          <span
-            className="text-[11px] uppercase tracking-widest"
-            style={{ color: accent, fontFamily: 'var(--font-mono)' }}
-          >
-            {num}
-          </span>
-          <div className="flex gap-4 relative z-50 pointer-events-auto">
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1 -m-1 text-white/40 hover:text-white transition-all hover:scale-110 cursor-pointer pointer-events-auto z-50"
-              aria-label={`View ${project.title} source on GitHub`}
-            >
-              <FaGithub size={20} aria-hidden="true" />
-            </a>
-            <a
-              href={project.demo}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1 -m-1 text-white/40 hover:text-cyan-400 transition-all hover:scale-110 cursor-pointer pointer-events-auto z-50"
-              aria-label={`View live demo of ${project.title}`}
-            >
-              <ExternalLink size={20} aria-hidden="true" />
-            </a>
-          </div>
-        </div>
+        {/* Scanline overlay */}
+        <div className="absolute inset-0 scanline opacity-30 pointer-events-none" />
 
         {/* Project Image */}
         {project.images?.[0] && (
-          <div className="relative w-full h-48 sm:h-56 overflow-hidden border-y border-white/5">
+          <div className="relative w-full h-56 overflow-hidden border-b border-theme">
             <Image 
               src={project.images[0]} 
               alt={`Interface of ${project.title}`} 
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="w-full h-full object-cover object-top opacity-70 group-hover/card:opacity-100 group-hover/card:scale-105 transition-all duration-700"
+              className="w-full h-full object-cover object-top grayscale group-hover/card:grayscale-0 group-hover/card:scale-105 transition-all duration-1000"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a14] to-transparent opacity-80" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/20 to-transparent opacity-60" />
+            
+            {/* HUD element on image */}
+            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+              <div className="flex flex-col gap-1">
+                <div className="w-12 h-[1px] bg-theme-muted" />
+                <span className="text-[8px] font-bold text-theme-muted uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)' }}>DEPLOYMENT_READY</span>
+              </div>
+              <div className="flex gap-3">
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 border border-theme bg-theme-card backdrop-blur-sm text-theme-muted hover:text-theme hover:border-theme transition-all hover:scale-110"
+                  aria-label={`View ${project.title} source on GitHub`}
+                >
+                  <FaGithub size={16} />
+                </a>
+                <a
+                  href={project.demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 border border-theme bg-theme-card backdrop-blur-sm text-theme-muted hover:text-cyan-400 hover:border-cyan-400/30 transition-all hover:scale-110"
+                  aria-label={`View live demo of ${project.title}`}
+                >
+                  <ExternalLink size={16} />
+                </a>
+              </div>
+            </div>
           </div>
         )}
 
         {/* Content */}
-        <div className="px-7 pb-7 pt-4">
-          <h3
-            className="text-xl md:text-2xl font-black mb-2 leading-tight group-hover/card:translate-x-1 transition-transform"
-            style={{ fontFamily: 'var(--font-syne)', color: accent }}
-          >
-            {project.title}
-          </h3>
-          <p
-            className="text-[11px] uppercase tracking-widest mb-4"
-            style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-mono)' }}
-          >
-            {project.subtitle}
-          </p>
-          <p className="text-sm text-white/85 leading-relaxed mb-6 line-clamp-3">
+        <div className="p-6 md:p-8">
+          <div className="flex items-center gap-3 mb-4">
+             <div className="w-1.5 h-1.5 bg-cyan-400" />
+             <h3
+              className="text-xl font-bold tracking-tight text-theme group-hover/card:translate-x-1 transition-transform duration-300"
+              style={{ fontFamily: 'var(--font-syne)' }}
+            >
+              {project.title}
+            </h3>
+          </div>
+          
+          <p className="text-[13px] text-theme-dim leading-relaxed mb-6 md:mb-8 line-clamp-3" style={{ fontFamily: 'var(--font-dm-sans)' }}>
             {project.description}
           </p>
 
-          {/* Tags — mixed styles */}
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag, ti) => (
-              <Tag key={tag} label={tag} index={ti} />
+          {/* Tags — consistent mono style */}
+          <div className="flex flex-wrap gap-2 mb-6 md:mb-8">
+            {project.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2.5 py-1 border border-theme bg-theme-card text-[9px] font-bold uppercase tracking-widest text-theme-muted"
+                style={{ fontFamily: 'var(--font-mono)' }}
+              >
+                {tag}
+              </span>
             ))}
           </div>
 
-          {/* Outcome pill */}
-          <div
-            className="mt-6 pt-4 border-t border-white/8 text-[10px] uppercase tracking-widest text-white/40 group-hover/card:text-white/60 transition-colors"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            {project.outcome}
+          {/* Technical spec label */}
+          <div className="pt-4 md:pt-5 border-t border-theme flex items-center justify-between">
+            <span className="text-[9px] uppercase tracking-[0.2em] text-theme-muted font-bold" style={{ fontFamily: 'var(--font-mono)' }}>
+              RESULT // 0x{index.toString(16)}
+            </span>
+            <span className="text-[9px] uppercase tracking-[0.1em] text-cyan-400/80 font-bold max-w-[70%] text-right" style={{ fontFamily: 'var(--font-mono)' }}>
+              {project.outcome.replace('Outcome: ', '')}
+            </span>
           </div>
         </div>
       </div>
@@ -303,18 +242,19 @@ function HoloGridBg() {
       ctx.globalCompositeOperation = 'source-over';
 
       // ── Moving perspective grid ──
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
       const gs = 90;
       const goy = ((time * 22 + my * 25) % gs + gs) % gs;
       const gox = ((mx * 25) % gs + gs) % gs;
 
       for (let gy = goy - gs; gy < h + gs; gy += gs) {
         const t = gy / h;
-        ctx.strokeStyle = `rgba(124,111,255,${0.04 + t * 0.05})`;
+        ctx.strokeStyle = isLight ? `rgba(124,111,255,${0.02 + t * 0.03})` : `rgba(124,111,255,${0.04 + t * 0.05})`;
         ctx.lineWidth = 0.7 + t * 0.5;
         ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
       }
       for (let gx = gox - gs; gx < w + gs; gx += gs) {
-        ctx.strokeStyle = 'rgba(34,211,238,0.035)';
+        ctx.strokeStyle = isLight ? 'rgba(34,211,238,0.025)' : 'rgba(34,211,238,0.035)';
         ctx.lineWidth = 0.5;
         ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke();
       }
@@ -322,7 +262,7 @@ function HoloGridBg() {
       // Mouse spot-light
       const mwx = (mx * 0.5 + 0.5) * w, mwy = (my * 0.5 + 0.5) * h;
       const spot = ctx.createRadialGradient(mwx, mwy, 0, mwx, mwy, 300);
-      spot.addColorStop(0, 'rgba(34,211,238,0.06)');
+      spot.addColorStop(0, isLight ? 'rgba(34,211,238,0.04)' : 'rgba(34,211,238,0.06)');
       spot.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = spot; ctx.fillRect(0, 0, w, h);
 
@@ -415,14 +355,14 @@ export default function Projects() {
         {/* Header */}
         <div className="flex items-start gap-6 mb-20">
           <span
-            className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-white/25 -rotate-90 origin-left whitespace-nowrap pt-8"
+            className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-theme-muted -rotate-90 origin-left whitespace-nowrap pt-8"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
             / PROJECTS
           </span>
           <div>
             <CharSplitHeading text="Selected Work" />
-            <p className="mt-3 text-sm text-white/35 max-w-md" style={{ fontFamily: 'var(--font-mono)' }}>
+            <p className="mt-3 text-sm text-theme-muted max-w-md" style={{ fontFamily: 'var(--font-mono)' }}>
               Real products, real outcomes. No tutorial clones.
             </p>
           </div>
@@ -439,48 +379,4 @@ export default function Projects() {
   );
 }
 
-// Reused char-split heading
-function CharSplitHeading({ text }: { text: string }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
 
-  return (
-    <motion.h2
-      ref={ref}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      className="flex flex-wrap overflow-hidden"
-      style={{
-        fontFamily: 'var(--font-syne)',
-        fontWeight: 900,
-        fontSize: 'clamp(2.4rem, 5vw, 4rem)',
-        lineHeight: 1,
-        letterSpacing: '-0.03em',
-      }}
-    >
-      {text.split(' ').map((word, wIdx, words) => {
-        const prevChars = words.slice(0, wIdx).join('').length + wIdx;
-        return (
-          <span key={wIdx} className="inline-block mr-[0.3em] whitespace-nowrap">
-            {word.split('').map((char, cIdx) => {
-              const i = prevChars + cIdx;
-              return (
-                <motion.span
-                  key={cIdx}
-                  custom={i}
-                  variants={{
-                    hidden: { y: -60, opacity: 0, rotate: -8 },
-                    visible: { y: 0, opacity: 1, rotate: 0, transition: { type: 'spring', stiffness: 200, damping: 12, delay: i * 0.04 } }
-                  }}
-                  style={{ display: 'inline-block' }}
-                >
-                  {char}
-                </motion.span>
-              );
-            })}
-          </span>
-        );
-      })}
-    </motion.h2>
-  );
-}

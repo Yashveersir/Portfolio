@@ -18,6 +18,7 @@ uniform float uTime;
 uniform vec2 uResolution;
 uniform vec2 uMouse;
 uniform float uClickTime;
+uniform float uTheme; // 0 for dark, 1 for light
 
 varying vec2 vUv;
 
@@ -140,10 +141,21 @@ void main() {
   float coreSDF = distToCenter - currentRadius;
 
   // Colors
-  vec3 cBlack = vec3(0.01, 0.02, 0.05); // Deep space
-  vec3 cCyan = vec3(0.05, 0.7, 0.9); // Sleek tech blue
-  vec3 cPurple = vec3(0.3, 0.1, 0.7); // Deep royal purple
-  vec3 cWhite = vec3(0.85, 0.9, 1.0); // Clean core
+  vec3 darkBg = vec3(0.01, 0.02, 0.05);
+  vec3 lightBg = vec3(0.97, 0.98, 0.99);
+  vec3 cBlack = mix(darkBg, lightBg, uTheme);
+
+  vec3 darkCyan = vec3(0.05, 0.7, 0.9);
+  vec3 lightCyan = vec3(0.0, 0.5, 0.7);
+  vec3 cCyan = mix(darkCyan, lightCyan, uTheme);
+
+  vec3 darkPurple = vec3(0.3, 0.1, 0.7);
+  vec3 lightPurple = vec3(0.5, 0.3, 0.8);
+  vec3 cPurple = mix(darkPurple, lightPurple, uTheme);
+
+  vec3 darkWhite = vec3(0.85, 0.9, 1.0);
+  vec3 lightWhite = vec3(0.1, 0.15, 0.2); // Core is darker in light mode for contrast
+  vec3 cWhite = mix(darkWhite, lightWhite, uTheme);
 
   vec3 finalColor = cBlack;
 
@@ -202,15 +214,15 @@ void main() {
   }
 
   // High contrast & Vignette
-  finalColor = pow(finalColor, vec3(1.2)); // Increase contrast
+  finalColor = pow(finalColor, vec3(mix(1.2, 0.9, uTheme))); // Less contrast in light mode
   float vignette = smoothstep(2.5, 0.2, length(uv));
-  finalColor *= vignette;
+  finalColor = mix(finalColor * vignette, finalColor, uTheme * 0.5); // Softer vignette in light mode
 
   gl_FragColor = vec4(finalColor, 1.0);
 }
 `;
 
-function WebGLBackground({ isVisible }: { isVisible: boolean }) {
+function WebGLBackground({ isVisible, theme }: { isVisible: boolean; theme: 'dark' | 'light' }) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const { size } = useThree();
   const mouse = useRef({ x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 });
@@ -222,8 +234,9 @@ function WebGLBackground({ isVisible }: { isVisible: boolean }) {
       uResolution: { value: new THREE.Vector2(size.width, size.height) },
       uMouse: { value: new THREE.Vector2(0.5, 0.5) },
       uClickTime: { value: 999.0 },
+      uTheme: { value: theme === 'light' ? 1.0 : 0.0 },
     }),
-    [size]
+    [size, theme]
   );
 
   useEffect(() => {
@@ -281,25 +294,45 @@ export default function HeroBg() {
   const [mounted, setMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
     setMounted(true);
     
+    // Check initial theme
+    const currentTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
+    setTheme(currentTheme);
+
+    // Observe theme changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+          const newTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
+          setTheme(newTheme);
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+    
     if (!containerRef.current) return;
     
-    const observer = new IntersectionObserver(
+    const intersectionObserver = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
       { threshold: 0.01 }
     );
     
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
+    intersectionObserver.observe(containerRef.current);
+    return () => {
+      observer.disconnect();
+      intersectionObserver.disconnect();
+    };
   }, []);
 
   if (!mounted) {
-    return <div className="absolute inset-0 w-full h-full bg-[#03040a]" suppressHydrationWarning />;
+    return <div className="absolute inset-0 w-full h-full bg-theme" style={{ background: 'var(--bg)' }} suppressHydrationWarning />;
   }
 
   return (
@@ -311,7 +344,7 @@ export default function HeroBg() {
     >
       {/* Orthographic camera is perfect for a full-screen quad shader */}
       <Canvas orthographic camera={{ position: [0, 0, 1], left: -1, right: 1, top: 1, bottom: -1 }}>
-        <WebGLBackground isVisible={isVisible} />
+        <WebGLBackground isVisible={isVisible} theme={theme} />
       </Canvas>
     </div>
   );

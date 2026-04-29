@@ -38,6 +38,9 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
   },
+  verification: {
+    google: 'rP5SFGFWNd2zFjbNfD3Qn7j5WojzWlr--Jo0OdttDzc',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -79,8 +82,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`scroll-smooth ${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}>
-      <body className={`${dmSans.className} bg-black text-white antialiased min-h-screen selection:bg-cyan-500/30`}>
+    <html lang="en" className={`scroll-smooth ${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+      <body className={`${dmSans.className} antialiased min-h-screen selection:bg-cyan-500/30`} suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              "name": "Yashveer Singh",
+              "url": "https://yashveersingh.xyz",
+              "jobTitle": "Full-Stack & AI Engineer",
+              "image": "https://yashveersingh.xyz/myImage.jpeg",
+              "sameAs": [
+                "https://github.com/yashveer-singh",
+                "https://www.linkedin.com/in/yashveer-singh-1b1a1b1b1",
+              ],
+              "knowsAbout": [
+                "Full-Stack Development",
+                "MERN Stack",
+                "Generative AI",
+                "Backend Systems",
+                "React",
+                "Node.js"
+              ]
+            })
+          }}
+        />
+        <div className="noise-overlay" />
         <CustomCursor />
         <ScrollProgress />
         <Navbar />
