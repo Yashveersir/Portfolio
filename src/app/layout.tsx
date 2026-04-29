@@ -27,9 +27,49 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'Yashveer Singh | Full-Stack & AI Engineer',
-  description: 'Portfolio of Yashveer Singh, specializing in MERN stack, Generative AI, and secure backend systems.',
+  description: 'Portfolio of Yashveer Singh — Full-Stack Developer specializing in MERN stack, Generative AI, and secure backend systems. Open to work.',
+  keywords: ['Yashveer Singh', 'Full-Stack Developer', 'MERN Stack', 'Generative AI', 'Portfolio', 'React', 'Node.js', 'Backend Engineer', 'Web Developer India'],
+  authors: [{ name: 'Yashveer Singh' }],
+  creator: 'Yashveer Singh',
+  metadataBase: new URL('https://yashveersingh.xyz'),
+  alternates: {
+    canonical: '/',
+  },
   icons: {
     icon: '/favicon.ico',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://yashveersingh.xyz',
+    siteName: 'Yashveer Singh Portfolio',
+    title: 'Yashveer Singh | Full-Stack & AI Engineer',
+    description: 'Full-Stack Developer specializing in MERN stack, Generative AI, and secure backend systems. Currently open to new opportunities.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Yashveer Singh — Full-Stack & AI Engineer',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Yashveer Singh | Full-Stack & AI Engineer',
+    description: 'Full-Stack Developer specializing in MERN stack, Generative AI, and secure backend systems.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large' as const,
+      'max-snippet': -1,
+    },
   },
 };
 

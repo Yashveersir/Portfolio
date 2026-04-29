@@ -270,6 +270,8 @@ export default function Hero() {
           {/* LEFT — text */}
           <div className="flex-1 max-w-2xl">
             <div className="mb-6" data-hero-headline="true">
+              {/* Screen-reader-only h1 for SEO and accessibility */}
+              <h1 className="sr-only">Yashveer Singh — I Build Things That Live Online</h1>
               <div className="overflow-hidden mb-1">
                 <motion.div
                   initial={{ opacity: 0, x: -60, rotate: -2 }}

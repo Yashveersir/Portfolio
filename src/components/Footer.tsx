@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { socialLinks } from '@/lib/constants';
-import { FaArrowUp, FaGithub, FaLinkedin } from 'react-icons/fa';
+import { FaArrowUp, FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
 export default function Footer() {
   const ref = useRef<HTMLElement>(null);
@@ -94,6 +94,9 @@ export default function Footer() {
               <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-blue-400 transition-colors" aria-label="LinkedIn Profile">
                 <FaLinkedin size={16} aria-hidden="true" />
               </a>
+              <a href="mailto:yashveersingh.work@gmail.com" className="text-white/20 hover:text-cyan-400 transition-colors" aria-label="Send Email">
+                <FaEnvelope size={16} aria-hidden="true" />
+              </a>
             </div>
             <AnimatePresence>
               {atBottom && (
@@ -116,7 +119,7 @@ export default function Footer() {
             className="text-[10px] uppercase tracking-widest text-white/15"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
-            Terminal Portfolio v2.4
+            Designed & Built by Yashveer Singh
           </p>
         </div>
       </div>

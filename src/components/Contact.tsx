@@ -244,6 +244,14 @@ export default function Contact() {
     }
   };
 
+  // Auto-dismiss success/error messages
+  useEffect(() => {
+    if (submitStatus !== 'idle') {
+      const timer = setTimeout(() => setSubmitStatus('idle'), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [submitStatus]);
+
   const dynamicHeading = name.trim() ? `Let's Talk, ${name.trim()}.` : "Let's build\nsomething great.";
 
   return (
@@ -372,6 +380,7 @@ export default function Contact() {
                     id="name"
                     name="name"
                     required
+                    maxLength={100}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="bg-black/40 border border-white/8 px-4 py-3 text-white text-sm placeholder-white/15 focus:outline-none focus:border-cyan-400/50 transition-colors"
@@ -394,6 +403,7 @@ export default function Contact() {
                     id="email"
                     name="email"
                     required
+                    maxLength={254}
                     className="bg-black/40 border border-white/8 px-4 py-3 text-white text-sm placeholder-white/15 focus:outline-none focus:border-cyan-400/50 transition-colors"
                     style={{ fontFamily: 'var(--font-mono)' }}
                     placeholder="john@example.com"
@@ -414,6 +424,8 @@ export default function Contact() {
                     name="message"
                     required
                     rows={4}
+                    minLength={10}
+                    maxLength={2000}
                     className="bg-black/40 border border-white/8 px-4 py-3 text-white text-sm placeholder-white/15 focus:outline-none focus:border-cyan-400/50 transition-colors resize-none"
                     style={{ fontFamily: 'var(--font-mono)' }}
                     placeholder="What are we building together?"

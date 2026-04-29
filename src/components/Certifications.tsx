@@ -81,7 +81,7 @@ export default function Certifications() {
         {/* Horizontal scroll strip */}
         <div
           ref={scrollRef}
-          className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide"
+          className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory cert-scrollbar"
         >
           {certifications.map((cert, i) => (
             <CertCard key={cert.title} cert={cert} index={i} />

@@ -118,11 +118,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Server-side validation
+    const trimmedName = String(name).trim();
+    const trimmedEmail = String(email).trim();
+    const trimmedMessage = String(message).trim();
+
+    if (trimmedName.length > 100) {
+      return NextResponse.json({ error: 'Name is too long (max 100 chars).' }, { status: 400 });
+    }
+    if (trimmedEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      return NextResponse.json({ error: 'Invalid email address.' }, { status: 400 });
+    }
+    if (trimmedMessage.length < 10) {
+      return NextResponse.json({ error: 'Message too short (min 10 chars).' }, { status: 400 });
+    }
+    if (trimmedMessage.length > 2000) {
+      return NextResponse.json({ error: 'Message too long (max 2000 chars).' }, { status: 400 });
+    }
+
+    // Basic sanitization — strip HTML tags to prevent XSS in email templates
+    const sanitize = (s: string) => s.replace(/<[^>]*>/g, '');
+    const safeName = sanitize(trimmedName);
+    const safeEmail = trimmedEmail; // Already validated format
+    const safeMessage = sanitize(trimmedMessage);
+
     // 1. Save to MongoDB
     try {
       await connectDB();
-      await Message.create({ name, email, message });
-      console.log(`✅ Message from ${name} saved to MongoDB`);
+      await Message.create({ name: safeName, email: safeEmail, message: safeMessage });
+      console.log(`✅ Message from ${safeName} saved to MongoDB`);
     } catch (dbErr) {
       console.error('⚠️ DB save failed (continuing):', dbErr);
     }
@@ -135,19 +159,19 @@ export async function POST(req: NextRequest) {
           // Confirmation to sender
           transporter.sendMail({
             from: `"Yashveer Singh" <${process.env.EMAIL_USER}>`,
-            to: email,
+            to: safeEmail,
             subject: '✅ Message Received — Yashveer Singh',
-            html: senderConfirmationHtml(name, message),
+            html: senderConfirmationHtml(safeName, safeMessage),
           }),
           // Notification to owner
           transporter.sendMail({
             from: `"Portfolio Alert" <${process.env.EMAIL_USER}>`,
             to: process.env.EMAIL_USER,
-            subject: `🔔 New Contact: ${name}`,
-            html: ownerNotificationHtml(name, email, message),
+            subject: `🔔 New Contact: ${safeName}`,
+            html: ownerNotificationHtml(safeName, safeEmail, safeMessage),
           }),
         ]);
-        console.log(`✉️ Emails sent to ${email} and owner`);
+        console.log(`✉️ Emails sent to ${safeEmail} and owner`);
       } catch (emailErr) {
         console.error('⚠️ Email send failed:', emailErr);
       }
