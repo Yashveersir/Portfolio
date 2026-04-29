@@ -69,7 +69,7 @@ export default function CustomCursor() {
     <>
       {/* Primary HUD Point */}
       <motion.div
-        className="fixed top-0 left-0 w-1 h-1 bg-cyan-400 z-[9999] pointer-events-none"
+        className="fixed top-0 left-0 w-1 h-1 bg-[var(--cyan)] z-[9999] pointer-events-none"
         style={{
           x: mouseX,
           y: mouseY,
@@ -99,25 +99,25 @@ export default function CustomCursor() {
         ].map((p, i) => (
           <motion.div
             key={i}
-            className="absolute w-2 h-2 border-t border-l border-cyan-400/60"
+            className="absolute w-2 h-2 border-t border-l border-[var(--cyan)]/60"
             style={{
               top: p.t, left: p.l, right: (p as { right?: number }).right, bottom: (p as { b?: number }).b,
               transform: `rotate(${p.r})`,
             }}
             animate={{
               scale: isHovering ? 1.5 : 1,
-              borderColor: isHovering ? 'rgba(34,211,238,1)' : 'rgba(34,211,238,0.6)',
+              borderColor: isHovering ? 'var(--cyan)' : 'color-mix(in srgb, var(--cyan), transparent 40%)',
             }}
           />
         ))}
 
         {/* Center Cross Lines */}
         <motion.div 
-          className="absolute w-full h-[1px] bg-cyan-400/10"
+          className="absolute w-full h-[1px] bg-[var(--cyan)]/10"
           animate={{ scaleX: isHovering ? 1.2 : 0.4 }}
         />
         <motion.div 
-          className="absolute h-full w-[1px] bg-cyan-400/10"
+          className="absolute h-full w-[1px] bg-[var(--cyan)]/10"
           animate={{ scaleY: isHovering ? 1.2 : 0.4 }}
         />
 
@@ -127,9 +127,9 @@ export default function CustomCursor() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="absolute -bottom-8 bg-theme-card border border-cyan-400/30 px-2 py-0.5 backdrop-blur-sm"
+              className="absolute -bottom-8 bg-theme-card border border-[var(--cyan)]/30 px-2 py-0.5 backdrop-blur-sm"
             >
-              <span className="text-[8px] font-bold tracking-[0.2em] text-cyan-400 uppercase font-mono">
+              <span className="text-[8px] font-bold tracking-[0.2em] text-[var(--cyan)] uppercase font-mono">
                 {cursorText}
               </span>
             </motion.div>
@@ -145,7 +145,7 @@ export default function CustomCursor() {
           y: trailY,
           translateX: '-50%',
           translateY: '-50%',
-          background: 'radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, color-mix(in srgb, var(--cyan), transparent 90%) 0%, transparent 70%)',
           opacity: isHovering ? 0.3 : 0.1,
         }}
       />

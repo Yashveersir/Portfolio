@@ -12,8 +12,8 @@ export default function ScrollProgress() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 right-0 h-[2px] bg-cyan-400 origin-left z-[100] shadow-[0_0_10px_rgba(34,211,238,0.8)]"
-      style={{ scaleX }}
+      className="fixed top-0 left-0 right-0 h-[2px] bg-[var(--cyan)] origin-left z-[100] shadow-[0_0_10px_var(--cyan)]"
+      style={{ scaleX, opacity: 0.8 }}
       suppressHydrationWarning
     />
   );

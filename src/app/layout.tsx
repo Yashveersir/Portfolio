@@ -84,7 +84,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`scroll-smooth ${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
-      <body className={`${dmSans.className} antialiased min-h-screen selection:bg-cyan-500/30`} suppressHydrationWarning>
+      <body className={`${dmSans.className} antialiased min-h-screen selection:bg-[var(--cyan)]/30`} suppressHydrationWarning>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

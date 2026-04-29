@@ -47,7 +47,7 @@ export default function Footer() {
           animate={atBottom && mounted ? { x: ['0%', '-50%'] } : { x: '0%' }}
           transition={{ repeat: Infinity, ease: 'linear', duration: 20 }}
         >
-          <span className="text-[11px] font-black uppercase tracking-[0.3em] text-cyan-400/50 mr-4" style={{ fontFamily: 'var(--font-syne)' }}>
+          <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[var(--cyan)] opacity-50 mr-4" style={{ fontFamily: 'var(--font-syne)' }}>
             LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH · LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH · LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH · LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH · LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH · LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH ·
           </span>
         </motion.div>
@@ -64,7 +64,7 @@ export default function Footer() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }
             }}
-            className="w-10 h-10 rounded-full border border-theme bg-theme-card flex items-center justify-center text-theme-dim hover:text-cyan-400 hover:border-cyan-400/50 hover:bg-cyan-400/10 transition-all group"
+            className="w-10 h-10 rounded-full border border-theme bg-theme-card flex items-center justify-center text-theme-dim hover:text-[var(--cyan)] hover:border-[var(--cyan)]/50 hover:bg-[var(--cyan)]/10 transition-all group"
             aria-label="Back to top"
           >
             <FaArrowUp size={14} className="group-hover:-translate-y-1 transition-transform" />
@@ -98,7 +98,7 @@ export default function Footer() {
               <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-theme-muted hover:text-blue-400 transition-colors" aria-label="LinkedIn Profile">
                 <FaLinkedin size={16} aria-hidden="true" />
               </a>
-              <a href="mailto:yashveersingh.work@gmail.com" className="text-theme-muted hover:text-cyan-400 transition-colors" aria-label="Send Email">
+              <a href="mailto:yashveersingh.work@gmail.com" className="text-theme-muted hover:text-[var(--cyan)] transition-colors" aria-label="Send Email">
                 <FaEnvelope size={16} aria-hidden="true" />
               </a>
             </div>
@@ -109,7 +109,7 @@ export default function Footer() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.6 }}
-                  className="text-[10px] text-cyan-400/40 uppercase tracking-[0.2em]"
+                  className="text-[10px] text-[var(--cyan)] opacity-40 uppercase tracking-[0.2em]"
                   style={{ fontFamily: 'var(--font-mono)' }}
                 >
                   Ready for new challenges.

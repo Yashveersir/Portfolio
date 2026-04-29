@@ -71,18 +71,18 @@ export default function PageLoader() {
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="relative w-16 h-16 flex items-center justify-center border border-cyan-400/30 bg-cyan-400/5 overflow-hidden"
+                className="relative w-16 h-16 flex items-center justify-center border border-[var(--cyan)]/30 bg-[var(--cyan)]/5 overflow-hidden"
               >
-                <div className="absolute inset-0 bg-cyan-400/10" />
+                <div className="absolute inset-0 bg-[var(--cyan)]/10" />
                 <motion.span 
-                  className="relative text-3xl font-black text-cyan-400"
+                  className="relative text-3xl font-black text-[var(--cyan)]"
                   style={{ fontFamily: 'var(--font-syne)' }}
                 >
                   Y
                 </motion.span>
                 {/* Scanning line */}
                 <motion.div 
-                  className="absolute inset-x-0 h-[2px] bg-cyan-400/50 z-10"
+                  className="absolute inset-x-0 h-[2px] bg-[var(--cyan)]/50 z-10"
                   animate={{ top: ['-10%', '110%'] }}
                   transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
                 />
@@ -92,10 +92,10 @@ export default function PageLoader() {
             {/* Progress Info */}
             <div className="flex justify-between items-end mb-2">
               <div className="flex flex-col">
-                <span className="text-[10px] text-cyan-400/60 font-mono tracking-widest uppercase mb-1">
+                <span className="text-[10px] text-[var(--cyan)]/60 font-mono tracking-widest uppercase mb-1">
                   Status
                 </span>
-                <span className="text-[11px] text-cyan-400 font-mono tracking-[0.2em] h-4">
+                <span className="text-[11px] text-[var(--cyan)] font-mono tracking-[0.2em] h-4">
                   {LOADING_STEPS[step]}
                 </span>
               </div>
@@ -107,7 +107,7 @@ export default function PageLoader() {
             {/* Progress Bar */}
             <div className="relative h-[2px] w-full bg-white/5 overflow-hidden">
               <motion.div
-                className="absolute inset-y-0 left-0 bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]"
+                className="absolute inset-y-0 left-0 bg-[var(--cyan)] shadow-[0_0_10px_var(--cyan)]"
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.1 }}
@@ -120,7 +120,7 @@ export default function PageLoader() {
                 {[...Array(4)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="w-1 h-1 bg-cyan-400/20"
+                    className="w-1 h-1 bg-[var(--cyan)]/20"
                     animate={{ opacity: [0.2, 1, 0.2] }}
                     transition={{ repeat: Infinity, duration: 1, delay: i * 0.2 }}
                   />
