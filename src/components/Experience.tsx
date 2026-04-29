@@ -10,6 +10,26 @@ function PathFlowBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -999, y: -999 });
   const [isVisible, setIsVisible] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    // Initial theme
+    const currentTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
+    setTheme(currentTheme);
+
+    // Observe theme changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+          const newTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
+          setTheme(newTheme);
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => { mouseRef.current.x = e.clientX; mouseRef.current.y = e.clientY; };
@@ -41,7 +61,11 @@ function PathFlowBg() {
     let w = 0, h = 0;
     interface Path { x: number; speed: number; pulseY: number; color: [number,number,number]; alpha: number; length: number; width: number; }
     let paths: Path[] = [];
-    const PALETTE: [number,number,number][] = [[34,211,238],[124,111,255],[168,85,247]];
+    const isLight = theme === 'light';
+    const PALETTE: [number,number,number][] = isLight 
+      ? [[8,145,178], [124,58,237], [79,70,229]]
+      : [[34,211,238], [124,111,255], [168,85,247]];
+      
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = window.innerWidth * dpr;

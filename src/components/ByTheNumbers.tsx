@@ -8,25 +8,25 @@ const METRICS = [
     value: '100K+',
     label: 'Lines of Code',
     sub: 'Mostly bugs, but they look pretty.',
-    color: '#22d3ee',
+    color: 'var(--cyan)',
   },
   {
     value: '500+',
     label: 'Cups of Coffee',
     sub: 'The true fuel of development.',
-    color: '#ff6400',
+    color: 'var(--amber)',
   },
   {
     value: '50+',
     label: 'Bugs Fixed',
     sub: '...and probably 100+ created.',
-    color: '#7c6fff',
+    color: 'var(--violet)',
   },
   {
     value: '13+',
     label: 'Certifications',
     sub: 'Because learning never stops.',
-    color: '#a855f7',
+    color: 'var(--purple-500)',
   },
 ];
 

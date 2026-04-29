@@ -11,6 +11,26 @@ function NetworkBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -999, y: -999, rippleR: 0, rippling: false });
   const [isVisible, setIsVisible] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    // Initial theme
+    const currentTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
+    setTheme(currentTheme);
+
+    // Observe theme changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+          const newTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
+          setTheme(newTheme);
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -79,13 +99,20 @@ function NetworkBg() {
       time += 0.004;
       ctx.clearRect(0, 0, w, h);
 
+      const isLight = theme === 'light';
+      
+      // Palette adjustments for light mode contrast
+      const cyan = isLight ? '8,145,178' : '34,211,238';
+      const purple = isLight ? '124,58,237' : '124,111,255';
+      const blue = isLight ? '37,99,235' : '96,165,250';
+
       // Strong ambient breathing orbs
       const breath = Math.sin(time * 0.9) * 0.5 + 0.5;
-      ctx.globalCompositeOperation = 'screen';
+      ctx.globalCompositeOperation = isLight ? 'multiply' : 'screen';
       const orbs = [
-        { cx: w*0.3, cy: h*0.4, r: Math.max(w,h)*0.55, c: '124,111,255', a: 0.07+breath*0.04 },
-        { cx: w*0.7, cy: h*0.6, r: Math.max(w,h)*0.5,  c: '34,211,238',  a: 0.06+breath*0.03 },
-        { cx: w*0.5, cy: h*0.2, r: Math.max(w,h)*0.35, c: '96,165,250',  a: 0.04+breath*0.02 },
+        { cx: w*0.3, cy: h*0.4, r: Math.max(w,h)*0.55, c: purple, a: (0.07+breath*0.04) * (isLight ? 0.4 : 1) },
+        { cx: w*0.7, cy: h*0.6, r: Math.max(w,h)*0.5,  c: cyan,   a: (0.06+breath*0.03) * (isLight ? 0.4 : 1) },
+        { cx: w*0.5, cy: h*0.2, r: Math.max(w,h)*0.35, c: blue,   a: (0.04+breath*0.02) * (isLight ? 0.4 : 1) },
       ];
       orbs.forEach(({cx,cy,r,c,a}) => {
         const g = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
@@ -94,12 +121,11 @@ function NetworkBg() {
       });
       ctx.globalCompositeOperation = 'source-over';
 
-      // Mouse-following glow — theme aware
+      // Mouse-following glow
       const mx = mouseRef.current.x, my = mouseRef.current.y;
-      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
       if (mx>0 && my>0) {
         const mg = ctx.createRadialGradient(mx,my,0,mx,my,320);
-        mg.addColorStop(0, isLight ? 'rgba(34,211,238,0.06)' : 'rgba(34,211,238,0.09)'); mg.addColorStop(1,'rgba(0,0,0,0)');
+        mg.addColorStop(0, isLight ? `rgba(${cyan},0.04)` : `rgba(${cyan},0.09)`); mg.addColorStop(1,'rgba(0,0,0,0)');
         ctx.fillStyle=mg; ctx.fillRect(0,0,w,h);
       }
 
@@ -117,8 +143,8 @@ function NetworkBg() {
           const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
           const d2=dx*dx+dy*dy;
           if (d2<CONN) {
-            const a=(1-d2/CONN)*0.15;
-            const col = particles[i].isCyan ? '34,211,238' : '124,111,255';
+            const a=(1-d2/CONN)* (isLight ? 0.1 : 0.15);
+            const col = particles[i].isCyan ? cyan : purple;
             ctx.strokeStyle=`rgba(${col},${a})`;
             ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.stroke();
           }
@@ -128,9 +154,9 @@ function NetworkBg() {
       // Draw particles with glow halos
       particles.forEach(p => {
         const pa = p.alpha*(Math.sin(time*0.9+p.phase)*0.4+0.6);
-        const col = p.isCyan ? '34,211,238' : '124,111,255';
+        const col = p.isCyan ? cyan : purple;
         const halo = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*5);
-        halo.addColorStop(0,`rgba(${col},${pa*0.5})`); halo.addColorStop(1,`rgba(${col},0)`);
+        halo.addColorStop(0,`rgba(${col},${pa* (isLight ? 0.2 : 0.5)})`); halo.addColorStop(1,`rgba(${col},0)`);
         ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(p.x,p.y,p.size*5,0,Math.PI*2); ctx.fill();
         ctx.fillStyle=`rgba(${col},${pa})`;
         ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
@@ -142,7 +168,7 @@ function NetworkBg() {
           const rr = mouseRef.current.rippleR - ring*25;
           if (rr>0) {
             const ra = Math.max(0, 0.4-rr/200);
-            const rc = ring===1 ? '124,111,255' : '34,211,238';
+            const rc = ring===1 ? purple : cyan;
             ctx.strokeStyle=`rgba(${rc},${ra})`;
             ctx.lineWidth=1.5-ring*0.4;
             ctx.beginPath(); ctx.arc(mx,my,rr,0,Math.PI*2); ctx.stroke();

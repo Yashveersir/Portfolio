@@ -10,7 +10,7 @@ import { useMousePosition } from '@/hooks/useMousePosition';
 import CharSplitHeading from './CharSplitHeading';
 
 // Per-project accent colors from spec
-const PROJECT_ACCENTS = ['#22d3ee', '#ff6400', '#7c6fff'];
+const PROJECT_ACCENTS = ['var(--cyan)', 'var(--amber)', 'var(--violet)'];
 
 function ProjectCard({ project, index }: { project: typeof projects[0]; index: number }) {
   const accent = PROJECT_ACCENTS[index % PROJECT_ACCENTS.length];

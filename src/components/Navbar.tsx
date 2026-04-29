@@ -163,39 +163,44 @@ export default function Navbar() {
               )}
             </a>
           ))}
-          <div className="w-[1px] h-4 bg-theme-muted mx-2" />
+        </div>
+
+        {/* Right actions */}
+        <div className="flex items-center gap-2 md:gap-4">
+          <div className="hidden md:block w-[1px] h-4 bg-theme-muted mx-2" />
           <ThemeToggle />
+          
           <a
             href="/Yashveer-Singh-Resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative px-4 py-2 overflow-hidden border border-cyan-400/40 text-[9px] font-bold uppercase tracking-[0.2em] text-cyan-400 transition-all hover:text-black"
+            className="hidden md:block group relative px-4 py-2 overflow-hidden border border-cyan-400/40 text-[9px] font-bold uppercase tracking-[0.2em] text-cyan-400 transition-all hover:text-black"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
             <div className="absolute inset-0 bg-cyan-400 -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
             <span className="relative z-10">Resume</span>
           </a>
-        </div>
 
-        {/* Mobile toggle */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="relative z-50 text-theme md:hidden flex items-center justify-center w-10 h-10 -mr-2"
-          aria-label="Toggle menu"
-        >
-          {open ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          )}
-        </button>
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setOpen(!open)}
+            className="relative z-50 text-theme md:hidden flex items-center justify-center w-10 h-10 -mr-2"
+            aria-label="Toggle menu"
+          >
+            {open ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile drawer */}

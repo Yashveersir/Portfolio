@@ -33,7 +33,7 @@ function TypingEffect() {
   }, [text, deleting, idx]);
 
   return (
-    <span className="text-cyan-400" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem' }}>
+    <span className="text-[var(--cyan)]" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem' }}>
       {'>'} {text}<span className="animate-pulse ml-0.5">_</span>
     </span>
   );
@@ -108,7 +108,7 @@ function PhotoFrame() {
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
       >
         <div className="flex items-center gap-3 border border-theme bg-theme-card backdrop-blur-md px-4 py-2 pixel-border">
-          <div className="w-2 h-2 rounded-none bg-cyan-400 animate-pulse" />
+          <div className="w-2 h-2 rounded-none bg-[var(--cyan)] animate-pulse" />
           <span className="text-[9px] font-bold text-theme-muted uppercase tracking-[0.25em]" style={{ fontFamily: 'var(--font-mono)' }}>
             CORE_ID // YS.V26
           </span>
@@ -123,8 +123,9 @@ function PhotoFrame() {
         <div
           className="absolute inset-[-20px] rounded-full pointer-events-none opacity-0 group-hover/photo:opacity-100 transition-opacity duration-700"
           style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(34,211,238,0.2) 0%, transparent 70%)',
+            background: 'radial-gradient(circle at 50% 50%, var(--cyan) 0%, transparent 70%)',
             filter: 'blur(24px)',
+            opacity: 0.2,
             transform: 'translateZ(-20px)'
           }}
         />
@@ -139,7 +140,8 @@ function PhotoFrame() {
           <motion.rect
             x="0" y="0" width="100" height="100"
             fill="none"
-            stroke="rgba(34,211,238,0.4)"
+            stroke="var(--cyan)"
+            style={{ opacity: 0.4 }}
             strokeWidth="0.5"
             strokeDasharray="4 6"
             animate={isInView ? { strokeDashoffset: [0, -100] } : { strokeDashoffset: 0 }}
@@ -169,11 +171,11 @@ function PhotoFrame() {
             style={{ filter: 'contrast(1.1) saturate(0.85) brightness(0.95)' }}
           />
           <div
-            className="absolute inset-0 bg-cyan-400/5 mix-blend-overlay"
+            className="absolute inset-0 bg-[var(--cyan)]/5 mix-blend-overlay"
           />
           <motion.div
             className="absolute left-0 right-0 h-[1px] pointer-events-none z-20"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(34,211,238,0.8), transparent)' }}
+            style={{ background: 'linear-gradient(90deg, transparent, var(--cyan), transparent)' }}
             animate={isInView ? { top: ['-5%', '105%'] } : { top: '-5%' }}
             transition={{ repeat: Infinity, duration: 4, ease: 'linear', repeatDelay: 2 }}
           />
@@ -192,11 +194,12 @@ function PhotoFrame() {
             style={{
               ...('top' in pos ? { top: pos.top } : { bottom: (pos as { bottom: number }).bottom }),
               ...('left' in pos ? { left: pos.left } : { right: (pos as { right: number }).right }),
-              border: '2px solid rgba(34,211,238,0.6)',
+              border: '2px solid var(--cyan)',
+              opacity: 0.6,
               clipPath: 'polygon(0 0, 35% 0, 35% 35%, 100% 35%, 100% 100%, 0 100%)',
               transform: `rotate(${pos.rot}deg) translateZ(${pos.z})`,
             }}
-            animate={{ opacity: [0.4, 1, 0.4] }}
+            animate={{ opacity: [0.3, 0.8, 0.3] }}
             transition={{ repeat: Infinity, duration: 3, delay: i * 0.7 }}
           />
         ))}
@@ -227,29 +230,27 @@ export default function Hero() {
         className="absolute left-8 md:left-12 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-cyan-400/20 to-transparent hidden md:block origin-top" 
       />
 
-      <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 1.0, duration: 0.8 }}
-        className="absolute top-28 right-8 md:right-16 z-20"
-      >
-        <div className="flex items-center gap-3 border border-theme bg-theme-card backdrop-blur-xl px-5 py-2.5 pixel-border">
-          <div className="relative w-2.5 h-2.5">
-            <div className="absolute inset-0 rounded-none bg-cyan-400/60 radar-ring" />
-            <div className="relative w-2.5 h-2.5 rounded-none bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
-          </div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400" style={{ fontFamily: 'var(--font-mono)' }}>
-            STATUS: ACTIVE
-          </span>
-        </div>
-      </motion.div>
-
       {/* Main content container */}
       <div className="relative z-10 w-full px-6 md:px-16 lg:px-24 max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-16 lg:gap-12 pt-20 pb-16">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-16 lg:gap-12 pt-32 md:pt-20 pb-16">
 
           {/* LEFT — text */}
           <div className="flex-1 w-full text-center lg:text-left">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.5 }}
+              className="inline-flex items-center gap-3 border border-theme bg-theme-card backdrop-blur-xl px-4 py-2 pixel-border mb-8 lg:mb-12"
+            >
+              <div className="relative w-2 h-2">
+                <div className="absolute inset-0 rounded-none bg-[var(--cyan)]/60 radar-ring" />
+                <div className="relative w-2 h-2 rounded-none bg-[var(--cyan)] shadow-[0_0_8px_var(--cyan)]" />
+              </div>
+              <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[var(--cyan)]" style={{ fontFamily: 'var(--font-mono)' }}>
+                STATUS: ACTIVE
+              </span>
+            </motion.div>
+
             <div className="mb-8" data-hero-headline="true">
               <h1 className="sr-only">Yashveer Singh — I Build Things That Live Online</h1>
               
@@ -261,7 +262,7 @@ export default function Hero() {
                   style={{
                     fontFamily: 'var(--font-syne)', fontWeight: 200,
                     fontSize: 'clamp(2rem, 5vw, 4.5rem)', lineHeight: 1,
-                    color: 'var(--text)', opacity: 0.8, letterSpacing: '-0.02em',
+                    color: 'var(--text)', opacity: 0.95, letterSpacing: '-0.02em',
                   }}
                 >
                   I Build
@@ -277,9 +278,10 @@ export default function Hero() {
                     fontFamily: 'var(--font-syne)', fontWeight: 800,
                     fontSize: 'clamp(3.8rem, 10vw, 8.5rem)', lineHeight: 0.9,
                     letterSpacing: '-0.05em',
-                    background: 'linear-gradient(135deg, var(--text) 20%, #22d3ee 80%)',
+                    background: 'linear-gradient(135deg, var(--text) 20%, var(--cyan) 80%)',
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                     paddingRight: '0.05em',
+                    filter: 'drop-shadow(0 2px 10px rgba(0,0,0,0.1))'
                   }}
                 >
                   Things
@@ -294,7 +296,7 @@ export default function Hero() {
                   style={{
                     fontFamily: 'var(--font-syne)', fontWeight: 200,
                     fontSize: 'clamp(1.6rem, 4vw, 3.8rem)', lineHeight: 1.1,
-                    color: 'var(--text)', opacity: 0.6, letterSpacing: '-0.01em',
+                    color: 'var(--text)', opacity: 0.85, letterSpacing: '-0.01em',
                   }}
                 >
                   That Live Online.
