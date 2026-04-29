@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useInView, useSpring, useTransform, useMotionValue } from 'framer-motion';
+import Image from 'next/image';
 
 const ROLES = [
   'Full-Stack Developer',
@@ -42,94 +43,166 @@ import HeroBg from './HeroBg';
 
 /* ──────────────── photo frame ──────────────── */
 function PhotoFrame() {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { margin: '0px' });
+
+  // 3D Tilt state
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseX = useSpring(x, { stiffness: 150, damping: 20 });
+  const mouseY = useSpring(y, { stiffness: 150, damping: 20 });
+
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], ['10deg', '-10deg']);
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-10deg', '10deg']);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseXPos = e.clientX - rect.left;
+    const mouseYPos = e.clientY - rect.top;
+    x.set(mouseXPos / width - 0.5);
+    y.set(mouseYPos / height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   return (
     <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       initial={{ opacity: 0, x: 60, scale: 0.95 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
       transition={{ type: 'spring' as const, stiffness: 80, damping: 18, delay: 0.6 }}
-      className="relative flex-shrink-0"
+      className="relative flex-shrink-0 perspective-1200"
+      style={{ transformStyle: 'preserve-3d' }}
     >
-      {/* Outer glow ring */}
-      <div
-        className="absolute inset-[-12px] rounded-2xl pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 50%, rgba(34,211,238,0.15) 0%, transparent 70%)',
-          filter: 'blur(12px)',
-        }}
-      />
-
-      {/* Animated dashed border */}
-      <svg
-        className="absolute inset-[-6px] w-[calc(100%+12px)] h-[calc(100%+12px)] pointer-events-none"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        style={{ overflow: 'visible' }}
+      {/* HUD Label: TOP LEFT */}
+      <motion.div 
+        className="absolute -top-10 -left-6 z-20 pointer-events-none"
+        style={{ translateZ: '40px' }}
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <motion.rect
-          x="0" y="0" width="100" height="100"
-          rx="8"
-          fill="none"
-          stroke="rgba(34,211,238,0.5)"
-          strokeWidth="0.5"
-          strokeDasharray="6 4"
-          animate={{ strokeDashoffset: [0, -40] }}
-          transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
+        <div className="flex flex-col gap-1">
+          <span className="text-[9px] font-bold text-cyan-400/60 uppercase tracking-[0.2em]" style={{ fontFamily: 'var(--font-mono)' }}>
+            [ IDENTITY_VERIFIED ]
+          </span>
+          <div className="w-12 h-[1px] bg-cyan-400/30" />
+        </div>
+      </motion.div>
 
-      {/* Photo container */}
-      <div
-        className="relative overflow-hidden"
-        style={{
-          width: 'clamp(220px, 22vw, 340px)',
-          height: 'clamp(280px, 28vw, 430px)',
-          clipPath: 'polygon(0 0, 94% 0, 100% 6%, 100% 100%, 6% 100%, 0 94%)',
-        }}
+      {/* HUD Label: BOTTOM RIGHT */}
+      <motion.div 
+        className="absolute -bottom-6 -right-10 z-20 pointer-events-none"
+        style={{ translateZ: '50px' }}
+        animate={{ y: [0, 5, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
       >
-        <img
-          src="/myImage.jpeg"
-          alt="Yashveer Singh"
-          className="w-full h-full object-cover object-center"
-          style={{ filter: 'contrast(1.08) saturate(0.9)' }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(160deg, rgba(34,211,238,0.12) 0%, transparent 50%, rgba(124,111,255,0.08) 100%)' }}
-        />
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)' }}
-        />
-        <motion.div
-          className="absolute left-0 right-0 h-[2px] pointer-events-none"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(34,211,238,0.6), transparent)' }}
-          animate={{ top: ['-2%', '102%'] }}
-          transition={{ repeat: Infinity, duration: 3, ease: 'linear', repeatDelay: 1 }}
-        />
-      </div>
+        <div className="flex items-center gap-2 border border-white/5 bg-black/40 backdrop-blur-sm px-3 py-1.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)' }}>
+            MERN_CORE :: v2.4
+          </span>
+        </div>
+      </motion.div>
 
-      {/* Corner accents */}
-      {[
-        { top: -6, left: -6, rot: 0 },
-        { top: -6, right: -6, rot: 90 },
-        { bottom: -6, right: -6, rot: 180 },
-        { bottom: -6, left: -6, rot: 270 },
-      ].map((pos, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-5 h-5 pointer-events-none"
+      <motion.div
+        style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
+        className="relative"
+      >
+        {/* Outer glow ring */}
+        <div
+          className="absolute inset-[-12px] rounded-2xl pointer-events-none"
           style={{
-            ...('top' in pos ? { top: pos.top } : { bottom: (pos as { bottom: number }).bottom }),
-            ...('left' in pos ? { left: pos.left } : { right: (pos as { right: number }).right }),
-            border: '1.5px solid rgba(34,211,238,0.8)',
-            clipPath: 'polygon(0 0, 40% 0, 40% 40%, 100% 40%, 100% 100%, 0 100%)',
-            transform: `rotate(${pos.rot}deg)`,
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(34,211,238,0.15) 0%, transparent 70%)',
+            filter: 'blur(12px)',
+            transform: 'translateZ(-10px)'
           }}
-          animate={{ opacity: [0.6, 1, 0.6] }}
-          transition={{ repeat: Infinity, duration: 2, delay: i * 0.5 }}
         />
-      ))}
+
+        {/* Animated dashed border */}
+        <svg
+          className="absolute inset-[-6px] w-[calc(100%+12px)] h-[calc(100%+12px)] pointer-events-none"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          style={{ overflow: 'visible', transform: 'translateZ(10px)' }}
+        >
+          <motion.rect
+            x="0" y="0" width="100" height="100"
+            rx="8"
+            fill="none"
+            stroke="rgba(34,211,238,0.5)"
+            strokeWidth="0.5"
+            strokeDasharray="6 4"
+            animate={isInView ? { strokeDashoffset: [0, -40] } : { strokeDashoffset: 0 }}
+            transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+
+        {/* Photo container */}
+        <div
+          className="relative overflow-hidden"
+          style={{
+            width: 'clamp(220px, 22vw, 340px)',
+            height: 'clamp(280px, 28vw, 430px)',
+            clipPath: 'polygon(0 0, 94% 0, 100% 6%, 100% 100%, 6% 100%, 0 94%)',
+            transform: 'translateZ(25px)'
+          }}
+        >
+          <Image
+            src="/myImage.jpeg"
+            alt="Yashveer Singh"
+            width={400}
+            height={500}
+            priority
+            className="w-full h-full object-cover object-center"
+            style={{ filter: 'contrast(1.08) saturate(0.9)' }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(160deg, rgba(34,211,238,0.12) 0%, transparent 50%, rgba(124,111,255,0.08) 100%)' }}
+          />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)' }}
+          />
+          <motion.div
+            className="absolute left-0 right-0 h-[2px] pointer-events-none"
+            style={{ background: 'linear-gradient(90deg, transparent, rgba(34,211,238,0.6), transparent)' }}
+            animate={isInView ? { top: ['-2%', '102%'] } : { top: '-2%' }}
+            transition={{ repeat: Infinity, duration: 3, ease: 'linear', repeatDelay: 1 }}
+          />
+        </div>
+
+        {/* Corner accents */}
+        {[
+          { top: -6, left: -6, rot: 0, z: '35px' },
+          { top: -6, right: -6, rot: 90, z: '35px' },
+          { bottom: -6, right: -6, rot: 180, z: '35px' },
+          { bottom: -6, left: -6, rot: 270, z: '35px' },
+        ].map((pos, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-5 h-5 pointer-events-none"
+            style={{
+              ...('top' in pos ? { top: pos.top } : { bottom: (pos as { bottom: number }).bottom }),
+              ...('left' in pos ? { left: pos.left } : { right: (pos as { right: number }).right }),
+              border: '1.5px solid rgba(34,211,238,0.8)',
+              clipPath: 'polygon(0 0, 40% 0, 40% 40%, 100% 40%, 100% 100%, 0 100%)',
+              transform: `rotate(${pos.rot}deg) translateZ(${pos.z})`,
+            }}
+            animate={{ opacity: [0.6, 1, 0.6] }}
+            transition={{ repeat: Infinity, duration: 2, delay: i * 0.5 }}
+          />
+        ))}
+      </motion.div>
 
       {/* Name badge below photo */}
       <motion.div
@@ -137,6 +210,7 @@ function PhotoFrame() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2 }}
         className="mt-4 flex items-center justify-between"
+        style={{ transform: 'translateZ(15px)' }}
       >
         <div>
           <p className="text-xs font-bold text-white/80 uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)' }}>
@@ -262,6 +336,7 @@ export default function Hero() {
                 href="#projects"
                 className="inline-block group relative overflow-hidden border border-cyan-400 bg-cyan-400 px-8 py-3 text-sm font-bold uppercase tracking-widest text-black transition-all hover:bg-transparent hover:text-cyan-400 cursor-pointer"
                 style={{ fontFamily: 'var(--font-mono)' }}
+                aria-label="View my projects"
               >
                 View Work
               </a>
@@ -269,6 +344,7 @@ export default function Hero() {
                 href="#contact"
                 className="inline-block border border-white/15 px-8 py-3 text-sm font-bold uppercase tracking-widest text-white/70 transition-all hover:border-white/40 hover:text-white cursor-pointer"
                 style={{ fontFamily: 'var(--font-mono)' }}
+                aria-label="Contact me"
               >
                 Let&apos;s Talk
               </a>
@@ -277,6 +353,7 @@ export default function Hero() {
                 download="Yashveer-Singh-Resume.pdf"
                 className="border border-violet-500/40 px-8 py-3 text-sm font-bold uppercase tracking-widest text-violet-400/80 transition-all hover:border-violet-400 hover:text-violet-300 hover:bg-violet-500/5 cursor-pointer"
                 style={{ fontFamily: 'var(--font-mono)' }}
+                aria-label="Download my resume"
               >
                 ↓ Resume
               </a>
@@ -332,3 +409,4 @@ export default function Hero() {
     </section>
   );
 }
+

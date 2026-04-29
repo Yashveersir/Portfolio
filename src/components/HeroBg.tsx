@@ -88,7 +88,7 @@ float snoise(vec3 v) {
 float fbm(vec3 p) {
   float value = 0.0;
   float amplitude = 0.5;
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 3; i++) {
     value += amplitude * snoise(p);
     p *= 2.0;
     amplitude *= 0.5;
@@ -210,11 +210,10 @@ void main() {
 }
 `;
 
-function WebGLBackground() {
+function WebGLBackground({ isVisible }: { isVisible: boolean }) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const { size } = useThree();
   const mouse = useRef({ x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 });
-  const scroll = useRef(0);
   const clickTime = useRef(999.0); // Time since last click
 
   const uniforms = useMemo(
@@ -245,7 +244,7 @@ function WebGLBackground() {
   }, []);
 
   useFrame((state, delta) => {
-    if (!materialRef.current) return;
+    if (!materialRef.current || !isVisible) return;
 
     // Smooth mouse interpolation
     mouse.current.x += (mouse.current.tx - mouse.current.x) * 3.0 * delta;
@@ -280,8 +279,23 @@ function WebGLBackground() {
 
 export default function HeroBg() {
   const [mounted, setMounted] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
   useEffect(() => {
     setMounted(true);
+    
+    if (!containerRef.current) return;
+    
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.01 }
+    );
+    
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
   }, []);
 
   if (!mounted) {
@@ -289,10 +303,15 @@ export default function HeroBg() {
   }
 
   return (
-    <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }} suppressHydrationWarning>
+    <div 
+      ref={containerRef}
+      className="absolute inset-0 w-full h-full pointer-events-none" 
+      style={{ zIndex: 0 }} 
+      suppressHydrationWarning
+    >
       {/* Orthographic camera is perfect for a full-screen quad shader */}
       <Canvas orthographic camera={{ position: [0, 0, 1], left: -1, right: 1, top: 1, bottom: -1 }}>
-        <WebGLBackground />
+        <WebGLBackground isVisible={isVisible} />
       </Canvas>
     </div>
   );

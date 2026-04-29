@@ -52,19 +52,36 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 50);
-      const ids = navLinks.map((l) => document.getElementById(l.id));
-      let cur = '';
-      ids.forEach((el) => {
-        if (el) {
-          const y = el.getBoundingClientRect().top + window.scrollY;
-          if (window.scrollY >= y - 120) cur = el.id;
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    
+    // Use IntersectionObserver for active section tracking
+    const observerOptions = {
+      root: null,
+      rootMargin: '-40% 0px -50% 0px', // Target the middle of the screen
+      threshold: 0,
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActive(entry.target.id);
         }
       });
-      setActive(cur);
     };
-    onScroll(); // Call once on mount to set initial state
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    
+    navLinks.forEach((link) => {
+      const el = document.getElementById(link.id);
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      observer.disconnect();
+    };
   }, []);
 
   // Removed custom scrollTo since Lenis handles hash navigation
@@ -88,6 +105,7 @@ export default function Navbar() {
           onClick={() => setOpen(false)}
           className="group relative text-lg font-black tracking-[-0.05em] text-white"
           style={{ fontFamily: 'var(--font-syne)' }}
+          aria-label="Yashveer Singh - Home"
         >
           <span className="text-cyan-400">Y</span>
           <span className="text-white/30">·</span>

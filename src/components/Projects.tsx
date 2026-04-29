@@ -5,6 +5,7 @@ import { motion, useInView } from 'framer-motion';
 import { projects } from '@/lib/constants';
 import { FaGithub } from 'react-icons/fa';
 import { ExternalLink } from 'lucide-react';
+import Image from 'next/image';
 
 // Per-project accent colors from spec
 const PROJECT_ACCENTS = ['#22d3ee', '#ff6400', '#7c6fff'];
@@ -49,12 +50,24 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
   const isFirst = index === 0;
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
+  
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
 
   return (
     <motion.div
       ref={ref}
+      onMouseMove={handleMouseMove}
       data-project-card="true"
-      className="relative"
+      className="relative group/card"
       initial={{ y: 40, opacity: 0 }}
       animate={isInView ? { y: 0, opacity: 1 } : { y: 40, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 100, damping: 20, delay: index * 0.15 }}
@@ -91,12 +104,20 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
       )}
 
       <div
-        className="relative z-10 border border-white/6 bg-[#0a0a14] overflow-hidden group hover-float-card"
+        className="relative z-10 border border-white/6 bg-[#0a0a14] overflow-hidden hover-float-card"
         style={{
           minHeight: index === 1 ? 380 : 340,
           borderTop: `1.5px solid ${accent}30`,
         }}
       >
+        {/* Dynamic glow tracking cursor */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"
+          style={{ 
+            background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, ${accent}15, transparent 40%)` 
+          }}
+        />
+
         {/* Glow top edge */}
         <div
           className="absolute top-0 left-0 right-0 h-[1px]"
@@ -116,17 +137,19 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
               href={project.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1 -m-1 text-white/40 hover:text-white transition-colors cursor-pointer pointer-events-auto z-50"
+              className="p-1 -m-1 text-white/40 hover:text-white transition-all hover:scale-110 cursor-pointer pointer-events-auto z-50"
+              aria-label={`View ${project.title} source on GitHub`}
             >
-              <FaGithub size={36} />
+              <FaGithub size={20} aria-hidden="true" />
             </a>
             <a
               href={project.demo}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1 -m-1 text-white/40 hover:text-cyan-400 transition-colors cursor-pointer pointer-events-auto z-50"
+              className="p-1 -m-1 text-white/40 hover:text-cyan-400 transition-all hover:scale-110 cursor-pointer pointer-events-auto z-50"
+              aria-label={`View live demo of ${project.title}`}
             >
-              <ExternalLink size={36} />
+              <ExternalLink size={20} aria-hidden="true" />
             </a>
           </div>
         </div>
@@ -134,19 +157,21 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
         {/* Project Image */}
         {project.images?.[0] && (
           <div className="relative w-full h-48 sm:h-56 overflow-hidden border-y border-white/5">
-            <img 
+            <Image 
               src={project.images[0]} 
-              alt={project.title} 
-              className="w-full h-full object-cover object-top opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+              alt={`Interface of ${project.title}`} 
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="w-full h-full object-cover object-top opacity-70 group-hover/card:opacity-100 group-hover/card:scale-105 transition-all duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a14] to-transparent opacity-80" />
           </div>
         )}
 
         {/* Content */}
-        <div className="px-7 pb-7">
+        <div className="px-7 pb-7 pt-4">
           <h3
-            className="text-xl md:text-2xl font-black mb-2 leading-tight"
+            className="text-xl md:text-2xl font-black mb-2 leading-tight group-hover/card:translate-x-1 transition-transform"
             style={{ fontFamily: 'var(--font-syne)', color: accent }}
           >
             {project.title}
@@ -157,7 +182,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
           >
             {project.subtitle}
           </p>
-          <p className="text-sm text-white/85 leading-relaxed mb-6">
+          <p className="text-sm text-white/85 leading-relaxed mb-6 line-clamp-3">
             {project.description}
           </p>
 
@@ -170,7 +195,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
 
           {/* Outcome pill */}
           <div
-            className="mt-6 pt-4 border-t border-white/8 text-xs text-white/60"
+            className="mt-6 pt-4 border-t border-white/8 text-[10px] uppercase tracking-widest text-white/40 group-hover/card:text-white/60 transition-colors"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
             {project.outcome}
@@ -184,6 +209,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
 function HoloGridBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -197,6 +223,21 @@ function HoloGridBg() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !isVisible) return;
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 

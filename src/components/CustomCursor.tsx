@@ -43,6 +43,11 @@ export default function CustomCursor() {
 
     let raf: number;
     const animate = () => {
+      if (document.visibilityState === 'hidden') {
+        raf = requestAnimationFrame(animate);
+        return;
+      }
+
       // Lerp ring position (smooth trailing)
       const dx = pos.current.x - ringPos.current.x;
       const dy = pos.current.y - ringPos.current.y;

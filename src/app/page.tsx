@@ -2,20 +2,22 @@
 
 import { useEffect } from 'react';
 import Lenis from 'lenis';
+import dynamic from 'next/dynamic';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
 import Skills from '@/components/Skills';
-import Projects from '@/components/Projects';
-import Certifications from '@/components/Certifications';
-import Experience from '@/components/Experience';
-import Contact from '@/components/Contact';
 import ScrollReveal from '@/components/ScrollReveal';
 import SectionBg from '@/components/SectionBg';
+
+const Projects = dynamic(() => import('@/components/Projects'), { ssr: true });
+const Certifications = dynamic(() => import('@/components/Certifications'), { ssr: true });
+const Experience = dynamic(() => import('@/components/Experience'), { ssr: true });
+const Contact = dynamic(() => import('@/components/Contact'), { ssr: true });
 
 export default function Home() {
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
@@ -23,6 +25,9 @@ export default function Home() {
       wheelMultiplier: 1,
       touchMultiplier: 2,
     });
+
+    // Expose lenis to window for use in other components (e.g., Footer)
+    (window as any).lenis = lenis;
 
     function raf(time: number) {
       lenis.raf(time);

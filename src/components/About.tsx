@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 
 const BIO_WORDS = [
   'Computer', 'Science', 'Engineering', 'student', 'with', '8.6', 'CGPA,',
@@ -76,6 +76,7 @@ const STATS = [
 function NeuralBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -89,6 +90,21 @@ function NeuralBg() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !isVisible) return;
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
@@ -106,7 +122,7 @@ function NeuralBg() {
     window.addEventListener('resize', resize);
 
     // More nodes, slightly faster
-    const nodes = Array.from({ length: 60 }, () => ({
+    const nodes = Array.from({ length: 35 }, () => ({
       x: Math.random() * 1400,
       y: Math.random() * 800,
       vx: (Math.random() - 0.5) * 0.18,
@@ -126,7 +142,14 @@ function NeuralBg() {
 
     resize();
 
-    const draw = () => {
+    let lastFrame = 0;
+    const FRAME_INTERVAL = 1000 / 30;
+
+    const draw = (now: number) => {
+      frameId = requestAnimationFrame(draw);
+      const elapsed = now - lastFrame;
+      if (elapsed < FRAME_INTERVAL) return;
+      lastFrame = now - (elapsed % FRAME_INTERVAL);
       time += 0.005;
       mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05;
       mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05;
@@ -191,7 +214,7 @@ function NeuralBg() {
       });
 
       // ── Connections — stronger, dual-color ──
-      const MAX_DIST2 = 200 * 200;
+      const MAX_DIST2 = 150 * 150;
       ctx.lineWidth = 0.8;
       for (let i = 0; i < nodes.length; i++) {
         const ni = nodes[i];
@@ -263,16 +286,14 @@ function NeuralBg() {
         ctx.beginPath(); ctx.arc(px, py, 1.8 / n.z, 0, Math.PI * 2); ctx.fill();
       });
 
-      frameId = requestAnimationFrame(draw);
     };
-
     frameId = requestAnimationFrame(draw);
 
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(frameId);
     };
-  }, []);
+  }, [isVisible]);
 
   return (
     <canvas
@@ -283,17 +304,91 @@ function NeuralBg() {
   );
 }
 
+function Terminal() {
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const isTerminalInView = useInView(terminalRef, { once: true, margin: '-50px' });
+  const [copied, setCopied] = useState(false);
+
+  const copyEmail = () => {
+    navigator.clipboard.writeText('singhyash9631@gmail.com');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <motion.div
+      ref={terminalRef}
+      initial="hidden"
+      animate={isTerminalInView ? "visible" : "hidden"}
+      variants={{
+        hidden: { opacity: 0, x: 40 },
+        visible: { 
+          opacity: 1, 
+          x: 0,
+          transition: { 
+            duration: 0.7, 
+            when: "beforeChildren",
+            staggerChildren: 0.1 
+          }
+        }
+      }}
+      className="group relative rounded-xl border border-white/8 bg-[#0a0a14]/80 backdrop-blur-xl overflow-hidden shadow-2xl"
+    >
+      {/* Window bar */}
+      <div className="flex items-center gap-1.5 border-b border-white/5 bg-white/3 px-4 py-3">
+        <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
+        <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+        <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+        <span
+          className="ml-auto text-[10px] text-white/20"
+          style={{ fontFamily: 'var(--font-mono)' }}
+        >
+          yashveer.ts
+        </span>
+      </div>
+
+      <div className="p-6" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', lineHeight: 1.8 }}>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}><span className="text-[#c084fc]">const</span> <span className="text-[#60a5fa]">developer</span> <span className="text-white/50">=</span> {'{'}</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">name:</span> <span className="text-[#fbbf24]">&apos;Yashveer Singh&apos;</span>,</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">role:</span> <span className="text-[#fbbf24]">&apos;Full-Stack &amp; AI Engineer&apos;</span>,</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">location:</span> <span className="text-[#fbbf24]">&apos;Burdwan, WB, India&apos;</span>,</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">email:</span> <span className="text-[#fbbf24]">&apos;singhyash9631@gmail.com&apos;</span>,</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">stack:</span> [<span className="text-[#22d3ee]">&apos;React&apos;</span>, <span className="text-[#22d3ee]">&apos;Node&apos;</span>, <span className="text-[#22d3ee]">&apos;AI&apos;</span>],</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">openToWork:</span> <span className="text-[#c084fc]">true</span>,</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>{'}'}</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="mt-3 text-white/20 animate-pulse">▌</motion.p>
+      </div>
+
+      {/* Hover Copy Button */}
+      <AnimatePresence>
+        <motion.div 
+          className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <button
+            onClick={copyEmail}
+            className="flex items-center gap-2 px-3 py-1.5 border border-white/10 bg-white/5 backdrop-blur hover:bg-white/10 transition-colors text-[10px] uppercase tracking-widest text-white/60"
+            style={{ fontFamily: 'var(--font-mono)' }}
+            aria-label="Copy email address"
+          >
+            {copied ? '✓ Copied' : 'Copy Email'}
+          </button>
+        </motion.div>
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
-  const terminalRef = useRef<HTMLDivElement>(null);
   const locationRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] });
   const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '6%']);
 
   const isStatsInView = useInView(statsRef, { once: true, margin: '-50px' });
-  const isTerminalInView = useInView(terminalRef, { once: true, margin: '-50px' });
   const isLocationInView = useInView(locationRef, { once: true, margin: '-50px' });
 
   return (
@@ -359,11 +454,11 @@ export default function About() {
                   initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
                   animate={isStatsInView ? { opacity: 1, x: 0 } : { opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
                   transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="p-5 border border-white/5 bg-white/3 hover:bg-white/6 transition-colors"
+                  className="group p-5 border border-white/5 bg-white/3 hover:bg-white/6 hover:border-white/10 transition-all cursor-default"
                   style={{ borderLeft: `2px solid ${s.color}40` }}
                 >
                   <p
-                    className="text-3xl font-black mb-1"
+                    className="text-3xl font-black mb-1 group-hover:scale-110 origin-left transition-transform duration-300"
                     style={{ color: s.color, fontFamily: 'var(--font-syne)' }}
                   >
                     {s.value}
@@ -378,49 +473,7 @@ export default function About() {
 
           {/* Right col — code terminal */}
           <div className="w-full lg:w-1/2 lg:pt-16">
-
-            <motion.div
-              ref={terminalRef}
-              initial="hidden"
-              animate={isTerminalInView ? "visible" : "hidden"}
-              variants={{
-                hidden: { opacity: 0, x: 40 },
-                visible: { 
-                  opacity: 1, 
-                  x: 0,
-                  transition: { 
-                    duration: 0.7, 
-                    when: "beforeChildren",
-                    staggerChildren: 0.1 
-                  }
-                }
-              }}
-              className="rounded-xl border border-white/8 bg-[#0a0a14]/80 backdrop-blur-xl overflow-hidden shadow-2xl"
-            >
-              {/* Window bar */}
-              <div className="flex items-center gap-1.5 border-b border-white/5 bg-white/3 px-4 py-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
-                <span
-                  className="ml-auto text-[10px] text-white/20"
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
-                  yashveer.ts
-                </span>
-              </div>
-              <div className="p-6" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', lineHeight: 1.8 }}>
-                <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}><span className="text-[#c084fc]">const</span> <span className="text-[#60a5fa]">developer</span> <span className="text-white/50">=</span> {'{'}</motion.p>
-                <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">name:</span> <span className="text-[#fbbf24]">&apos;Yashveer Singh&apos;</span>,</motion.p>
-                <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">role:</span> <span className="text-[#fbbf24]">&apos;Full-Stack &amp; AI Engineer&apos;</span>,</motion.p>
-                <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">location:</span> <span className="text-[#fbbf24]">&apos;Burdwan, West Bengal, India&apos;</span>,</motion.p>
-                <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">stack:</span> [<span className="text-[#22d3ee]">&apos;React&apos;</span>, <span className="text-[#22d3ee]">&apos;Next.js&apos;</span>, <span className="text-[#22d3ee]">&apos;Node&apos;</span>, <span className="text-[#22d3ee]">&apos;AI&apos;</span>],</motion.p>
-                <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">openToWork:</span> <span className="text-[#c084fc]">true</span>,</motion.p>
-                <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">cgpa:</span> <span className="text-[#fb923c]">8.6</span>,</motion.p>
-                <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>{'}'}</motion.p>
-                <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="mt-3 text-white/20 animate-pulse">▌</motion.p>
-              </div>
-            </motion.div>
+            <Terminal />
 
             {/* Location + availability note */}
             <motion.div
@@ -490,3 +543,4 @@ function CharSplitHeading({ text }: { text: string }) {
     </motion.h2>
   );
 }
+

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 
 /**
  * Dramatic background animations for non-Hero sections.
@@ -22,6 +22,7 @@ interface Props {
 export default function SectionBg({ variant, color = '#22d3ee', opacity = 1 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
+  const [isVisible, setIsVisible] = useState(false);
 
   const hexToRgb = useCallback((hex: string) => {
     const c = hex.replace('#', '');
@@ -35,6 +36,21 @@ export default function SectionBg({ variant, color = '#22d3ee', opacity = 1 }: P
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !isVisible) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -297,18 +313,23 @@ export default function SectionBg({ variant, color = '#22d3ee', opacity = 1 }: P
       hexgrid: drawHexgrid,
     };
 
-    const animate = () => {
+    let lastFrame = 0;
+    const FRAME_INTERVAL = 1000 / 30; // Cap at 30fps
+    const animate = (now: number) => {
+      animRef.current = requestAnimationFrame(animate);
+      const delta = now - lastFrame;
+      if (delta < FRAME_INTERVAL) return;
+      lastFrame = now - (delta % FRAME_INTERVAL);
       time += 0.016;
       drawFns[variant]();
-      animRef.current = requestAnimationFrame(animate);
     };
-    animate();
+    animRef.current = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener('resize', resize);
     };
-  }, [variant, color, hexToRgb]);
+  }, [variant, color, hexToRgb, isVisible]);
 
   return (
     <canvas

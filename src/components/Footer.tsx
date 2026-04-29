@@ -2,21 +2,33 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowUp } from 'react-icons/fa';
+import { socialLinks } from '@/lib/constants';
+import { FaArrowUp, FaGithub, FaLinkedin } from 'react-icons/fa';
 
 export default function Footer() {
   const ref = useRef<HTMLElement>(null);
   const [atBottom, setAtBottom] = useState(false);
   const [year, setYear] = useState(2026);
+  const [time, setTime] = useState('');
 
   useEffect(() => {
     setYear(new Date().getFullYear());
+    const tick = () => {
+      const now = new Date();
+      setTime(now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' }));
+    };
+    tick();
+    const interval = setInterval(tick, 60000);
+
     const observer = new IntersectionObserver(
       ([entry]) => setAtBottom(entry.isIntersecting),
       { threshold: 0.6 }
     );
     if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -29,7 +41,7 @@ export default function Footer() {
       <div className="absolute top-0 left-0 w-full overflow-hidden border-b border-white/5 py-3 pointer-events-none select-none bg-[#050505]">
         <motion.div
           className="flex whitespace-nowrap"
-          animate={{ x: ['0%', '-50%'] }}
+          animate={atBottom ? { x: ['0%', '-50%'] } : { x: '0%' }}
           transition={{ repeat: Infinity, ease: 'linear', duration: 20 }}
         >
           <span className="text-[11px] font-black uppercase tracking-[0.3em] text-cyan-400/50 mr-4" style={{ fontFamily: 'var(--font-syne)' }}>
@@ -41,7 +53,13 @@ export default function Footer() {
         {/* Back to top button */}
         <div className="flex justify-center mb-8">
           <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={() => {
+              if ((window as any).lenis) {
+                (window as any).lenis.scrollTo(0);
+              } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
             className="w-10 h-10 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/50 hover:text-cyan-400 hover:border-cyan-400/50 hover:bg-cyan-400/10 transition-all group"
             aria-label="Back to top"
           >
@@ -50,37 +68,55 @@ export default function Footer() {
         </div>
 
         {/* Bottom row */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Left — copyright */}
-          <p
-            className="text-[10px] uppercase tracking-widest text-white/20"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            © {year} Yashveer Singh · All rights reserved
-          </p>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-8 border-t border-white/5">
+          {/* Left — copyright & time */}
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <p
+              className="text-[10px] uppercase tracking-[0.2em] text-white/20"
+              style={{ fontFamily: 'var(--font-mono)' }}
+            >
+              © {year} Yashveer Singh
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+              <p className="text-[9px] text-white/15 uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)' }}>
+                Burdwan, IN — {time} IST
+              </p>
+            </div>
+          </div>
 
-          {/* Center — conditional hire me message */}
-          <AnimatePresence>
-            {atBottom && (
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                transition={{ duration: 0.6 }}
-                className="text-xs text-white/40 text-center"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                You made it to the bottom. Now hire me. 👋
-              </motion.p>
-            )}
-          </AnimatePresence>
+          {/* Center — hire me & social */}
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex gap-4">
+              <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-white transition-colors" aria-label="GitHub Profile">
+                <FaGithub size={16} aria-hidden="true" />
+              </a>
+              <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-blue-400 transition-colors" aria-label="LinkedIn Profile">
+                <FaLinkedin size={16} aria-hidden="true" />
+              </a>
+            </div>
+            <AnimatePresence>
+              {atBottom && (
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-[10px] text-cyan-400/40 uppercase tracking-[0.2em]"
+                  style={{ fontFamily: 'var(--font-mono)' }}
+                >
+                  Ready for new challenges.
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Right — built with */}
           <p
             className="text-[10px] uppercase tracking-widest text-white/15"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
-            Built with Next.js · Framer Motion
+            Terminal Portfolio v2.4
           </p>
         </div>
       </div>

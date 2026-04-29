@@ -1,9 +1,10 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { certifications } from '@/lib/constants';
 import { ExternalLink } from 'lucide-react';
+import { useMousePosition } from '@/hooks/useMousePosition';
 
 function CharSplitHeading({ text }: { text: string }) {
   const ref = useRef<HTMLHeadingElement>(null);
@@ -12,6 +13,7 @@ function CharSplitHeading({ text }: { text: string }) {
     <h2
       ref={ref}
       className="flex overflow-hidden"
+      aria-label={text}
       style={{
         fontFamily: 'var(--font-syne)',
         fontWeight: 900,
@@ -27,6 +29,7 @@ function CharSplitHeading({ text }: { text: string }) {
           animate={isInView ? { y: 0, opacity: 1, rotate: 0 } : {}}
           transition={{ type: 'spring' as const, stiffness: 200, damping: 12, delay: i * 0.04 }}
           style={{ display: 'inline-block', minWidth: char === ' ' ? '0.3em' : undefined }}
+          aria-hidden="true"
         >
           {char}
         </motion.span>
@@ -78,7 +81,7 @@ export default function Certifications() {
         {/* Horizontal scroll strip */}
         <div
           ref={scrollRef}
-          className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory"
+          className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide"
         >
           {certifications.map((cert, i) => (
             <CertCard key={cert.title} cert={cert} index={i} />
@@ -104,26 +107,30 @@ export default function Certifications() {
 function CertCard({ cert, index }: { cert: typeof certifications[0]; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-40px' });
+  const { mousePos, handleMouseMove } = useMousePosition(ref);
 
   return (
     <motion.div
       ref={ref}
+      onMouseMove={handleMouseMove}
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ type: 'spring' as const, stiffness: 100, damping: 16, delay: Math.min(index * 0.06, 0.5) }}
-      className="snap-start flex-shrink-0 relative border border-white/6 bg-[#0a0a14]/80 backdrop-blur-xl overflow-hidden group tilt-card"
+      className="snap-start flex-shrink-0 relative border border-white/6 bg-[#0a0a14]/80 backdrop-blur-xl overflow-hidden group tilt-card hover-float-card"
       style={{
         width: 'clamp(220px, 30vw, 280px)',
         borderTop: `1.5px solid ${cert.color}30`,
       }}
     >
-      {/* Glow */}
+      {/* Dynamic glow tracking cursor */}
       <div
         className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{ background: `radial-gradient(circle at 50% 0%, ${cert.color}10, transparent 60%)` }}
+        style={{ 
+          background: `radial-gradient(300px circle at ${mousePos.x}px ${mousePos.y}px, ${cert.color}15, transparent 40%)` 
+        }}
       />
 
-      <div className="p-6 flex flex-col h-full min-h-[180px]">
+      <div className="p-6 flex flex-col h-full min-h-[180px] relative z-10">
         {/* Number + icon row */}
         <div className="flex items-center justify-between mb-4">
           <span
@@ -164,8 +171,9 @@ function CertCard({ cert, index }: { cert: typeof certifications[0]; index: numb
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest transition-colors group/link"
           style={{ color: cert.color, fontFamily: 'var(--font-mono)' }}
+          aria-label={`View certificate for ${cert.title}`}
         >
-          <ExternalLink size={11} />
+          <ExternalLink size={11} aria-hidden="true" />
           <span className="group-hover/link:underline">View Certificate</span>
         </a>
       </div>

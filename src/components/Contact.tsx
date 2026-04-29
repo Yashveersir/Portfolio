@@ -9,6 +9,7 @@ import { FaGithub, FaLinkedin } from 'react-icons/fa';
 function NetworkBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -999, y: -999, rippleR: 0, rippling: false });
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -32,6 +33,21 @@ function NetworkBg() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !isVisible) return;
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
     let animationFrameId: number;
@@ -43,8 +59,7 @@ function NetworkBg() {
     };
     window.addEventListener('resize', resize); resize();
 
-    // More particles with dual color
-    const particles = Array.from({ length: 55 }, () => ({
+    const particles = Array.from({ length: 30 }, () => ({
       x: Math.random() * (w || 1400), y: Math.random() * (h || 800),
       vx: (Math.random()-0.5)*0.22, vy: (Math.random()-0.5)*0.22,
       size: Math.random()*1.6+0.4, alpha: Math.random()*0.45+0.1,
@@ -53,7 +68,13 @@ function NetworkBg() {
     }));
 
     let time = 0;
-    const draw = () => {
+    let lastFrame = 0;
+    const FRAME_INTERVAL = 1000 / 30;
+    const draw = (now: number) => {
+      animationFrameId = requestAnimationFrame(draw);
+      const elapsed = now - lastFrame;
+      if (elapsed < FRAME_INTERVAL) return;
+      lastFrame = now - (elapsed % FRAME_INTERVAL);
       time += 0.004;
       ctx.clearRect(0, 0, w, h);
 
@@ -87,7 +108,7 @@ function NetworkBg() {
       });
 
       // Connections between nearby particles
-      const CONN = 130*130;
+      const CONN = 100*100;
       ctx.lineWidth = 0.7;
       for (let i=0;i<particles.length;i++) {
         for (let j=i+1;j<particles.length;j++) {
@@ -128,12 +149,10 @@ function NetworkBg() {
         mouseRef.current.rippleR += 5;
         if (mouseRef.current.rippleR>280) mouseRef.current.rippling=false;
       }
-
-      animationFrameId = requestAnimationFrame(draw);
     };
-    draw();
+    animationFrameId = requestAnimationFrame(draw);
     return () => { window.removeEventListener('resize',resize); cancelAnimationFrame(animationFrameId); };
-  }, []);
+  }, [isVisible]);
 
   return (
     <canvas
@@ -155,6 +174,7 @@ function CharSplitHeading({ text }: { text: string }) {
     <h2
       ref={ref}
       className="flex flex-wrap overflow-hidden"
+      aria-label={text}
       style={{
         fontFamily: 'var(--font-syne)',
         fontWeight: 900,
@@ -176,6 +196,7 @@ function CharSplitHeading({ text }: { text: string }) {
                 animate={isInView ? { y: 0, opacity: 1, rotate: 0 } : {}}
                 transition={{ type: 'spring', stiffness: 200, damping: 12, delay: currentIdx * 0.035 }}
                 style={{ display: 'inline-block' }}
+                aria-hidden="true"
               >
                 {char}
               </motion.span>
@@ -255,7 +276,7 @@ export default function Contact() {
               </span>
               <div>
                 {/* Live-updating headline as user types their name */}
-                <div key={dynamicHeading}>
+                <div className="min-h-[120px]">
                   <CharSplitHeading text={dynamicHeading.split('\n')[0]} />
                   {dynamicHeading.includes('\n') && (
                     <div className="mt-1">
@@ -288,9 +309,10 @@ export default function Contact() {
               <a
                 href={`mailto:${socialLinks.email}`}
                 className="group flex items-center gap-4 text-white/75 hover:text-cyan-400 transition-colors cursor-pointer"
+                aria-label={`Send an email to ${socialLinks.email}`}
               >
                 <div className="w-10 h-10 border border-white/8 bg-white/3 flex items-center justify-center group-hover:border-cyan-400/40 group-hover:bg-cyan-400/8 transition-all">
-                  <Mail size={16} />
+                  <Mail size={16} aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-white/55 mb-0.5" style={{ fontFamily: 'var(--font-mono)' }}>Email</p>
@@ -304,16 +326,18 @@ export default function Contact() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 border border-white/8 bg-white/3 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all"
+                  aria-label="GitHub Profile"
                 >
-                  <FaGithub size={16} />
+                  <FaGithub size={16} aria-hidden="true" />
                 </a>
                 <a
                   href={socialLinks.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 border border-white/8 bg-white/3 flex items-center justify-center text-white/40 hover:text-blue-400 hover:border-blue-400/30 transition-all"
+                  aria-label="LinkedIn Profile"
                 >
-                  <FaLinkedin size={16} />
+                  <FaLinkedin size={16} aria-hidden="true" />
                 </a>
               </div>
             </motion.div>

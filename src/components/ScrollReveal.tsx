@@ -26,6 +26,9 @@ export default function ScrollReveal({
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Single observer for entrance animation (once)
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
+
   // Scroll-linked parallax
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -48,8 +51,6 @@ export default function ScrollReveal({
       scale: 1,
     },
   };
-
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
 
   return (
     <motion.div

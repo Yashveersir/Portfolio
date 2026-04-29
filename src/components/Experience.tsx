@@ -3,10 +3,12 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { experiences } from '@/lib/constants';
+import { useMousePosition } from '@/hooks/useMousePosition';
 
 function PathFlowBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -999, y: -999 });
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => { mouseRef.current.x = e.clientX; mouseRef.current.y = e.clientY; };
@@ -17,6 +19,21 @@ function PathFlowBg() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !isVisible) return;
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
     let animationFrameId: number;
@@ -105,6 +122,7 @@ function CharSplitHeading({ text }: { text: string }) {
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       className="flex flex-wrap overflow-hidden"
+      aria-label={text}
       style={{
         fontFamily: 'var(--font-syne)',
         fontWeight: 900,
@@ -128,6 +146,7 @@ function CharSplitHeading({ text }: { text: string }) {
                     visible: { y: 0, opacity: 1, rotate: 0, transition: { type: 'spring', stiffness: 200, damping: 12, delay: i * 0.04 } }
                   }}
                   style={{ display: 'inline-block' }}
+                  aria-hidden="true"
                 >
                   {char}
                 </motion.span>
@@ -195,18 +214,10 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '-60px' });
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
+  const { mousePos, handleMouseMove } = useMousePosition(ref);
 
   const isEven = index % 2 === 0;
+  const isOngoing = exp.date.toLowerCase().includes('ongoing');
 
   return (
     <motion.div
@@ -225,9 +236,16 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
         style={{ width: 16, height: 16, transform: 'translate(-50%, -50%)' }}
       >
         <div
-          className="w-3 h-3 rounded-full border-2 transition-all duration-300"
-          style={{ borderColor: exp.color, background: '#0a0a14', boxShadow: `0 0 8px ${exp.color}60` }}
-        />
+          className="w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 relative"
+          style={{ borderColor: exp.color, background: '#0a0a14', boxShadow: `0 0 12px ${exp.color}60` }}
+        >
+          {isOngoing && (
+            <div 
+              className="absolute inset-[-4px] rounded-full border border-current animate-ping opacity-40"
+              style={{ color: exp.color }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Card Wrapper */}
@@ -235,17 +253,14 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
         <div
           ref={ref}
           onMouseMove={handleMouseMove}
-          className="bg-[#0a0a14]/60 backdrop-blur-xl p-7 relative overflow-hidden transition-colors hover-float-card"
+          className="bg-[#0a0a14]/60 backdrop-blur-xl p-7 relative overflow-hidden transition-all hover-float-card border border-white/6 group-hover:border-white/15"
         >
-          {/* Border overlay */}
-          <div 
-             className="absolute inset-0 pointer-events-none border border-white/6 group-hover:border-white/15 transition-colors"
-          />
           {/* Highlight line */}
           <div 
-             className={`absolute inset-y-0 w-[2px] pointer-events-none left-0 ${isEven ? 'md:left-auto md:right-0' : ''}`}
-             style={{ backgroundColor: `${exp.color}40` }}
+             className={`absolute inset-y-0 w-[2.5px] pointer-events-none left-0 ${isEven ? 'md:left-auto md:right-0' : ''}`}
+             style={{ backgroundColor: `${exp.color}60` }}
           />
+        
         {/* Dynamic glow tracking cursor */}
         <div
           className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -257,16 +272,16 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
         {/* Header row */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
           <div className="flex items-center gap-3">
-            <span className="text-xl">{exp.icon}</span>
+            <span className="text-2xl group-hover:scale-125 transition-transform duration-500" role="img" aria-hidden="true">{exp.icon}</span>
             <div>
               <h3
-                className="text-base font-bold"
+                className="text-base font-bold group-hover:translate-x-1 transition-transform"
                 style={{ fontFamily: 'var(--font-syne)', color: exp.color }}
               >
                 {exp.title}
               </h3>
               <p
-                className="text-xs text-white/60 uppercase tracking-widest"
+                className="text-[10px] uppercase tracking-widest text-white/60"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 {exp.organization}
@@ -274,7 +289,7 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
             </div>
           </div>
           <span
-            className="text-[10px] uppercase tracking-widest text-white/25 whitespace-nowrap"
+            className="text-[10px] uppercase tracking-widest text-white/25 whitespace-nowrap bg-white/5 px-2 py-0.5"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
             {exp.date}
@@ -287,14 +302,14 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
         </p>
 
         {/* Achievements */}
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2.5">
           {exp.achievements.map((a, ai) => (
             <li
               key={ai}
-              className="flex items-start gap-2 text-xs text-white/65"
+              className="flex items-start gap-2.5 text-xs text-white/65 group-hover:text-white/80 transition-colors"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
-              <span style={{ color: exp.color, marginTop: 2, flexShrink: 0 }}>›</span>
+              <span style={{ color: exp.color, marginTop: 2, flexShrink: 0 }} className="group-hover:translate-x-1 transition-transform" aria-hidden="true">›</span>
               {a}
             </li>
           ))}

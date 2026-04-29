@@ -40,12 +40,13 @@ body {
 }
 
 /* ── Global text readability boost ──
-   Dark halo behind all text so it stays legible over canvas animations */
+   Subtle halo for legibility over animations.
+   Reduced spread and blur to improve scroll performance. */
 p, h1, h2, h3, h4, h5, h6, span, li, label, a {
-  text-shadow: 0 1px 10px rgba(0,0,0,0.65), 0 0 28px rgba(0,0,0,0.4);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 h1, h2, h3 {
-  text-shadow: 0 2px 20px rgba(0,0,0,0.85), 0 0 40px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
 
 /* ── Boost Tailwind white/N opacity classes for better contrast ── */
@@ -161,16 +162,4 @@ h1, h2, h3 {
   transform: translateY(-8px) scale(1.015);
   box-shadow: 0 20px 40px -10px rgba(34, 211, 238, 0.15), 0 0 30px -5px rgba(124, 111, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.15);
-}
-
-/* Scroll-triggered section reveal */
-@keyframes section-fade-up {
-  from { opacity: 0; transform: translateY(40px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.section-reveal {
-  opacity: 0;
-  animation: section-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-timeline: view();
-  animation-range: entry 0% entry 35%;
 }

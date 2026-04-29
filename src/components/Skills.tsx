@@ -73,6 +73,7 @@ function BentoCell({
 function CoreSystemBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -86,6 +87,21 @@ function CoreSystemBg() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !isVisible) return;
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
@@ -108,25 +124,31 @@ function CoreSystemBg() {
     // Orbiting data particles on 3 rings — dual-color
     const RING_RADII = [180, 270, 360];
     const orbiters = RING_RADII.flatMap((r, ri) =>
-      Array.from({ length: 8 + ri * 4 }, (_, i) => ({
-        angle: (i / (8 + ri * 4)) * Math.PI * 2,
+      Array.from({ length: 5 + ri * 2 }, (_, i) => ({
+        angle: (i / (5 + ri * 2)) * Math.PI * 2,
         speed: (0.007 - ri * 0.0015) * (i % 2 === 0 ? 1 : -1),
         radius: r,
         size: 2 - ri * 0.2,
         alpha: 0.75 - ri * 0.1,
-        isCyan: i % 3 !== 0, // 2/3 cyan, 1/3 violet
+        isCyan: i % 3 !== 0,
       }))
     );
 
     // Star-field background
-    const stars = Array.from({ length: 80 }, () => ({
+    const stars = Array.from({ length: 40 }, () => ({
       x: Math.random(), y: Math.random(),
       s: Math.random() * 1 + 0.3,
       a: Math.random() * 0.25 + 0.05,
       phase: Math.random() * Math.PI * 2,
     }));
 
-    const draw = () => {
+    let lastFrame = 0;
+    const FRAME_INTERVAL = 1000 / 30;
+    const draw = (now: number) => {
+      frameId = requestAnimationFrame(draw);
+      const elapsed = now - lastFrame;
+      if (elapsed < FRAME_INTERVAL) return;
+      lastFrame = now - (elapsed % FRAME_INTERVAL);
       time += 0.005;
       mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.04;
       mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.04;
@@ -241,16 +263,14 @@ function CoreSystemBg() {
         ctx.beginPath(); ctx.arc(s.x * w, s.y * h, s.s, 0, Math.PI * 2); ctx.fill();
       });
 
-      frameId = requestAnimationFrame(draw);
     };
-
     frameId = requestAnimationFrame(draw);
 
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(frameId);
     };
-  }, []);
+  }, [isVisible]);
 
   return (
     <canvas
@@ -412,6 +432,7 @@ function CharSplitHeading({ text }: { text: string }) {
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       className="flex flex-wrap overflow-hidden"
+      aria-label={text}
       style={{
         fontFamily: 'var(--font-syne)',
         fontWeight: 900,
@@ -435,6 +456,7 @@ function CharSplitHeading({ text }: { text: string }) {
                     visible: { y: 0, opacity: 1, rotate: 0, transition: { type: 'spring', stiffness: 200, damping: 12, delay: i * 0.04 } }
                   }}
                   style={{ display: 'inline-block' }}
+                  aria-hidden="true"
                 >
                   {char}
                 </motion.span>
