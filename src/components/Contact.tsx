@@ -206,7 +206,10 @@ export default function Contact() {
       const formData = new FormData(e.currentTarget);
       const data = Object.fromEntries(formData.entries());
 
-      const response = await fetch('/api/contact', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const apiEndpoint = backendUrl ? `${backendUrl.replace(/\/$/, '')}/api/contact` : '/api/contact';
+
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

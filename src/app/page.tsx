@@ -37,6 +37,13 @@ export default function Home() {
 
     requestAnimationFrame(raf);
 
+    // Wake up Render backend if configured
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    if (backendUrl) {
+      console.log('⚡ Pinging backend to wake it up:', backendUrl);
+      fetch(backendUrl).catch((err) => console.warn('⚠️ Backend wakeup ping failed:', err));
+    }
+
     return () => {
       lenis.destroy();
     };

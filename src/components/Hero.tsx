@@ -19,16 +19,27 @@ function TypingEffect() {
 
   useEffect(() => {
     const current = ROLES[idx];
+    
+    if (text === current && !deleting) {
+      const timeout = setTimeout(() => {
+        setDeleting(true);
+      }, 1800);
+      return () => clearTimeout(timeout);
+    } else if (text === '' && deleting) {
+      setDeleting(false);
+      setIdx((p) => (p + 1) % ROLES.length);
+      return;
+    }
+
     const speed = deleting ? 28 : 72;
     const timeout = setTimeout(() => {
       if (!deleting) {
         setText(current.slice(0, text.length + 1));
-        if (text === current) setTimeout(() => setDeleting(true), 1800);
       } else {
         setText(current.slice(0, text.length - 1));
-        if (text === '') { setDeleting(false); setIdx((p) => (p + 1) % ROLES.length); }
       }
-    }, text === current && !deleting ? 1800 : speed);
+    }, speed);
+
     return () => clearTimeout(timeout);
   }, [text, deleting, idx]);
 
