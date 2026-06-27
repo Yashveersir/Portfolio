@@ -323,45 +323,55 @@ export default function Skills() {
             gridTemplateRows: 'auto auto',
           }}
         >
-          {/* Backend — wide, prominent */}
+          {/* Backend — Row 1 left (6 cols) */}
           <BentoCell
             color={skillCategories[0].color}
-            className="col-span-12 md:col-span-7 p-8"
+            className="col-span-12 md:col-span-6 p-8"
             animFrom="left"
             delay={0}
           >
             <CellContent category={skillCategories[0]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight={false} />
           </BentoCell>
 
-          {/* Programming — narrow, tighter padding */}
-          <BentoCell
-            color={skillCategories[2].color}
-            className="col-span-12 md:col-span-5 p-5"
-            rotate={1}
-            animFrom="bottom"
-            delay={0.1}
-          >
-            <CellContent category={skillCategories[2]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight />
-          </BentoCell>
-
-          {/* Frontend — medium */}
+          {/* Frontend — Row 1 right (6 cols) */}
           <BentoCell
             color={skillCategories[1].color}
-            className="col-span-12 md:col-span-5 p-8"
+            className="col-span-12 md:col-span-6 p-8"
             animFrom="scale"
-            delay={0.2}
+            delay={0.1}
           >
             <CellContent category={skillCategories[1]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight={false} />
           </BentoCell>
 
-          {/* Tools — wider */}
+          {/* Programming — Row 2 left (4 cols) */}
           <BentoCell
-            color={skillCategories[3].color}
-            className="col-span-12 md:col-span-7 p-6"
-            animFrom="bottom"
+            color={skillCategories[2].color}
+            className="col-span-12 md:col-span-4 p-5"
+            rotate={1}
+            animFrom="left"
             delay={0.15}
           >
+            <CellContent category={skillCategories[2]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight />
+          </BentoCell>
+
+          {/* Database & Cloud — Row 2 center (4 cols) */}
+          <BentoCell
+            color={skillCategories[3].color}
+            className="col-span-12 md:col-span-4 p-6"
+            animFrom="scale"
+            delay={0.2}
+          >
             <CellContent category={skillCategories[3]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight={false} />
+          </BentoCell>
+
+          {/* DevOps & Tools — Row 2 right (4 cols) */}
+          <BentoCell
+            color={skillCategories[4].color}
+            className="col-span-12 md:col-span-4 p-6"
+            animFrom="bottom"
+            delay={0.25}
+          >
+            <CellContent category={skillCategories[4]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight={false} />
           </BentoCell>
         </div>
       </div>

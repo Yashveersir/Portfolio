@@ -66,12 +66,19 @@ export const skillCategories = [
     ],
   },
   {
-    title: 'Tools',
-    color: '#ec4899',
+    title: 'Database & Cloud',
+    color: '#10b981',
     skills: [
       { name: 'PostgreSQL', icon: null, image: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg' },
       { name: 'MongoDB', icon: null, image: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg' },
+      { name: 'SQL', icon: null, image: null },
       { name: 'Firebase', icon: null, image: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-original.svg' },
+    ],
+  },
+  {
+    title: 'DevOps & Tools',
+    color: '#ec4899',
+    skills: [
       { name: 'Docker', icon: null, image: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg' },
       { name: 'CI/CD', icon: null, image: null },
       { name: 'GitHub Actions', icon: null, image: null },
