@@ -344,26 +344,17 @@ export default function Hero() {
                 <span className="relative z-10">Contact</span>
               </a>
 
-              <button
-                onClick={async () => {
-                  const res = await fetch('/api/resume?download=true');
-                  const blob = await res.blob();
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = 'Yashveer-Singh-Resume.pdf';
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                  URL.revokeObjectURL(url);
-                }}
-                className="group relative px-10 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--amber)] border border-[var(--amber)]/30 overflow-hidden hover:text-[var(--amber)] hover:border-[var(--amber)] transition-all cursor-pointer shadow-[0_0_15px_rgba(255,100,0,0.1)] hover:shadow-[0_0_20px_rgba(255,100,0,0.2)]"
+              <a
+                href="/api/resume?download=true"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative px-10 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--amber)] border border-[var(--amber)]/30 overflow-hidden hover:text-[var(--amber)] hover:border-[var(--amber)] transition-all cursor-pointer shadow-[0_0_15px_rgba(255,100,0,0.1)] hover:shadow-[0_0_20px_rgba(255,100,0,0.2)] text-center inline-block"
                 style={{ fontFamily: 'var(--font-mono)' }}
                 aria-label="Download my resume"
               >
                 <div className="absolute inset-0 bg-[var(--amber)]/5 -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
                 <span className="relative z-10">↓ Resume</span>
-              </button>
+              </a>
             </motion.div>
           </div>
 
