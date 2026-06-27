@@ -10,13 +10,14 @@ function PathFlowBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -999, y: -999 });
   const [isVisible, setIsVisible] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
+    }
+    return 'dark';
+  });
 
   useEffect(() => {
-    // Initial theme
-    const currentTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
-    setTheme(currentTheme);
-
     // Observe theme changes
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -127,7 +128,7 @@ function PathFlowBg() {
     };
     draw();
     return () => { window.removeEventListener('resize',resize); cancelAnimationFrame(animationFrameId); };
-  }, [isVisible]);
+  }, [isVisible, theme]);
 
   return (
     <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }} />
@@ -308,6 +309,25 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
             </li>
           ))}
         </ul>
+
+        {/* View Certificate */}
+        {(exp as { certificate?: string }).certificate && (
+          <div className="mt-5 flex">
+            <a
+              href={(exp as { certificate?: string }).certificate}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-amber-500 hover:text-amber-400 border border-amber-500/25 hover:border-amber-500/50 px-4 py-2 bg-amber-500/5 hover:bg-amber-500/10 transition-all duration-300"
+              style={{ fontFamily: 'var(--font-mono)' }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="7" />
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+              </svg>
+              View Certificate
+            </a>
+          </div>
+        )}
 
         {/* Card footer detail */}
         <div className="mt-8 pt-4 border-t border-theme flex justify-between items-center">

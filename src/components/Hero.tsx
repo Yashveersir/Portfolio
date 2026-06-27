@@ -346,7 +346,7 @@ export default function Hero() {
 
               <button
                 onClick={async () => {
-                  const res = await fetch('/Yashveer-Singh-Resume.pdf');
+                  const res = await fetch('/api/resume?download=true');
                   const blob = await res.blob();
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement('a');

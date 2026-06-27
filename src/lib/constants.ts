@@ -75,6 +75,33 @@ export const skillCategories = [
 /* ========== PROJECTS ========== */
 export const projects = [
   {
+    title: 'Present AI',
+    subtitle: 'AI Presentation Evaluator',
+    role: 'Role: AI Developer & Pipeline Architect',
+    outcome: 'Outcome: built real-time video evaluation pipeline scoring speech, confidence, eye contact, and emotion',
+    descriptionBullets: [
+      'End-to-end data pipeline combining FFmpeg, Whisper STT, and MediaPipe',
+      'Eye-contact, facial expression, and filler word detection analysis',
+      'Integrated Gemini API to generate personalized score-driven coaching feedback',
+    ],
+    description:
+      'An AI-powered video analysis platform scoring confidence, speech clarity, eye contact, and facial expressions with MediaPipe, Whisper STT, and Gemini API feedback.',
+    tags: ['React 18', 'Firebase', 'Gemini API', 'Whisper API', 'MediaPipe', 'FFmpeg'],
+    features: [
+      'Filler word and speech clarity detection',
+      'Eye-contact and facial expression analysis',
+      'Gemini-powered personalized presenter feedback',
+      'Client-side media processing with FFmpeg',
+    ],
+    github: 'https://github.com/Yashveersir/AI-Presentation-Evaluator',
+    demo: 'https://presentai-eval-yash2026.web.app/',
+    featured: true,
+    color: '#10b981',
+    images: [
+      '/project-images/present-ai.png',
+    ]
+  },
+  {
     title: 'Green Valley Poultry Farm',
     subtitle: 'Full-Stack E-Commerce Platform',
     role: 'Role: Full-Stack Developer',
@@ -267,20 +294,22 @@ export const experiences = [
     icon: '💼',
     date: 'Apr 2026 – May 2026',
     color: '#6366f1',
+    certificate: '/Certificates/Vaidsys_Internship_Certificate.pdf',
   },
   {
-    title: 'Software Engineer Intern',
-    organization: 'YugaYatra Retail (OPC) Pvt. Ltd.',
+    title: 'Software Developer Intern',
+    organization: 'Yuga Yatra Retail (OPC) Pvt. Ltd.',
     description:
-      'Working on web development using Cursor AI, Firebase Studio, and AI technologies. Developing websites/apps, freelancing projects, and collaborating with teams using Google Workspace.',
+      'Built and shipped client-facing web modules using Cursor AI and Firebase Studio, driving project success through active cross-functional collaboration.',
     achievements: [
-      'Delivered client-facing web modules on strict timelines',
-      'Integrated AI-assisted development workflow for faster iteration',
-      'Collaborated in shared docs, reviews, and remote standups',
+      'Developed responsive retail-tech interfaces with modern UI/UX patterns',
+      'Reduced development iteration time by 40% via AI-assisted workflows',
+      'Collaborated with cross-functional teams to drive project delivery',
     ],
     icon: '🚀',
     date: 'Apr 2026 – Jun 2026',
     color: '#8b5cf6',
+    certificate: '/Certificates/Yuga_Yatra_Internship_Certificate.png',
   },
   {
     title: 'Peer Mentor',

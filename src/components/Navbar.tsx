@@ -171,7 +171,7 @@ export default function Navbar() {
           <ThemeToggle />
           
           <a
-            href="/Yashveer-Singh-Resume.pdf"
+            href="/api/resume"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:block group relative px-4 py-2 overflow-hidden border border-amber-500/40 text-[9px] font-bold uppercase tracking-[0.2em] text-amber-500 transition-all hover:text-black"
@@ -230,7 +230,7 @@ export default function Navbar() {
                 </a>
               ))}
               <a
-                href="/Yashveer-Singh-Resume.pdf"
+                href="/api/resume"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-4 border border-amber-500/40 px-10 py-4 text-[11px] font-bold uppercase tracking-widest text-amber-500 rounded-full hover:bg-amber-500/10 transition-colors"
