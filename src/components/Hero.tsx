@@ -178,7 +178,7 @@ function PhotoFrame() {
             width={400}
             height={500}
             priority
-            className="w-full h-full object-cover object-center scale-105 group-hover/photo:scale-110 transition-transform duration-1000"
+            className="w-full h-full object-cover object-top scale-105 group-hover/photo:scale-110 transition-transform duration-1000"
             style={{ filter: 'contrast(1.1) saturate(0.85) brightness(0.95)' }}
           />
           <div
