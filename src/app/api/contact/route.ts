@@ -93,12 +93,12 @@ function senderConfirmationHtml(name: string, message: string) {
         </td>
       </tr>
     </table>
-  </div>\`;
+  </div>`;
 }
 
 function ownerNotificationHtml(name: string, email: string, message: string) {
   const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-  return \`
+  return `
   <div style="background-color: #f6f9fc; padding: 40px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
     <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin: 0 auto;">
       <tr>
@@ -139,7 +139,7 @@ function ownerNotificationHtml(name: string, email: string, message: string) {
         </td>
       </tr>
     </table>
-  </div>\`;
+  </div>`;
 }
 
 /* ── POST /api/contact ── */
