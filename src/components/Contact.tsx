@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { socialLinks } from '@/lib/constants';
-import { Mail, ArrowRight } from 'lucide-react';
+import { Mail, ArrowRight, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import CharSplitHeading from './CharSplitHeading';
 
@@ -437,31 +437,93 @@ export default function Contact() {
                   )}
                 </button>
 
-                {submitStatus === 'success' && (
-                  <motion.p
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-xs text-center text-green-400"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
-                    ✓ Message received. I&apos;ll be in touch soon.
-                  </motion.p>
-                )}
-                {submitStatus === 'error' && (
-                  <motion.p
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-xs text-center text-red-400"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
-                    Something went wrong. Email me directly.
-                  </motion.p>
-                )}
               </form>
             </motion.div>
           </div>
         </div>
       </div>
+
+      {/* Popup Modal */}
+      <AnimatePresence>
+        {(isSubmitting || submitStatus !== 'idle') && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+              onClick={() => {
+                if (!isSubmitting) setSubmitStatus('idle');
+              }}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-sm bg-theme-card border border-theme rounded-2xl p-8 shadow-2xl flex flex-col items-center text-center overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500" />
+              
+              {isSubmitting && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex flex-col items-center"
+                >
+                  <Loader2 className="w-16 h-16 text-cyan-400 animate-spin mb-6" />
+                  <h3 className="text-2xl font-bold text-theme mb-3" style={{ fontFamily: 'var(--font-syne)' }}>Sending...</h3>
+                  <p className="text-theme-dim text-sm" style={{ fontFamily: 'var(--font-mono)' }}>Please wait while your message is delivered.</p>
+                </motion.div>
+              )}
+              
+              {!isSubmitting && submitStatus === 'success' && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex flex-col items-center w-full"
+                >
+                  <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mb-6 text-green-400 shadow-[0_0_30px_rgba(74,222,128,0.2)]">
+                    <CheckCircle2 className="w-10 h-10" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-theme mb-3" style={{ fontFamily: 'var(--font-syne)' }}>Delivered Successfully!</h3>
+                  <p className="text-theme-dim text-sm mb-8" style={{ fontFamily: 'var(--font-mono)' }}>Thank you for reaching out. I&apos;ll get back to you as soon as possible.</p>
+                  <button
+                    onClick={() => setSubmitStatus('idle')}
+                    className="w-full bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-3 rounded-xl hover:bg-green-500/20 hover:border-green-500/50 transition-all text-sm font-bold tracking-widest uppercase"
+                    style={{ fontFamily: 'var(--font-mono)' }}
+                  >
+                    Close
+                  </button>
+                </motion.div>
+              )}
+
+              {!isSubmitting && submitStatus === 'error' && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex flex-col items-center w-full"
+                >
+                  <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-400 shadow-[0_0_30px_rgba(248,113,113,0.2)]">
+                    <XCircle className="w-10 h-10" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-theme mb-3" style={{ fontFamily: 'var(--font-syne)' }}>Delivery Failed</h3>
+                  <p className="text-theme-dim text-sm mb-8" style={{ fontFamily: 'var(--font-mono)' }}>Something went wrong. Please try emailing me directly.</p>
+                  <button
+                    onClick={() => setSubmitStatus('idle')}
+                    className="w-full bg-red-500/10 border border-red-500/30 text-red-400 px-6 py-3 rounded-xl hover:bg-red-500/20 hover:border-red-500/50 transition-all text-sm font-bold tracking-widest uppercase"
+                    style={{ fontFamily: 'var(--font-mono)' }}
+                  >
+                    Close
+                  </button>
+                </motion.div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

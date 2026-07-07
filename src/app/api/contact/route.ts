@@ -53,126 +53,93 @@ function getTransporter() {
 /* ── Professional Email Templates ── */
 function senderConfirmationHtml(name: string, message: string) {
   return `
-  <div style="background-color: #0b0f19; padding: 40px 10px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #151c2c; border-radius: 16px; overflow: hidden; border: 1px solid #223049; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3), 0 10px 10px -5px rgba(0,0,0,0.3);">
-      <!-- Glowing Top Accent -->
+  <div style="background-color: #f6f9fc; padding: 40px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin: 0 auto;">
       <tr>
-        <td height="6" style="background: linear-gradient(90deg, #06b6d4 0%, #6366f1 50%, #8b5cf6 100%);"></td>
-      </tr>
-      <!-- Header/Logo area -->
-      <tr>
-        <td style="padding: 40px 40px 20px 40px; text-align: center;">
-          <div style="display: inline-block; padding: 12px; background-color: rgba(6, 182, 212, 0.1); border-radius: 50%; margin-bottom: 20px; border: 1px solid rgba(6, 182, 212, 0.2);">
-            <span style="font-size: 32px;">✉️</span>
-          </div>
-          <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">Message Secured!</h1>
-          <p style="color: #94a3b8; font-size: 14px; margin-top: 8px; margin-bottom: 0;">We've received your submission.</p>
+        <td style="padding: 40px; text-align: center; border-bottom: 1px solid #e2e8f0;">
+          <h1 style="color: #0f172a; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">Message Received</h1>
         </td>
       </tr>
-      <!-- Body Content -->
       <tr>
-        <td style="padding: 20px 40px 30px 40px;">
-          <p style="color: #cbd5e1; font-size: 16px; line-height: 1.7; margin: 0 0 24px 0;">
-            Hi <strong>${name}</strong>,
+        <td style="padding: 40px;">
+          <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+            Hi <strong>\${name}</strong>,
           </p>
-          <p style="color: #cbd5e1; font-size: 15px; line-height: 1.7; margin: 0 0 24px 0;">
-            Thanks for reaching out! Your message has safely landed. I will review the details and get back to you as soon as possible. Here is a copy of what you sent:
+          <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
+            Thank you for reaching out. I have received your message and will get back to you shortly. For your records, here is a copy of what you sent:
           </p>
-          <!-- Message box -->
-          <div style="background-color: #0b0f19; border-left: 4px solid #06b6d4; padding: 20px; border-radius: 8px; margin-bottom: 32px; border: 1px solid #1e293b; border-left-width: 4px;">
-            <p style="margin: 0 0 8px 0; font-size: 11px; color: #06b6d4; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Your Message</p>
-            <p style="color: #f1f5f9; font-size: 15px; margin: 0; line-height: 1.6; font-style: italic;">"${message}"</p>
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
+            <p style="color: #475569; font-size: 15px; margin: 0; line-height: 1.6; white-space: pre-wrap; font-style: italic;">"\${message}"</p>
           </div>
-          <!-- Buttons/Links -->
           <table border="0" cellpadding="0" cellspacing="0" width="100%">
             <tr>
               <td align="center">
-                <a href="https://github.com/Yashveersir" style="display: inline-block; background-color: #1e293b; border: 1px solid #334155; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 14px; margin: 5px; transition: all 0.3s;">
-                  🐙 GitHub Profile
+                <a href="https://yashveersingh.xyz" style="display: inline-block; background-color: #0f172a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; margin-right: 10px;">
+                  View Portfolio
                 </a>
-                <a href="https://www.linkedin.com/in/yashveer-singh-41bb36280" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%); color: #ffffff; padding: 13px 25px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 14px; margin: 5px; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2); transition: all 0.3s;">
-                  💼 Connect on LinkedIn
+                <a href="https://www.linkedin.com/in/yashveer-singh-41bb36280" style="display: inline-block; background-color: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;">
+                  Connect on LinkedIn
                 </a>
               </td>
             </tr>
           </table>
         </td>
       </tr>
-      <!-- Footer -->
       <tr>
-        <td style="background-color: #0e1320; padding: 30px 40px; text-align: center; border-top: 1px solid #1e293b;">
-          <p style="margin: 0; color: #94a3b8; font-size: 14px;">Best Regards,</p>
-          <p style="margin: 4px 0 2px 0; color: #ffffff; font-size: 18px; font-weight: 700; letter-spacing: -0.3px;">Yashveer Singh</p>
-          <p style="margin: 0; color: #06b6d4; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Full-Stack Developer</p>
-          <p style="margin: 16px 0 0 0; color: #475569; font-size: 11px;">You are receiving this automated email because you submitted a contact request on <a href="https://yashveersingh.xyz" style="color: #6366f1; text-decoration: none;">yashveersingh.xyz</a>.</p>
+        <td style="background-color: #f8fafc; padding: 30px 40px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e2e8f0;">
+          <p style="margin: 0; color: #64748b; font-size: 14px;">Best regards,</p>
+          <p style="margin: 5px 0 0 0; color: #0f172a; font-size: 16px; font-weight: 600;">Yashveer Singh</p>
+          <p style="margin: 20px 0 0 0; color: #94a3b8; font-size: 12px;">This is an automated email from <a href="https://yashveersingh.xyz" style="color: #3b82f6; text-decoration: none;">yashveersingh.xyz</a>.</p>
         </td>
       </tr>
     </table>
-  </div>`;
+  </div>\`;
 }
 
 function ownerNotificationHtml(name: string, email: string, message: string) {
   const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-  return `
-  <div style="background-color: #0b0f19; padding: 40px 10px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #151c2c; border-radius: 16px; overflow: hidden; border: 1px solid #223049; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3), 0 10px 10px -5px rgba(0,0,0,0.3);">
-      <!-- Glowing Top Accent (Warm Amber/Red Alert) -->
+  return \`
+  <div style="background-color: #f6f9fc; padding: 40px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin: 0 auto;">
       <tr>
-        <td height="6" style="background: linear-gradient(90deg, #f59e0b 0%, #ef4444 50%, #ec4899 100%);"></td>
-      </tr>
-      <!-- Header/Logo area -->
-      <tr>
-        <td style="padding: 40px 40px 20px 40px; text-align: center;">
-          <div style="display: inline-block; padding: 12px; background-color: rgba(245, 158, 11, 0.1); border-radius: 50%; margin-bottom: 20px; border: 1px solid rgba(245, 158, 11, 0.2);">
-            <span style="font-size: 32px;">🔔</span>
-          </div>
-          <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">New Portfolio Inquiry</h1>
-          <p style="color: #94a3b8; font-size: 14px; margin-top: 8px; margin-bottom: 0;">${timestamp} IST</p>
+        <td style="padding: 40px; text-align: center; border-bottom: 1px solid #e2e8f0; background-color: #f8fafc; border-radius: 8px 8px 0 0;">
+          <h1 style="color: #0f172a; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">New Portfolio Inquiry</h1>
+          <p style="color: #64748b; font-size: 14px; margin-top: 8px; margin-bottom: 0;">\${timestamp} IST</p>
         </td>
       </tr>
-      <!-- Body Content -->
       <tr>
-        <td style="padding: 20px 40px 30px 40px;">
-          <!-- Sender Meta Table -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin-bottom: 24px;">
+        <td style="padding: 40px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin-bottom: 30px;">
             <tr>
-              <td style="padding: 12px 0; border-bottom: 1px solid #1e293b; color: #94a3b8; font-size: 12px; font-weight: bold; text-transform: uppercase; width: 100px;">From Name</td>
-              <td style="padding: 12px 0; border-bottom: 1px solid #1e293b; color: #ffffff; font-size: 15px; font-weight: 600;">${name}</td>
+              <td style="padding: 15px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; width: 120px;">Name</td>
+              <td style="padding: 15px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 16px; font-weight: 500;">\${name}</td>
             </tr>
             <tr>
-              <td style="padding: 12px 0; border-bottom: 1px solid #1e293b; color: #94a3b8; font-size: 12px; font-weight: bold; text-transform: uppercase;">Email Address</td>
-              <td style="padding: 12px 0; border-bottom: 1px solid #1e293b; color: #06b6d4; font-size: 15px; font-weight: 600;">
-                <a href="mailto:${email}" style="color: #06b6d4; text-decoration: none;">${email}</a>
+              <td style="padding: 15px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase;">Email</td>
+              <td style="padding: 15px 0; border-bottom: 1px solid #e2e8f0; color: #3b82f6; font-size: 16px; font-weight: 500;">
+                <a href="mailto:\${email}" style="color: #3b82f6; text-decoration: none;">\${email}</a>
               </td>
             </tr>
           </table>
           
-          <!-- Message box -->
-          <div style="background-color: #0b0f19; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 32px; border: 1px solid #1e293b; border-left-width: 4px;">
-            <p style="margin: 0 0 8px 0; font-size: 11px; color: #f59e0b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Message</p>
-            <p style="color: #f1f5f9; font-size: 15px; margin: 0; line-height: 1.6;">${message}</p>
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
+            <p style="margin: 0 0 10px 0; font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Message Content</p>
+            <p style="color: #334155; font-size: 15px; margin: 0; line-height: 1.6; white-space: pre-wrap;">\${message}</p>
           </div>
           
-          <!-- Reply CTA Button -->
           <table border="0" cellpadding="0" cellspacing="0" width="100%">
             <tr>
               <td align="center">
-                <a href="mailto:${email}?subject=Re: Portfolio Inquiry&body=Hi ${encodeURIComponent(name)}," style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: #ffffff; padding: 13px 30px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);">
-                  ⚡ Quick Reply to ${name}
+                <a href="mailto:\${email}?subject=Re: Portfolio Inquiry&body=Hi \${encodeURIComponent(name)}," style="display: inline-block; background-color: #0f172a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 15px;">
+                  Reply to \${name}
                 </a>
               </td>
             </tr>
           </table>
         </td>
       </tr>
-      <!-- Footer -->
-      <tr>
-        <td style="background-color: #0e1320; padding: 20px 40px; text-align: center; border-top: 1px solid #1e293b;">
-          <p style="margin: 0; color: #475569; font-size: 11px;">Sent automatically from the contact system at <a href="https://yashveersingh.xyz" style="color: #6366f1; text-decoration: none;">yashveersingh.xyz</a>.</p>
-        </td>
-      </tr>
     </table>
-  </div>`;
+  </div>\`;
 }
 
 /* ── POST /api/contact ── */
