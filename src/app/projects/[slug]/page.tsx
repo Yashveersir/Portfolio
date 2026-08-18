@@ -40,13 +40,13 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white pt-32 pb-20 selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-transparent text-theme transition-theme pt-32 pb-20 selection:bg-cyan-500/30">
       <div className="noise-overlay" />
       
       <div className="max-w-4xl mx-auto px-6 relative z-10">
         <Link 
           href="/#projects" 
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-colors mb-12 font-mono text-sm uppercase tracking-widest"
+          className="inline-flex items-center gap-2 text-theme-muted hover:text-cyan-400 transition-colors mb-12 font-mono text-sm uppercase tracking-widest"
         >
           <ArrowLeft size={16} />
           Back to Projects
@@ -54,10 +54,10 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
 
         {/* Header */}
         <div className="mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500" style={{ fontFamily: 'var(--font-syne)' }}>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--text)] to-[var(--text-muted)]" style={{ fontFamily: 'var(--font-syne)' }}>
             {project.title}
           </h1>
-          <p className="text-xl text-gray-400 mb-8 max-w-2xl leading-relaxed">
+          <p className="text-xl text-theme-muted mb-8 max-w-2xl leading-relaxed">
             {project.description}
           </p>
 
@@ -70,16 +70,16 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
           </div>
 
           {(project.role || project.outcome) && (
-            <div className="mb-10 p-6 bg-[#11111a] border border-gray-800 rounded-xl space-y-4">
+            <div className="mb-10 p-6 bg-theme-card border border-theme rounded-xl space-y-4 transition-theme">
               {project.role && (
                 <div>
-                  <h3 className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">Role</h3>
-                  <p className="text-gray-300">{project.role}</p>
+                  <h3 className="text-xs font-mono text-theme-muted uppercase tracking-widest mb-1">Role</h3>
+                  <p className="text-theme-dim">{project.role}</p>
                 </div>
               )}
               {project.outcome && (
                 <div>
-                  <h3 className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">Outcome</h3>
+                  <h3 className="text-xs font-mono text-theme-muted uppercase tracking-widest mb-1">Outcome</h3>
                   <p className="text-cyan-400">{project.outcome}</p>
                 </div>
               )}
@@ -94,7 +94,7 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
               </a>
             )}
             {project.github && (
-              <a href={project.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-3 border border-gray-700 hover:border-gray-400 transition-colors uppercase tracking-widest text-sm font-bold rounded">
+              <a href={project.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-3 border border-theme hover:border-cyan-400 transition-colors uppercase tracking-widest text-sm font-bold rounded">
                 <FaGithub size={16} />
                 Source Code
               </a>
@@ -104,7 +104,7 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
 
         {/* Hero Image */}
         {(project.images && project.images.length > 0) && (
-          <div className="relative w-full aspect-video border border-gray-800 rounded-xl overflow-hidden mb-20 group">
+          <div className="relative w-full aspect-video border border-theme rounded-xl overflow-hidden mb-20 group transition-theme">
             <Image 
               src={project.images[0]} 
               alt={project.title} 
@@ -118,20 +118,20 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
         <div className="space-y-20">
           <section>
             <h2 className="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-4">
-              <span className="text-xs font-mono text-gray-500 tracking-widest uppercase">01</span>
+              <span className="text-xs font-mono text-theme-muted tracking-widest uppercase">01</span>
               Overview
             </h2>
-            <div className="prose prose-invert max-w-none text-gray-300 leading-loose text-lg">
+            <div className="prose prose-invert max-w-none text-theme-dim leading-loose text-lg">
               {project.caseStudy.overview}
             </div>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-4">
-              <span className="text-xs font-mono text-gray-500 tracking-widest uppercase">02</span>
+              <span className="text-xs font-mono text-theme-muted tracking-widest uppercase">02</span>
               Architecture & Tech Stack
             </h2>
-            <div className="prose prose-invert max-w-none text-gray-300 leading-loose text-lg">
+            <div className="prose prose-invert max-w-none text-theme-dim leading-loose text-lg">
               {project.caseStudy.architecture}
             </div>
           </section>
@@ -165,10 +165,10 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
           {project.features && project.features.length > 0 && (
             <section>
               <h2 className="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-4">
-                <span className="text-xs font-mono text-gray-500 tracking-widest uppercase">05</span>
+                <span className="text-xs font-mono text-theme-muted tracking-widest uppercase">05</span>
                 Key Features
               </h2>
-              <ul className="list-disc pl-6 space-y-2 text-gray-300 text-lg">
+              <ul className="list-disc pl-6 space-y-2 text-theme-dim text-lg">
                 {project.features.map((feature: string, idx: number) => (
                   <li key={idx}>{feature}</li>
                 ))}
@@ -178,8 +178,8 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
         </div>
 
         {/* Footer Link */}
-        <div className="mt-32 pt-10 border-t border-gray-800 text-center">
-          <Link href="/#contact" className="text-cyan-400 hover:text-white transition-colors text-xl font-bold" style={{ fontFamily: 'var(--font-syne)' }}>
+        <div className="mt-32 pt-10 border-t border-theme transition-theme text-center">
+          <Link href="/#contact" className="text-cyan-400 hover:text-theme transition-colors text-xl font-bold" style={{ fontFamily: 'var(--font-syne)' }}>
             Like what you see? Let's talk.
           </Link>
         </div>
