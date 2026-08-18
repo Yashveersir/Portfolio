@@ -5,15 +5,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sun, Moon } from 'lucide-react';
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<'dark' | 'light' | null>(null);
+  const [theme, setTheme] = useState<'dark' | 'light' | null>(() => {
+    // This runs only on client, so it's fine to access localStorage here
+    if (typeof window === 'undefined') return null;
+    const saved = localStorage.getItem('theme') as 'dark' | 'light' | null;
+    return saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  });
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
-    const initialTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    setTheme(initialTheme);
-    document.documentElement.setAttribute('data-theme', initialTheme);
-    document.documentElement.classList.add(initialTheme);
-  }, []);
+    if (!theme) return;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.classList.add(theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const toggleTheme = () => {
     if (!theme) return;

@@ -294,16 +294,15 @@ export default function HeroBg() {
   const [mounted, setMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof document === 'undefined') return 'dark';
+    return (document.documentElement.getAttribute('data-theme') as 'dark' | 'light') || 'dark';
+  });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    
-    // Check initial theme
-    const currentTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
-    setTheme(currentTheme);
-
-    // Observe theme changes
+    // Observe theme changes via MutationObserver — no initial setState needed
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'data-theme') {
@@ -312,23 +311,20 @@ export default function HeroBg() {
         }
       });
     });
-
     observer.observe(document.documentElement, { attributes: true });
-    
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     if (!containerRef.current) return;
-    
     const intersectionObserver = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
       { threshold: 0.01 }
     );
-    
     intersectionObserver.observe(containerRef.current);
-    return () => {
-      observer.disconnect();
-      intersectionObserver.disconnect();
-    };
+    return () => intersectionObserver.disconnect();
   }, []);
 
   if (!mounted) {

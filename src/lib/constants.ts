@@ -1,9 +1,4 @@
-import {
-  FaNodeJs, FaReact, FaHtml5, FaCss3Alt, FaJsSquare, FaGitAlt, FaGithub,
-} from 'react-icons/fa';
-import {
-  SiExpress, SiMongodb, SiPostman, SiJsonwebtokens, SiCplusplus, SiRender,
-} from 'react-icons/si';
+
 
 /* ========== NAV LINKS ========== */
 export const navLinks = [

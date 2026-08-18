@@ -2,8 +2,28 @@
 
 import { useState, useEffect } from 'react';
 
+type PortfolioData = {
+  projects?: unknown[];
+  skills?: unknown[];
+  experiences?: unknown[];
+  certifications?: unknown[];
+  numbers?: unknown[];
+  aboutStats?: unknown[];
+  aboutTerminal?: Record<string, unknown>;
+  socialLinks?: Record<string, string>;
+  theme?: Record<string, string>;
+  heroHeadline1?: string;
+  heroHeadline2?: string;
+  heroHeadline3?: string;
+  heroImage?: string;
+  heroRoles?: string[];
+  aboutBio?: string;
+  resumeUrl?: string;
+  [key: string]: unknown;
+};
+
 export function usePortfolioData() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

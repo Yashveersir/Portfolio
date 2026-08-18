@@ -292,8 +292,7 @@ export default function Skills() {
   const { data } = usePortfolioData();
   const skillCategories = data?.skills?.length > 0 ? data.skills : DEFAULT_SKILLS;
 
-  // All skill names for cross-glow
-  const allSkillNames = skillCategories.flatMap((c: any) => c.skills ? c.skills.map((s: any) => s.name) : []);
+
 
   return (
     <section
@@ -388,13 +387,13 @@ function CellContent({
   setHoveredSkill,
   tight,
 }: {
-  category: any;
+  category: { title: string; color?: string; skills?: Array<{ name: string; icon?: string | null; image?: string | null }> };
   hoveredSkill: string | null;
   setHoveredSkill: (s: string | null) => void;
   tight: boolean;
 }) {
   if (!category) return null;
-  const skillsArray = category.skills || [];
+  const skillsArray: Array<{ name: string; icon?: string | null; image?: string | null }> = category.skills || [];
 
   return (
     <>
@@ -411,7 +410,7 @@ function CellContent({
         <span className="text-[8px] text-theme-muted font-mono tracking-widest uppercase">MODULE_v4.2</span>
       </div>
       <div className={`flex flex-wrap ${tight ? 'gap-2' : 'gap-3'}`}>
-        {skillsArray.map((skill: any) => {
+        {skillsArray.map((skill) => {
           const isGlowing = hoveredSkill !== null && hoveredSkill === skill.name;
           const isFaded = hoveredSkill !== null && hoveredSkill !== skill.name;
           return (
@@ -428,6 +427,7 @@ function CellContent({
               transition={{ duration: 0.2 }}
             >
               {skill.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={skill.image} alt={skill.name} className="w-4 h-4 object-contain grayscale group-hover:grayscale-0 transition-all" />
               ) : (
                 <div className="w-1.5 h-1.5 rotate-45" style={{ background: category.color || '#22d3ee' }} />

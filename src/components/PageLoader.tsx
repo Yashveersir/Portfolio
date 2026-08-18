@@ -13,7 +13,6 @@ const LOADING_STEPS = [
 
 export default function PageLoader() {
   const [progress, setProgress] = useState(0);
-  const [step, setStep] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
@@ -45,10 +44,7 @@ export default function PageLoader() {
     };
   }, []);
 
-  useEffect(() => {
-    const stepIndex = Math.floor((progress / 100) * (LOADING_STEPS.length - 1));
-    setStep(stepIndex);
-  }, [progress]);
+  const step = Math.floor((progress / 100) * (LOADING_STEPS.length - 1));
 
   return (
     <AnimatePresence>

@@ -376,19 +376,31 @@ app.put('/api/portfolio', authenticateToken, async (req, res) => {
   try {
     const updateData = req.body;
     let portfolio = await Portfolio.findOne();
-    
+
     if (!portfolio) {
       portfolio = new Portfolio(updateData);
     } else {
-      // Update fields
-      Object.assign(portfolio, updateData);
+      // Deep merge every field from the request body
+      Object.keys(updateData).forEach((key) => {
+        portfolio[key] = updateData[key];
+      });
+      portfolio.markModified('projects');
+      portfolio.markModified('skills');
+      portfolio.markModified('experiences');
+      portfolio.markModified('certifications');
+      portfolio.markModified('numbers');
+      portfolio.markModified('aboutStats');
+      portfolio.markModified('aboutTerminal');
+      portfolio.markModified('socialLinks');
+      portfolio.markModified('theme');
     }
-    
+
     await portfolio.save();
-    res.json({ success: true, message: 'Portfolio updated successfully', portfolio });
+    res.json({ success: true, message: 'Portfolio updated successfully' });
   } catch (error) {
-    console.error('Error updating portfolio:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('❌ Error updating portfolio:', error.message);
+    console.error('Full error:', JSON.stringify(error, null, 2));
+    res.status(500).json({ error: error.message || 'Internal Server Error' });
   }
 });
 

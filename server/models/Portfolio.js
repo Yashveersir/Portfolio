@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const portfolioSchema = new mongoose.Schema({
   // Theme Customization
   theme: {
-    primaryColor: { type: String, default: '#22d3ee' },   // cyan
-    secondaryColor: { type: String, default: '#a855f7' } // purple
+    primaryColor: { type: String, default: '#22d3ee' },
+    secondaryColor: { type: String, default: '#a855f7' }
   },
 
   // Hero Section
@@ -14,9 +14,9 @@ const portfolioSchema = new mongoose.Schema({
   heroHeadline3: { type: String, default: 'That Live Online.' },
   heroImage: { type: String, default: '/myImage.jpeg' },
   resumeUrl: { type: String, default: '/api/resume' },
-  
+
   // About Section
-  aboutBio: { type: String, default: 'I am a Software Engineer and Designer dedicated to crafting high-performance web experiences. My work merges technical precision with minimalist aesthetics, specializing in full-stack systems and Generative AI integration.' },
+  aboutBio: { type: String },
   aboutStats: [{
     value: String,
     label: String,
@@ -31,28 +31,39 @@ const portfolioSchema = new mongoose.Schema({
     openToWork: Boolean
   },
 
-  // By The Numbers
+  // By The Numbers / Fun Metrics
   numbers: [{
     value: String,
-    label: String
+    label: String,
+    sub: String,
+    color: String
   }],
 
   // Projects
   projects: [{
     title: String,
+    subtitle: String,
     slug: String,
+    role: String,
+    outcome: String,
     description: String,
+    descriptionBullets: [String],
+    tags: [String],
     tech: [String],
+    features: [String],
     github: String,
+    demo: String,
     live: String,
     image: String,
+    images: [String],
+    color: String,
+    featured: Boolean,
     caseStudy: {
       overview: String,
       architecture: String,
       challenges: String,
       solutions: String
-    },
-    featured: Boolean
+    }
   }],
 
   // Skills
@@ -66,26 +77,40 @@ const portfolioSchema = new mongoose.Schema({
     }]
   }],
 
-  // Experience / Certifications
-  experience: [{
+  // Experience & Responsibilities
+  experiences: [{
     title: String,
-    company: String,
+    organization: String,
+    description: String,
+    achievements: [String],
+    icon: String,
     date: String,
-    description: String
+    color: String,
+    certificate: String
   }],
-  
+
+  // Certifications
   certifications: [{
     title: String,
     issuer: String,
+    icon: String,
+    color: String,
+    pdf: String,
     date: String,
     link: String
   }],
-  
+
+  // Social Links
   socialLinks: {
     email: String,
     github: String,
-    linkedin: String
+    linkedin: String,
+    twitter: String,
+    discord: String,
+    phone: String
   }
-}, { timestamps: true });
+
+}, { timestamps: true, strict: false }); 
+// strict: false allows any additional fields without crashing
 
 module.exports = mongoose.model('Portfolio', portfolioSchema);

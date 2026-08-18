@@ -14,7 +14,24 @@ import CharSplitHeading from './CharSplitHeading';
 // Per-project accent colors from spec
 const PROJECT_ACCENTS = ['var(--cyan)', 'var(--amber)', 'var(--violet)'];
 
-function ProjectCard({ project, index }: { project: any; index: number }) {
+type Project = {
+  title: string;
+  subtitle?: string;
+  slug?: string;
+  role?: string;
+  outcome?: string;
+  description?: string;
+  tags?: string[];
+  features?: string[];
+  github?: string;
+  demo?: string;
+  images?: string[];
+  color?: string;
+  caseStudy?: object;
+  [key: string]: unknown;
+};
+
+function ProjectCard({ project, index }: { project: Project; index: number }) {
   const accent = PROJECT_ACCENTS[index % PROJECT_ACCENTS.length];
   const num = String(index + 1).padStart(2, '0');
 
@@ -121,7 +138,7 @@ function ProjectCard({ project, index }: { project: any; index: number }) {
 
           {/* Tags — consistent mono style */}
           <div className="flex flex-wrap gap-2 mb-6 md:mb-8">
-            {project.tags?.map((tag: string, i: number) => (
+            {project.tags?.map((tag: string) => (
               <span
                 key={tag}
                 className="px-2.5 py-1 border border-theme bg-theme-card text-[9px] font-bold uppercase tracking-widest text-theme-muted"
@@ -337,7 +354,7 @@ function HoloGridBg() {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(frameId);
     };
-  }, []);
+  }, [isVisible]);
 
   return (
     <canvas
@@ -388,7 +405,7 @@ export default function Projects() {
 
         {/* Cards — different heights, NOT uniform */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {projects.map((project: any, i: number) => (
+          {projects.map((project: Project, i: number) => (
             <ProjectCard key={project.title} project={project} index={i} />
           ))}
         </div>
