@@ -12,7 +12,7 @@ import CharSplitHeading from './CharSplitHeading';
 export default function Certifications() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { data } = usePortfolioData();
-  const certifications = data?.certifications?.length > 0 ? data.certifications : DEFAULT_CERTIFICATIONS;
+  const certifications = (data && Array.isArray(data.certifications) && data.certifications.length > 0) ? data.certifications : DEFAULT_CERTIFICATIONS;
 
   return (
     <section

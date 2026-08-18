@@ -230,7 +230,7 @@ export default function Hero() {
   const heroHeadline1 = data?.heroHeadline1 || 'I Build';
   const heroHeadline2 = data?.heroHeadline2 || 'Things';
   const heroHeadline3 = data?.heroHeadline3 || 'That Live Online.';
-  const roles = data?.heroRoles?.length > 0 ? data.heroRoles : DEFAULT_ROLES;
+  const roles = (data && Array.isArray(data.heroRoles) && data.heroRoles.length > 0) ? data.heroRoles : DEFAULT_ROLES;
 
   return (
     <section

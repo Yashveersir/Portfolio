@@ -409,7 +409,7 @@ export default function About() {
 
   const { data, loading } = usePortfolioData();
   const bioWords = data?.aboutBio ? data.aboutBio.split(' ') : DEFAULT_BIO_WORDS;
-  const stats = data?.aboutStats?.length > 0 ? data.aboutStats : DEFAULT_STATS;
+  const stats = (data && Array.isArray(data.aboutStats) && data.aboutStats.length > 0) ? data.aboutStats : DEFAULT_STATS;
   const terminalData = data?.aboutTerminal;
 
   useEffect(() => {

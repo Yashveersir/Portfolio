@@ -367,7 +367,7 @@ function HoloGridBg() {
 
 export default function Projects() {
   const { data } = usePortfolioData();
-  const projects = data?.projects?.length > 0 ? data.projects : DEFAULT_PROJECTS;
+  const projects = (data && Array.isArray(data.projects) && data.projects.length > 0) ? data.projects : DEFAULT_PROJECTS;
 
   return (
     <section id="projects" className="relative py-28 md:py-40 overflow-hidden">

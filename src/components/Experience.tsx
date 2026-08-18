@@ -138,7 +138,7 @@ function PathFlowBg() {
 
 export default function Experience() {
   const { data } = usePortfolioData();
-  const experiences = data?.experiences?.length > 0 ? data.experiences : DEFAULT_EXPERIENCES;
+  const experiences = (data && Array.isArray(data.experiences) && data.experiences.length > 0) ? data.experiences : DEFAULT_EXPERIENCES;
 
   return (
     <section

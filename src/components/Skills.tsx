@@ -290,7 +290,7 @@ function CoreSystemBg() {
 export default function Skills() {
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
   const { data } = usePortfolioData();
-  const skillCategories = data?.skills?.length > 0 ? data.skills : DEFAULT_SKILLS;
+  const skillCategories = (data && Array.isArray(data.skills) && data.skills.length > 0) ? data.skills : DEFAULT_SKILLS;
 
 
 

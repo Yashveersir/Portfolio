@@ -69,7 +69,7 @@ function MetricCard({ metric, index }: { metric: any; index: number }) {
 
 export default function ByTheNumbers() {
   const { data } = usePortfolioData();
-  const metrics = data?.numbers?.length > 0 ? data.numbers : DEFAULT_METRICS;
+  const metrics = (data && Array.isArray(data.numbers) && data.numbers.length > 0) ? data.numbers : DEFAULT_METRICS;
 
   return (
     <section className="relative py-28 md:py-40 overflow-hidden border-y border-theme">
