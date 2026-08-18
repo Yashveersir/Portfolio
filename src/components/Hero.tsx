@@ -295,12 +295,11 @@ export default function Hero() {
                   initial={{ opacity: 0, y: 80 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ ...springConfig, delay: 1.95 }}
+                  className="bg-gradient-to-br from-[var(--text)] to-[var(--cyan)] text-transparent bg-clip-text"
                   style={{
                     fontFamily: 'var(--font-syne)', fontWeight: 800,
                     fontSize: 'clamp(3.8rem, 10vw, 8.5rem)', lineHeight: 0.9,
                     letterSpacing: '-0.05em',
-                    background: 'linear-gradient(135deg, var(--text) 20%, var(--cyan) 80%)',
-                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                     paddingRight: '0.05em'
                   }}
                 >
