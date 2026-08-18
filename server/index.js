@@ -8,9 +8,26 @@ const bcrypt = require('bcryptjs');
 const Portfolio = require('./models/Portfolio');
 const app = express();
 
-// Middleware
+// ─── Mongoose: disable command buffering ───────────────────────────────────
+// Without this, queries silently wait 10s for a DB connection then throw
+// "buffering timed out". With this disabled, they fail IMMEDIATELY with a
+// clear error if the DB is not yet connected.
+mongoose.set('bufferCommands', false);
+
+// ─── Middleware ────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
+
+// Guard: any route that needs DB should use this middleware
+const requireDB = (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(503).json({
+      error: 'Database not ready. The server is still connecting to MongoDB. Please wait 10-20 seconds and try again.',
+      dbState: mongoose.connection.readyState
+    });
+  }
+  next();
+};
 
 // Main Backend Landing Page
 app.get('/', (req, res) => {
@@ -356,7 +373,7 @@ app.post('/api/admin/login', async (req, res) => {
 });
 
 // 2. Get Portfolio Data (Public)
-app.get('/api/portfolio', async (req, res) => {
+app.get('/api/portfolio', requireDB, async (req, res) => {
   try {
     let portfolio = await Portfolio.findOne();
     if (!portfolio) {
@@ -372,7 +389,7 @@ app.get('/api/portfolio', async (req, res) => {
 });
 
 // 3. Update Portfolio Data (Protected)
-app.put('/api/portfolio', authenticateToken, async (req, res) => {
+app.put('/api/portfolio', requireDB, authenticateToken, async (req, res) => {
   try {
     const updateData = req.body;
     let portfolio = await Portfolio.findOne();
