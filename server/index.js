@@ -407,15 +407,36 @@ app.put('/api/portfolio', authenticateToken, async (req, res) => {
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// Start the server FIRST so Render doesn't time out waiting for MongoDB to connect
-app.listen(PORT, () => {
-  console.log(`🚀 Contact backend running on port ${PORT}`);
-  
-  if (MONGO_URI) {
-    mongoose.connect(MONGO_URI)
-      .then(() => console.log('✅ Connected successfully to MongoDB Atlas (cluster0)'))
-      .catch((err) => console.error('❌ MongoDB Connection Error:', err.message));
-  } else {
-    console.log('⚠️ MONGO_URI environment variable is missing! Database will not connect.');
-  }
+// Health check endpoint — reports DB connection status
+app.get('/api/health', (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  // 0=disconnected, 1=connected, 2=connecting, 3=disconnecting
+  const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+  res.json({ status: 'ok', db: states[dbState] || 'unknown' });
 });
+
+// Connect to MongoDB FIRST, then start the server.
+// This ensures no DB query ever runs before the connection is established.
+async function startServer() {
+  if (MONGO_URI) {
+    try {
+      console.log('⏳ Connecting to MongoDB Atlas...');
+      await mongoose.connect(MONGO_URI, {
+        serverSelectionTimeoutMS: 30000, // 30s to find a server
+        socketTimeoutMS: 45000,          // 45s for operations
+      });
+      console.log('✅ Connected successfully to MongoDB Atlas');
+    } catch (err) {
+      console.error('❌ MongoDB Connection Error:', err.message);
+      // Still start the server even if DB fails — health endpoint will report the issue
+    }
+  } else {
+    console.warn('⚠️ MONGO_URI is not set — database will not connect.');
+  }
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Portfolio backend running on port ${PORT}`);
+  });
+}
+
+startServer();
