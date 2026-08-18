@@ -10,6 +10,12 @@ const DEFAULT_STATS = [
   { value: '10+', label: 'Hackathons Participated', color: 'var(--violet)' },
   { value: '13+', label: 'Certifications Earned', color: 'var(--purple-500)' },
 ];
+
+const DEFAULT_METRICS = [
+  { value: '100K+', label: 'Lines of Code', sub: 'Mostly bugs, but they look pretty.', color: 'var(--cyan)' },
+  { value: '500+', label: 'Cups of Coffee', sub: 'The true fuel of development.', color: 'var(--amber)' },
+  { value: '50+', label: 'Bugs Fixed', sub: '...and probably 100+ created.', color: 'var(--violet)' },
+];
 const DEFAULT_TERMINAL = {
   name: "Yashveer Singh",
   role: "Full-Stack & Generative AI Developer",
@@ -76,6 +82,7 @@ export default function AdminPage() {
       if (!data.socialLinks || !data.socialLinks.email) data.socialLinks = DEFAULT_SOCIAL;
       if (!data.experiences || data.experiences.length === 0) data.experiences = DEFAULT_EXPS;
       if (!data.certifications || data.certifications.length === 0) data.certifications = DEFAULT_CERTS;
+      if (!data.numbers || data.numbers.length === 0) data.numbers = DEFAULT_METRICS;
 
       setPortfolioData(data);
     } catch (err) {
@@ -390,6 +397,63 @@ export default function AdminPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* FUN METRICS / BY THE NUMBERS */}
+                <div className="bg-[#0a0a14] p-8 rounded-2xl border border-cyan-900/30">
+                  <div className="flex justify-between items-center mb-6 border-b border-cyan-900/30 pb-4">
+                    <h3 className="text-xl font-bold text-white">Fun Metrics (By The Numbers)</h3>
+                    <button 
+                      onClick={() => setPortfolioData({...portfolioData, numbers: [...(portfolioData.numbers||[]), { value: '', label: '', sub: '', color: 'var(--cyan)' }]})}
+                      className="flex items-center gap-1 bg-cyan-500/20 text-cyan-400 px-3 py-1.5 rounded hover:bg-cyan-500/30 text-sm"
+                    >
+                      <Plus size={16} /> Add Metric
+                    </button>
+                  </div>
+                  <div className="grid gap-4">
+                    {portfolioData.numbers?.map((num: any, idx: number) => (
+                      <div key={idx} className="flex flex-wrap gap-4 items-center bg-[#05050f] p-4 rounded-xl border border-cyan-900/50">
+                        <div className="flex-1 min-w-[150px]">
+                          <label className="block text-xs text-gray-500 mb-1">Value</label>
+                          <input value={num.value} onChange={(e) => {
+                            const newNums = [...portfolioData.numbers];
+                            newNums[idx].value = e.target.value;
+                            setPortfolioData({...portfolioData, numbers: newNums});
+                          }} className="w-full p-2 bg-transparent border-b border-gray-700 text-white outline-none focus:border-cyan-400" placeholder="e.g. 100K+" />
+                        </div>
+                        <div className="flex-1 min-w-[150px]">
+                          <label className="block text-xs text-gray-500 mb-1">Label</label>
+                          <input value={num.label} onChange={(e) => {
+                            const newNums = [...portfolioData.numbers];
+                            newNums[idx].label = e.target.value;
+                            setPortfolioData({...portfolioData, numbers: newNums});
+                          }} className="w-full p-2 bg-transparent border-b border-gray-700 text-white outline-none focus:border-cyan-400" placeholder="e.g. Lines of Code" />
+                        </div>
+                        <div className="w-full md:w-[40%]">
+                          <label className="block text-xs text-gray-500 mb-1">Subtitle</label>
+                          <input value={num.sub} onChange={(e) => {
+                            const newNums = [...portfolioData.numbers];
+                            newNums[idx].sub = e.target.value;
+                            setPortfolioData({...portfolioData, numbers: newNums});
+                          }} className="w-full p-2 bg-transparent border-b border-gray-700 text-white outline-none focus:border-cyan-400" placeholder="e.g. Mostly bugs..." />
+                        </div>
+                        <div className="w-24">
+                          <label className="block text-xs text-gray-500 mb-1">Color</label>
+                          <input value={num.color} onChange={(e) => {
+                            const newNums = [...portfolioData.numbers];
+                            newNums[idx].color = e.target.value;
+                            setPortfolioData({...portfolioData, numbers: newNums});
+                          }} className="w-full p-2 bg-transparent border-b border-gray-700 text-white outline-none focus:border-cyan-400 text-xs" />
+                        </div>
+                        <button onClick={() => {
+                          const newNums = [...portfolioData.numbers];
+                          newNums.splice(idx, 1);
+                          setPortfolioData({...portfolioData, numbers: newNums});
+                        }} className="text-red-500 hover:text-red-400 self-end mb-2"><Trash2 size={20} /></button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             )}
 
