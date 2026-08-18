@@ -57,9 +57,13 @@ const portfolioSchema = new mongoose.Schema({
 
   // Skills
   skills: [{
-    category: String,
-    items: [String],
-    icon: String // Optional, string representing icon name or path
+    title: String,
+    color: String,
+    skills: [{
+      name: String,
+      icon: String,
+      image: String
+    }]
   }],
 
   // Experience / Certifications
