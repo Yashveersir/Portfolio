@@ -398,6 +398,9 @@ app.put('/api/portfolio', requireDB, authenticateToken, async (req, res) => {
       portfolio = new Portfolio(updateData);
     } else {
       // Deep merge every field from the request body
+      delete updateData._id;
+      delete updateData.__v;
+      
       Object.keys(updateData).forEach((key) => {
         portfolio[key] = updateData[key];
       });
