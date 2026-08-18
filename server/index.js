@@ -456,6 +456,20 @@ async function startServer() {
 
   app.listen(PORT, () => {
     console.log(`🚀 Portfolio backend running on port ${PORT}`);
+    
+    // Prevent Render Free Tier from sleeping by self-pinging every 14 minutes
+    const url = 'https://portfolio-d6sq.onrender.com/api/health';
+    setInterval(() => {
+      require('https').get(url, (res) => {
+        if (res.statusCode === 200) {
+          console.log(`[Self-Ping] Automatically pinged ${url} to keep server awake.`);
+        } else {
+          console.error(`[Self-Ping] Failed to ping server. Status: ${res.statusCode}`);
+        }
+      }).on('error', (err) => {
+        console.error(`[Self-Ping] Error: ${err.message}`);
+      });
+    }, 14 * 60 * 1000); // 14 minutes (840,000 ms)
   });
 }
 
