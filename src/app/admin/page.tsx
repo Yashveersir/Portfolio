@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { skillCategories, certifications as DEFAULT_CERTS, experiences as DEFAULT_EXPS, socialLinks as DEFAULT_SOCIAL, projects as DEFAULT_PROJECTS } from '@/lib/constants';
+import { skillCategories, certifications as DEFAULT_CERTS, experiences as DEFAULT_EXPS, socialLinks as DEFAULT_SOCIAL, projects as DEFAULT_PROJECTS, aboutText } from '@/lib/constants';
 import { Palette, Image as ImageIcon, User, Briefcase, FileText, LogOut, Save, Upload, Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import Image from 'next/image';
 const DEFAULT_STATS = [
@@ -75,6 +75,11 @@ export default function AdminPage() {
       const data = await res.json();
       
       // Ensure defaults if missing
+      if (!data.heroHeadline1) data.heroHeadline1 = 'I Build';
+      if (!data.heroHeadline2) data.heroHeadline2 = 'Things';
+      if (!data.heroHeadline3) data.heroHeadline3 = 'That Live Online.';
+      if (!data.aboutBio) data.aboutBio = aboutText;
+
       if (!data.aboutStats || !data.aboutStats.length) data.aboutStats = DEFAULT_STATS;
       if (!data.aboutTerminal || !data.aboutTerminal.name) data.aboutTerminal = DEFAULT_TERMINAL;
       if (!data.projects || data.projects.length === 0) data.projects = DEFAULT_PROJECTS;
@@ -466,7 +471,7 @@ export default function AdminPage() {
                   <div className="flex justify-between items-center mb-6 border-b border-cyan-900/30 pb-4">
                     <h3 className="text-xl font-bold text-white">Skill Categories</h3>
                     <button 
-                      onClick={() => setPortfolioData({...portfolioData, skills: [...(portfolioData.skills||[]), { category: 'New Category', items: [] }]})}
+                      onClick={() => setPortfolioData({...portfolioData, skills: [...(portfolioData.skills||[]), { title: 'New Category', color: '#22d3ee', skills: [] }]})}
                       className="flex items-center gap-1 bg-cyan-500/20 text-cyan-400 px-3 py-1.5 rounded hover:bg-cyan-500/30 text-sm"
                     >
                       <Plus size={16} /> Add Category
@@ -481,19 +486,34 @@ export default function AdminPage() {
                           setPortfolioData({...portfolioData, skills: newSkills});
                         }} className="absolute top-4 right-4 text-red-500 hover:text-red-400"><Trash2 size={18} /></button>
                         
-                        <div className="mb-3 w-5/6">
-                          <label className="block text-xs text-gray-500 mb-1 uppercase">Category Name</label>
-                          <input value={skill.category} onChange={(e) => {
-                            const newSkills = [...portfolioData.skills];
-                            newSkills[idx].category = e.target.value;
-                            setPortfolioData({...portfolioData, skills: newSkills});
-                          }} className="w-full p-2 bg-transparent border-b border-gray-700 text-white outline-none focus:border-cyan-400 text-lg font-bold" />
+                        <div className="mb-3 w-5/6 flex gap-4">
+                          <div className="flex-1">
+                            <label className="block text-xs text-gray-500 mb-1 uppercase">Category Name</label>
+                            <input value={skill.title || ''} onChange={(e) => {
+                              const newSkills = [...portfolioData.skills];
+                              newSkills[idx].title = e.target.value;
+                              setPortfolioData({...portfolioData, skills: newSkills});
+                            }} className="w-full p-2 bg-transparent border-b border-gray-700 text-white outline-none focus:border-cyan-400 text-lg font-bold" />
+                          </div>
+                          <div className="w-24">
+                            <label className="block text-xs text-gray-500 mb-1 uppercase">Color</label>
+                            <input value={skill.color || ''} onChange={(e) => {
+                              const newSkills = [...portfolioData.skills];
+                              newSkills[idx].color = e.target.value;
+                              setPortfolioData({...portfolioData, skills: newSkills});
+                            }} className="w-full p-2 bg-transparent border-b border-gray-700 text-white outline-none focus:border-cyan-400 text-sm" placeholder="#..." />
+                          </div>
                         </div>
                         <div>
                           <label className="block text-xs text-gray-500 mb-1 uppercase">Skills (comma-separated)</label>
-                          <textarea value={skill.items?.join(', ')} onChange={(e) => {
+                          <textarea value={skill.skills?.map((s:any) => s.name).join(', ') || ''} onChange={(e) => {
                             const newSkills = [...portfolioData.skills];
-                            newSkills[idx].items = e.target.value.split(',').map(s=>s.trim()).filter(Boolean);
+                            const newNames = e.target.value.split(',').map(s=>s.trim()).filter(Boolean);
+                            const oldSkills = skill.skills || [];
+                            newSkills[idx].skills = newNames.map((name: string) => {
+                              const existing = oldSkills.find((s: any) => s.name === name);
+                              return existing ? existing : { name, icon: null, image: null };
+                            });
                             setPortfolioData({...portfolioData, skills: newSkills});
                           }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/30 rounded text-cyan-300 outline-none focus:border-cyan-400 h-16 font-mono text-sm" />
                         </div>
