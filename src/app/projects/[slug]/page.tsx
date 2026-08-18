@@ -4,6 +4,8 @@ import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import Image from 'next/image';
 
+import { projects as DEFAULT_PROJECTS } from '@/lib/constants';
+
 async function getProject(slug: string) {
   // Use absolute URL since fetch runs on server during build/SSR
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
@@ -15,7 +17,8 @@ async function getProject(slug: string) {
     });
     if (!res.ok) return null;
     const data = await res.json();
-    return data.projects?.find((p: any) => p.slug === slug);
+    const projects = data.projects && data.projects.length > 0 ? data.projects : DEFAULT_PROJECTS;
+    return projects?.find((p: any) => p.slug === slug);
   } catch (err) {
     console.error('Failed to fetch project:', err);
     return null;

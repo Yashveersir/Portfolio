@@ -31,7 +31,8 @@ export default function AdminPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [portfolioData, setPortfolioData] = useState<any>(null);
-  const [successMsg, setSuccessMsg] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   
   const [activeTab, setActiveTab] = useState('theme');
   const [expandedProjectIndex, setExpandedProjectIndex] = useState<number | null>(null);
@@ -96,9 +97,8 @@ export default function AdminPage() {
   };
 
   const handleSave = async () => {
-    if (!window.confirm("Are you sure you want to save these changes to the live database?")) return;
+    setShowConfirmModal(false);
     setLoading(true);
-    setSuccessMsg('');
     try {
       const res = await fetch('/api/admin/proxy', {
         method: 'PUT',
@@ -107,8 +107,8 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setSuccessMsg('Portfolio updated successfully!');
-        setTimeout(() => setSuccessMsg(''), 3000);
+        setShowSuccessModal(true);
+        setTimeout(() => setShowSuccessModal(false), 3000);
       } else {
         alert(data.error || 'Error saving');
       }
@@ -233,13 +233,13 @@ export default function AdminPage() {
         <header className="p-6 border-b border-cyan-900/30 bg-[#0a0a14]/50 backdrop-blur-md flex justify-between items-center sticky top-0 z-10">
           <h2 className="text-lg font-medium text-gray-200 capitalize">Editing: {activeTab}</h2>
           <div className="flex items-center gap-4">
-            {successMsg && <span className="text-green-400 font-bold text-sm animate-pulse">{successMsg}</span>}
             <button
-              onClick={handleSave}
+              onClick={() => setShowConfirmModal(true)}
               disabled={loading}
               className="flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-black px-6 py-2 rounded-lg font-bold transition-all shadow-[0_0_10px_rgba(34,211,238,0.2)] hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] disabled:opacity-50"
             >
-              <Save size={18} /> {loading ? 'Saving...' : 'Save Changes'}
+              {loading ? <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" /> : <Save size={18} />}
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </header>
@@ -868,6 +868,37 @@ export default function AdminPage() {
           </div>
         </div>
       </main>
+      {/* CONFIRMATION MODAL */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-[#0a0a14] border border-cyan-900/50 p-8 rounded-2xl shadow-2xl max-w-md w-full">
+            <h3 className="text-2xl font-bold text-white mb-2">Save Changes?</h3>
+            <p className="text-gray-400 mb-8">Are you sure you want to push these changes to the live database? This action will immediately update your public portfolio.</p>
+            <div className="flex justify-end gap-4">
+              <button onClick={() => setShowConfirmModal(false)} className="px-6 py-2 rounded-lg font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
+                Cancel
+              </button>
+              <button onClick={handleSave} className="px-6 py-2 bg-cyan-400 text-black font-bold rounded-lg hover:bg-cyan-300 transition-colors flex items-center gap-2">
+                <Save size={18} /> Yes, Save to Live
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUCCESS MODAL */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 pointer-events-none">
+          <div className="bg-[#05050f] border border-green-500/50 p-8 rounded-2xl shadow-[0_0_40px_rgba(34,197,94,0.2)] max-w-sm w-full flex flex-col items-center">
+            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4 text-green-400">
+              <Save size={32} />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-1">Success!</h3>
+            <p className="text-gray-400 text-center text-sm">Your portfolio has been updated.</p>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
