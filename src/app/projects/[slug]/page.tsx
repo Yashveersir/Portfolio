@@ -15,13 +15,19 @@ async function getProject(slug: string) {
     const res = await fetch(`${baseUrl}/api/portfolio`, {
       next: { revalidate: 60 } // Cache for 60 seconds
     });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const projects = data.projects && data.projects.length > 0 ? data.projects : DEFAULT_PROJECTS;
-    return projects?.find((p: any) => p.slug === slug);
+    
+    let projects = DEFAULT_PROJECTS;
+    if (res.ok) {
+      const data = await res.json();
+      if (data.projects && data.projects.length > 0) {
+        projects = data.projects;
+      }
+    }
+    
+    return projects.find((p: any) => p.slug === slug);
   } catch (err) {
     console.error('Failed to fetch project:', err);
-    return null;
+    return DEFAULT_PROJECTS.find((p: any) => p.slug === slug);
   }
 }
 
