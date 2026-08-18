@@ -335,11 +335,11 @@ export default function Hero() {
             >
               <a
                 href="#projects"
-                className="group relative px-10 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-black overflow-hidden transition-all hover:text-cyan-400"
+                className="group relative px-10 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--bg)] overflow-hidden transition-all hover:text-[var(--cyan)]"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
-                <div className="absolute inset-0 bg-cyan-400 transition-transform duration-300 group-hover:scale-x-0 origin-right" />
-                <div className="absolute inset-0 border border-cyan-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                <div className="absolute inset-0 bg-[var(--cyan)] transition-transform duration-300 group-hover:scale-x-0 origin-right" />
+                <div className="absolute inset-0 border border-[var(--cyan)] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
                 <span className="relative z-10">Exploration</span>
               </a>
               

@@ -121,6 +121,10 @@ export default function AdminPage() {
   };
 
   const handleSave = async () => {
+    if (!window.confirm("Are you sure you want to save these changes to the live database?")) {
+      return;
+    }
+
     setLoading(true);
     setSuccessMsg('');
     try {

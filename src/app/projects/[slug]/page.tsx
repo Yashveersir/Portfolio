@@ -52,22 +52,39 @@ export default async function ProjectCaseStudy({ params }: { params: { slug: str
           </p>
 
           <div className="flex flex-wrap gap-3 mb-10">
-            {project.tech?.map((t: string) => (
-              <span key={t} className="px-3 py-1.5 border border-theme bg-theme-card text-xs font-mono text-theme-muted uppercase tracking-widest">
+            {project.tags?.map((t: string) => (
+              <span key={t} className="px-3 py-1.5 border border-cyan-900/50 bg-cyan-900/10 text-xs font-mono text-cyan-400 uppercase tracking-widest rounded">
                 {t}
               </span>
             ))}
           </div>
 
+          {(project.role || project.outcome) && (
+            <div className="mb-10 p-6 bg-[#11111a] border border-gray-800 rounded-xl space-y-4">
+              {project.role && (
+                <div>
+                  <h3 className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">Role</h3>
+                  <p className="text-gray-300">{project.role}</p>
+                </div>
+              )}
+              {project.outcome && (
+                <div>
+                  <h3 className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">Outcome</h3>
+                  <p className="text-cyan-400">{project.outcome}</p>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex gap-4">
-            {project.live && (
-              <a href={project.live} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-3 bg-cyan-500 text-black font-bold uppercase tracking-widest text-sm hover:bg-cyan-400 transition-colors">
+            {project.demo && (
+              <a href={project.demo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-3 bg-cyan-500 text-black font-bold uppercase tracking-widest text-sm hover:bg-cyan-400 transition-colors rounded">
                 <ExternalLink size={16} />
                 Live Demo
               </a>
             )}
             {project.github && (
-              <a href={project.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-3 border border-gray-700 hover:border-gray-400 transition-colors uppercase tracking-widest text-sm font-bold">
+              <a href={project.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-3 border border-gray-700 hover:border-gray-400 transition-colors uppercase tracking-widest text-sm font-bold rounded">
                 <FaGithub size={16} />
                 Source Code
               </a>
@@ -76,10 +93,10 @@ export default async function ProjectCaseStudy({ params }: { params: { slug: str
         </div>
 
         {/* Hero Image */}
-        {project.image && (
+        {(project.images && project.images.length > 0) && (
           <div className="relative w-full aspect-video border border-gray-800 rounded-xl overflow-hidden mb-20 group">
             <Image 
-              src={project.image} 
+              src={project.images[0]} 
               alt={project.title} 
               fill 
               className="object-cover group-hover:scale-105 transition-transform duration-1000" 
@@ -128,12 +145,26 @@ export default async function ProjectCaseStudy({ params }: { params: { slug: str
             </div>
             <h2 className="text-2xl font-bold mb-6 text-green-400 flex items-center gap-4 relative z-10">
               <span className="text-xs font-mono text-green-500/50 tracking-widest uppercase">04</span>
-              Solutions & Outcome
+              Solutions
             </h2>
             <div className="prose prose-invert max-w-none text-green-200/80 leading-loose text-lg relative z-10">
               {project.caseStudy.solutions}
             </div>
           </section>
+
+          {project.features && project.features.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-4">
+                <span className="text-xs font-mono text-gray-500 tracking-widest uppercase">05</span>
+                Key Features
+              </h2>
+              <ul className="list-disc pl-6 space-y-2 text-gray-300 text-lg">
+                {project.features.map((feature: string, idx: number) => (
+                  <li key={idx}>{feature}</li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
 
         {/* Footer Link */}
