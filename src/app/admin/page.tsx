@@ -1,11 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { skillCategories, certifications as DEFAULT_CERTS, experiences as DEFAULT_EXPS, socialLinks as DEFAULT_SOCIAL } from '@/lib/constants';
+import { skillCategories, certifications as DEFAULT_CERTS, experiences as DEFAULT_EXPS, socialLinks as DEFAULT_SOCIAL, projects as DEFAULT_PROJECTS } from '@/lib/constants';
 import { Palette, Image as ImageIcon, User, Briefcase, FileText, LogOut, Save, Upload, Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import Image from 'next/image';
-
-const DEFAULT_PROJECTS: any[] = [];
 const DEFAULT_STATS = [
   { value: '8.6', label: 'CGPA', color: 'var(--cyan)' },
   { value: '7+', label: 'Projects Completed', color: 'var(--amber)' },
@@ -73,9 +71,11 @@ export default function AdminPage() {
       // Ensure defaults if missing
       if (!data.aboutStats || !data.aboutStats.length) data.aboutStats = DEFAULT_STATS;
       if (!data.aboutTerminal || !data.aboutTerminal.name) data.aboutTerminal = DEFAULT_TERMINAL;
-      if (!data.projects) data.projects = DEFAULT_PROJECTS;
-      if (!data.skills) data.skills = skillCategories;
-      if (!data.socialLinks) data.socialLinks = DEFAULT_SOCIAL;
+      if (!data.projects || data.projects.length === 0) data.projects = DEFAULT_PROJECTS;
+      if (!data.skills || data.skills.length === 0) data.skills = skillCategories;
+      if (!data.socialLinks || !data.socialLinks.email) data.socialLinks = DEFAULT_SOCIAL;
+      if (!data.experiences || data.experiences.length === 0) data.experiences = DEFAULT_EXPS;
+      if (!data.certifications || data.certifications.length === 0) data.certifications = DEFAULT_CERTS;
 
       setPortfolioData(data);
     } catch (err) {
@@ -176,6 +176,8 @@ export default function AdminPage() {
     { id: 'hero', icon: <ImageIcon size={18} />, label: 'Hero' },
     { id: 'about', icon: <User size={18} />, label: 'About & Terminal' },
     { id: 'projects', icon: <Briefcase size={18} />, label: 'Projects & Skills' },
+    { id: 'experience', icon: <Briefcase size={18} />, label: 'Experience' },
+    { id: 'certifications', icon: <FileText size={18} />, label: 'Certifications' },
     { id: 'contact', icon: <FileText size={18} />, label: 'Socials & Resume' },
   ];
 
@@ -599,6 +601,136 @@ export default function AdminPage() {
                       )
                     })}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* EXPERIENCE */}
+            {activeTab === 'experience' && (
+              <div className="bg-[#0a0a14] p-8 rounded-2xl border border-cyan-900/30">
+                <div className="flex justify-between items-center mb-6 border-b border-cyan-900/30 pb-4">
+                  <h3 className="text-xl font-bold text-white">Experience & Responsibilities</h3>
+                  <button 
+                    onClick={() => {
+                      setPortfolioData({...portfolioData, experiences: [...(portfolioData.experiences||[]), { title: 'New Role', organization: '', date: '', description: '', achievements: [] }]});
+                    }}
+                    className="flex items-center gap-1 bg-cyan-500/20 text-cyan-400 px-3 py-1.5 rounded hover:bg-cyan-500/30 text-sm"
+                  >
+                    <Plus size={16} /> Add Experience
+                  </button>
+                </div>
+                <div className="space-y-6">
+                  {portfolioData.experiences?.map((exp: any, idx: number) => (
+                    <div key={idx} className="bg-[#05050f] border border-cyan-900/50 rounded-xl p-6 relative">
+                      <button onClick={() => {
+                        const nx = [...portfolioData.experiences]; nx.splice(idx, 1); setPortfolioData({...portfolioData, experiences: nx});
+                      }} className="absolute top-4 right-4 text-red-500 hover:text-red-400"><Trash2 size={18} /></button>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Role / Title</label>
+                          <input value={exp.title || ''} onChange={(e) => {
+                            const nx = [...portfolioData.experiences]; nx[idx].title = e.target.value; setPortfolioData({...portfolioData, experiences: nx});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400" />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Organization</label>
+                          <input value={exp.organization || ''} onChange={(e) => {
+                            const nx = [...portfolioData.experiences]; nx[idx].organization = e.target.value; setPortfolioData({...portfolioData, experiences: nx});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400" />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Date / Duration</label>
+                          <input value={exp.date || ''} onChange={(e) => {
+                            const nx = [...portfolioData.experiences]; nx[idx].date = e.target.value; setPortfolioData({...portfolioData, experiences: nx});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400" placeholder="e.g. Jan 2024 - Present" />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Icon (Emoji)</label>
+                          <input value={exp.icon || ''} onChange={(e) => {
+                            const nx = [...portfolioData.experiences]; nx[idx].icon = e.target.value; setPortfolioData({...portfolioData, experiences: nx});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400" placeholder="e.g. 💼" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs text-gray-500 mb-1">Description</label>
+                          <textarea value={exp.description || ''} onChange={(e) => {
+                            const nx = [...portfolioData.experiences]; nx[idx].description = e.target.value; setPortfolioData({...portfolioData, experiences: nx});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400 h-20" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs text-gray-500 mb-1">Achievements / Bullets (One per line)</label>
+                          <textarea value={exp.achievements?.join('\n') || ''} onChange={(e) => {
+                            const nx = [...portfolioData.experiences]; nx[idx].achievements = e.target.value.split('\n').filter(Boolean); setPortfolioData({...portfolioData, experiences: nx});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400 h-24" placeholder="Increased speed by 20%..." />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs text-gray-500 mb-1">Certificate / PDF Link</label>
+                          <input value={exp.certificate || ''} onChange={(e) => {
+                            const nx = [...portfolioData.experiences]; nx[idx].certificate = e.target.value; setPortfolioData({...portfolioData, experiences: nx});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400" placeholder="/Certificates/..." />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* CERTIFICATIONS */}
+            {activeTab === 'certifications' && (
+              <div className="bg-[#0a0a14] p-8 rounded-2xl border border-cyan-900/30">
+                <div className="flex justify-between items-center mb-6 border-b border-cyan-900/30 pb-4">
+                  <h3 className="text-xl font-bold text-white">Certifications</h3>
+                  <button 
+                    onClick={() => {
+                      setPortfolioData({...portfolioData, certifications: [...(portfolioData.certifications||[]), { title: 'New Certificate', issuer: '', icon: '🛡️', color: '#22d3ee' }]});
+                    }}
+                    className="flex items-center gap-1 bg-cyan-500/20 text-cyan-400 px-3 py-1.5 rounded hover:bg-cyan-500/30 text-sm"
+                  >
+                    <Plus size={16} /> Add Certificate
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {portfolioData.certifications?.map((cert: any, idx: number) => (
+                    <div key={idx} className="bg-[#05050f] border border-cyan-900/50 rounded-xl p-4 relative">
+                      <button onClick={() => {
+                        const nc = [...portfolioData.certifications]; nc.splice(idx, 1); setPortfolioData({...portfolioData, certifications: nc});
+                      }} className="absolute top-2 right-2 text-red-500 hover:text-red-400"><Trash2 size={16} /></button>
+                      
+                      <div className="grid grid-cols-2 gap-2 mt-4">
+                        <div className="col-span-2">
+                          <label className="block text-xs text-gray-500 mb-1">Title</label>
+                          <input value={cert.title || ''} onChange={(e) => {
+                            const nc = [...portfolioData.certifications]; nc[idx].title = e.target.value; setPortfolioData({...portfolioData, certifications: nc});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400 text-sm" />
+                        </div>
+                        <div className="col-span-2">
+                          <label className="block text-xs text-gray-500 mb-1">Issuer</label>
+                          <input value={cert.issuer || ''} onChange={(e) => {
+                            const nc = [...portfolioData.certifications]; nc[idx].issuer = e.target.value; setPortfolioData({...portfolioData, certifications: nc});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400 text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Icon (Emoji)</label>
+                          <input value={cert.icon || ''} onChange={(e) => {
+                            const nc = [...portfolioData.certifications]; nc[idx].icon = e.target.value; setPortfolioData({...portfolioData, certifications: nc});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400 text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Hex Color</label>
+                          <input value={cert.color || ''} onChange={(e) => {
+                            const nc = [...portfolioData.certifications]; nc[idx].color = e.target.value; setPortfolioData({...portfolioData, certifications: nc});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400 text-sm" />
+                        </div>
+                        <div className="col-span-2">
+                          <label className="block text-xs text-gray-500 mb-1">PDF Link</label>
+                          <input value={cert.pdf || ''} onChange={(e) => {
+                            const nc = [...portfolioData.certifications]; nc[idx].pdf = e.target.value; setPortfolioData({...portfolioData, certifications: nc});
+                          }} className="w-full p-2 bg-[#0a0a14] border border-cyan-900/50 rounded text-white outline-none focus:border-cyan-400 text-sm" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
