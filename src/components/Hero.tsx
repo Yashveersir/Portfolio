@@ -92,7 +92,7 @@ function PhotoFrame({ heroImage }: { heroImage?: string }) {
       onMouseLeave={handleMouseLeave}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 1.3 }}
+      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 2.2 }}
       className="relative flex-shrink-0 perspective-1200"
       style={{ transformStyle: 'preserve-3d' }}
     >
@@ -279,7 +279,7 @@ export default function Hero() {
                 <motion.div
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ ...springConfig, delay: 0.9 }}
+                  transition={{ ...springConfig, delay: 1.8 }}
                   style={{
                     fontFamily: 'var(--font-syne)', fontWeight: 200,
                     fontSize: 'clamp(2rem, 5vw, 4.5rem)', lineHeight: 1,
@@ -294,15 +294,14 @@ export default function Hero() {
                 <motion.div
                   initial={{ opacity: 0, y: 80 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ ...springConfig, delay: 1.05 }}
+                  transition={{ ...springConfig, delay: 1.95 }}
                   style={{
                     fontFamily: 'var(--font-syne)', fontWeight: 800,
                     fontSize: 'clamp(3.8rem, 10vw, 8.5rem)', lineHeight: 0.9,
                     letterSpacing: '-0.05em',
                     background: 'linear-gradient(135deg, var(--text) 20%, var(--cyan) 80%)',
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    paddingRight: '0.05em',
-                    filter: 'drop-shadow(0 2px 10px rgba(0,0,0,0.1))'
+                    paddingRight: '0.05em'
                   }}
                 >
                   {heroHeadline2}
@@ -313,7 +312,7 @@ export default function Hero() {
                 <motion.div
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ ...springConfig, delay: 1.2 }}
+                  transition={{ ...springConfig, delay: 2.1 }}
                   style={{
                     fontFamily: 'var(--font-syne)', fontWeight: 200,
                     fontSize: 'clamp(1.6rem, 4vw, 3.8rem)', lineHeight: 1.1,
@@ -325,14 +324,14 @@ export default function Hero() {
               </div>
             </div>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="mb-12 h-6 flex justify-center lg:justify-start">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4 }} className="mb-12 h-6 flex justify-center lg:justify-start">
               <TypingEffect roles={roles} />
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.7, duration: 0.6 }}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 2.6, duration: 0.6 }}
               className="flex flex-wrap gap-5 justify-center lg:justify-start"
             >
               <a
