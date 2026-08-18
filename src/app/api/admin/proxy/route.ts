@@ -20,15 +20,22 @@ export async function PUT(req: NextRequest) {
       body: JSON.stringify(body),
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error('Backend returned non-JSON:', text.substring(0, 200));
+      return NextResponse.json({ error: `Backend Error: ${res.status} - ${res.statusText}. Payload might be too large.` }, { status: res.status });
+    }
 
     if (res.ok) {
       return NextResponse.json(data);
     } else {
       return NextResponse.json({ error: data.error || 'Update failed' }, { status: res.status });
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Proxy Update Error:', err);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
   }
 }
