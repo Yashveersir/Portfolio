@@ -121,7 +121,7 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
               <span className="text-xs font-mono text-theme-muted tracking-widest uppercase">01</span>
               Overview
             </h2>
-            <div className="prose prose-invert max-w-none text-theme-dim leading-loose text-lg">
+            <div className="max-w-none text-theme-dim leading-loose text-lg">
               {project.caseStudy.overview}
             </div>
           </section>
@@ -131,7 +131,7 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
               <span className="text-xs font-mono text-theme-muted tracking-widest uppercase">02</span>
               Architecture & Tech Stack
             </h2>
-            <div className="prose prose-invert max-w-none text-theme-dim leading-loose text-lg">
+            <div className="max-w-none text-theme-dim leading-loose text-lg">
               {project.caseStudy.architecture}
             </div>
           </section>
@@ -144,7 +144,7 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
               <span className="text-xs font-mono text-red-500/50 tracking-widest uppercase">03</span>
               Challenges
             </h2>
-            <div className="prose prose-invert max-w-none text-red-200/80 leading-loose text-lg relative z-10">
+            <div className="max-w-none text-theme-dim leading-loose text-lg relative z-10">
               {project.caseStudy.challenges}
             </div>
           </section>
@@ -157,7 +157,7 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
               <span className="text-xs font-mono text-green-500/50 tracking-widest uppercase">04</span>
               Solutions
             </h2>
-            <div className="prose prose-invert max-w-none text-green-200/80 leading-loose text-lg relative z-10">
+            <div className="max-w-none text-theme-dim leading-loose text-lg relative z-10">
               {project.caseStudy.solutions}
             </div>
           </section>
