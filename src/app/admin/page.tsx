@@ -232,16 +232,6 @@ export default function AdminPage() {
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="p-6 border-b border-cyan-900/30 bg-[#0a0a14]/50 backdrop-blur-md flex justify-between items-center sticky top-0 z-10">
           <h2 className="text-lg font-medium text-gray-200 capitalize">Editing: {activeTab}</h2>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setShowConfirmModal(true)}
-              disabled={loading}
-              className="flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-black px-6 py-2 rounded-lg font-bold transition-all shadow-[0_0_10px_rgba(34,211,238,0.2)] hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] disabled:opacity-50"
-            >
-              {loading ? <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" /> : <Save size={18} />}
-              {loading ? 'Saving...' : 'Save Changes'}
-            </button>
-          </div>
         </header>
 
         <div className="flex-1 overflow-y-auto p-6 md:p-10">
@@ -868,6 +858,16 @@ export default function AdminPage() {
           </div>
         </div>
       </main>
+      {/* FLOATING SAVE BUTTON */}
+      <button
+        onClick={() => setShowConfirmModal(true)}
+        disabled={loading}
+        className="fixed bottom-8 right-8 z-[90] flex items-center gap-3 bg-cyan-500 hover:bg-cyan-400 text-black px-8 py-4 rounded-full font-extrabold text-lg transition-all shadow-[0_0_30px_rgba(34,211,238,0.4)] hover:shadow-[0_0_40px_rgba(34,211,238,0.6)] disabled:opacity-50 hover:-translate-y-1 active:translate-y-0"
+      >
+        {loading ? <div className="w-6 h-6 border-4 border-black border-t-transparent rounded-full animate-spin" /> : <Save size={24} />}
+        {loading ? 'SAVING...' : 'SAVE CHANGES'}
+      </button>
+
       {/* CONFIRMATION MODAL */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
