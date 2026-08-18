@@ -107,8 +107,9 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
           <div className="relative w-full aspect-video border border-theme rounded-xl overflow-hidden mb-20 group transition-theme">
             <Image 
               src={project.images[0]} 
-              alt={project.title} 
+              alt={project.title || "Project Image"} 
               fill 
+              unoptimized
               className="object-cover group-hover:scale-105 transition-transform duration-1000" 
             />
           </div>
@@ -116,51 +117,59 @@ export default async function ProjectCaseStudy({ params }: { params: Promise<{ s
 
         {/* Case Study Content */}
         <div className="space-y-20">
-          <section>
-            <h2 className="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-4">
-              <span className="text-xs font-mono text-theme-muted tracking-widest uppercase">01</span>
-              Overview
-            </h2>
-            <div className="max-w-none text-theme-dim leading-loose text-lg">
-              {project.caseStudy.overview}
-            </div>
-          </section>
+          {project.caseStudy.overview && (
+            <section>
+              <h2 className="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-4">
+                <span className="text-xs font-mono text-theme-muted tracking-widest uppercase">01</span>
+                Overview
+              </h2>
+              <div className="max-w-none text-theme-dim leading-loose text-lg">
+                {project.caseStudy.overview}
+              </div>
+            </section>
+          )}
 
-          <section>
-            <h2 className="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-4">
-              <span className="text-xs font-mono text-theme-muted tracking-widest uppercase">02</span>
-              Architecture & Tech Stack
-            </h2>
-            <div className="max-w-none text-theme-dim leading-loose text-lg">
-              {project.caseStudy.architecture}
-            </div>
-          </section>
+          {project.caseStudy.architecture && (
+            <section>
+              <h2 className="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-4">
+                <span className="text-xs font-mono text-theme-muted tracking-widest uppercase">02</span>
+                Architecture & Tech Stack
+              </h2>
+              <div className="max-w-none text-theme-dim leading-loose text-lg">
+                {project.caseStudy.architecture}
+              </div>
+            </section>
+          )}
 
-          <section className="p-8 border border-red-500/20 bg-red-500/5 rounded-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-            </div>
-            <h2 className="text-2xl font-bold mb-6 text-red-400 flex items-center gap-4 relative z-10">
-              <span className="text-xs font-mono text-red-500/50 tracking-widest uppercase">03</span>
-              Challenges
-            </h2>
-            <div className="max-w-none text-theme-dim leading-loose text-lg relative z-10">
-              {project.caseStudy.challenges}
-            </div>
-          </section>
+          {project.caseStudy.challenges && (
+            <section className="p-8 border border-red-500/20 bg-red-500/5 rounded-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+              </div>
+              <h2 className="text-2xl font-bold mb-6 text-red-400 flex items-center gap-4 relative z-10">
+                <span className="text-xs font-mono text-red-500/50 tracking-widest uppercase">03</span>
+                Challenges
+              </h2>
+              <div className="max-w-none text-theme-dim leading-loose text-lg relative z-10">
+                {project.caseStudy.challenges}
+              </div>
+            </section>
+          )}
 
-          <section className="p-8 border border-green-500/20 bg-green-500/5 rounded-2xl relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-4 opacity-10">
-              <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </div>
-            <h2 className="text-2xl font-bold mb-6 text-green-400 flex items-center gap-4 relative z-10">
-              <span className="text-xs font-mono text-green-500/50 tracking-widest uppercase">04</span>
-              Solutions
-            </h2>
-            <div className="max-w-none text-theme-dim leading-loose text-lg relative z-10">
-              {project.caseStudy.solutions}
-            </div>
-          </section>
+          {project.caseStudy.solutions && (
+            <section className="p-8 border border-green-500/20 bg-green-500/5 rounded-2xl relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-4 opacity-10">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <h2 className="text-2xl font-bold mb-6 text-green-400 flex items-center gap-4 relative z-10">
+                <span className="text-xs font-mono text-green-500/50 tracking-widest uppercase">04</span>
+                Solutions
+              </h2>
+              <div className="max-w-none text-theme-dim leading-loose text-lg relative z-10">
+                {project.caseStudy.solutions}
+              </div>
+            </section>
+          )}
 
           {project.features && project.features.length > 0 && (
             <section>
