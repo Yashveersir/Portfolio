@@ -130,7 +130,7 @@ export default function Navbar() {
       >
         {/* Logo */}
         <a
-          href="#hero"
+          href="/#hero"
           onClick={() => setOpen(false)}
           className="group relative flex items-center gap-4 text-xl font-black tracking-[-0.05em] text-theme"
           style={{ fontFamily: 'var(--font-syne)' }}
@@ -148,7 +148,7 @@ export default function Navbar() {
           {navLinks.map((link) => (
             <a
               key={link.id}
-              href={`#${link.id}`}
+              href={`/#${link.id}`}
               onClick={() => {
                 setOpen(false);
               }}
@@ -218,7 +218,7 @@ export default function Navbar() {
               {navLinks.map((link) => (
                 <a
                   key={link.id}
-                  href={`#${link.id}`}
+                  href={`/#${link.id}`}
                   onClick={() => {
                     setOpen(false);
                   }}
