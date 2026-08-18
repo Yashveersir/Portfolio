@@ -180,7 +180,15 @@ export default function AdminPage() {
   }
 
   if (!portfolioData) {
-    return <div className="min-h-screen flex items-center justify-center text-cyan-400 bg-[#05050f] font-mono">Initializing dashboard...</div>;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-cyan-400 bg-[#05050f] font-mono gap-4">
+        <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+        <div className="text-xl font-bold">Initializing dashboard...</div>
+        <div className="text-gray-500 text-sm max-w-sm text-center">
+          Waking up backend server. If the server was asleep (Render free tier), this may take up to 50 seconds.
+        </div>
+      </div>
+    );
   }
 
   const tabs = [
