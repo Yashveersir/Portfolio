@@ -2,7 +2,8 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { motion, useInView, useTransform } from 'framer-motion';
-import { experiences } from '@/lib/constants';
+import { experiences as DEFAULT_EXPERIENCES } from '@/lib/constants';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
 import { useMousePosition } from '@/hooks/useMousePosition';
 import CharSplitHeading from './CharSplitHeading';
 
@@ -135,9 +136,10 @@ function PathFlowBg() {
   );
 }
 
-// Using shared CharSplitHeading component
-
 export default function Experience() {
+  const { data } = usePortfolioData();
+  const experiences = data?.experiences?.length > 0 ? data.experiences : DEFAULT_EXPERIENCES;
+
   return (
     <section
       id="experience"
@@ -177,7 +179,7 @@ export default function Experience() {
           />
 
           <div className="flex flex-col gap-10 md:gap-16">
-            {experiences.map((exp, i) => (
+            {experiences.map((exp: any, i: number) => (
               <ExperienceItem key={exp.title} exp={exp} index={i} />
             ))}
           </div>
@@ -187,7 +189,7 @@ export default function Experience() {
   );
 }
 
-function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: number }) {
+function ExperienceItem({ exp, index }: { exp: any; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '-60px' });
@@ -298,7 +300,7 @@ function ExperienceItem({ exp, index }: { exp: typeof experiences[0]; index: num
 
         {/* Achievements */}
         <ul className="flex flex-col gap-3">
-          {exp.achievements.map((a, ai) => (
+          {exp.achievements.map((a: string, ai: number) => (
             <li
               key={ai}
               className="flex items-start gap-3 text-[11px] text-theme-muted group-hover/expcard:text-theme-dim transition-colors"

@@ -2,8 +2,9 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useInView } from 'framer-motion';
-import { skillCategories } from '@/lib/constants';
+import { skillCategories as DEFAULT_SKILLS } from '@/lib/constants';
 import CharSplitHeading from './CharSplitHeading';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
 
 // 3D tilt card with glassmorphism
 function BentoCell({
@@ -288,9 +289,11 @@ function CoreSystemBg() {
 
 export default function Skills() {
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
+  const { data } = usePortfolioData();
+  const skillCategories = data?.skills?.length > 0 ? data.skills : DEFAULT_SKILLS;
 
   // All skill names for cross-glow
-  const allSkillNames = skillCategories.flatMap((c) => c.skills.map((s) => s.name));
+  const allSkillNames = skillCategories.flatMap((c: any) => c.skills ? c.skills.map((s: any) => s.name) : []);
 
   return (
     <section
@@ -385,19 +388,22 @@ function CellContent({
   setHoveredSkill,
   tight,
 }: {
-  category: typeof skillCategories[0];
+  category: any;
   hoveredSkill: string | null;
   setHoveredSkill: (s: string | null) => void;
   tight: boolean;
 }) {
+  if (!category) return null;
+  const skillsArray = category.skills || [];
+
   return (
     <>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-2 h-2" style={{ background: category.color, boxShadow: `0 0 10px ${category.color}80` }} />
+          <div className="w-2 h-2" style={{ background: category.color || '#22d3ee', boxShadow: `0 0 10px ${category.color || '#22d3ee'}80` }} />
           <h3
             className="text-[10px] uppercase tracking-[0.3em] font-bold"
-            style={{ color: category.color, fontFamily: 'var(--font-mono)' }}
+            style={{ color: category.color || '#22d3ee', fontFamily: 'var(--font-mono)' }}
           >
             {category.title}
           </h3>
@@ -405,7 +411,7 @@ function CellContent({
         <span className="text-[8px] text-theme-muted font-mono tracking-widest uppercase">MODULE_v4.2</span>
       </div>
       <div className={`flex flex-wrap ${tight ? 'gap-2' : 'gap-3'}`}>
-        {category.skills.map((skill) => {
+        {skillsArray.map((skill: any) => {
           const isGlowing = hoveredSkill !== null && hoveredSkill === skill.name;
           const isFaded = hoveredSkill !== null && hoveredSkill !== skill.name;
           return (
@@ -416,7 +422,7 @@ function CellContent({
               onHoverEnd={() => setHoveredSkill(null)}
               whileHover={{ y: -2 }}
               animate={{
-                borderColor: isGlowing ? `${category.color}40` : 'var(--card-border)',
+                borderColor: isGlowing ? `${category.color || '#22d3ee'}40` : 'var(--card-border)',
                 opacity: isFaded ? 0.3 : 1,
               }}
               transition={{ duration: 0.2 }}
@@ -424,7 +430,7 @@ function CellContent({
               {skill.image ? (
                 <img src={skill.image} alt={skill.name} className="w-4 h-4 object-contain grayscale group-hover:grayscale-0 transition-all" />
               ) : (
-                <div className="w-1.5 h-1.5 rotate-45" style={{ background: category.color }} />
+                <div className="w-1.5 h-1.5 rotate-45" style={{ background: category.color || '#22d3ee' }} />
               )}
               <span
                 className="text-[10px] text-theme-dim font-bold uppercase tracking-widest whitespace-nowrap"

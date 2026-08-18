@@ -2,8 +2,9 @@
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
 
-const METRICS = [
+const DEFAULT_METRICS = [
   {
     value: '100K+',
     label: 'Lines of Code',
@@ -30,7 +31,7 @@ const METRICS = [
   },
 ];
 
-function MetricCard({ metric, index }: { metric: typeof METRICS[0]; index: number }) {
+function MetricCard({ metric, index }: { metric: any; index: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-50px' });
 
@@ -67,6 +68,9 @@ function MetricCard({ metric, index }: { metric: typeof METRICS[0]; index: numbe
 }
 
 export default function ByTheNumbers() {
+  const { data } = usePortfolioData();
+  const metrics = data?.numbers?.length > 0 ? data.numbers : DEFAULT_METRICS;
+
   return (
     <section className="relative py-28 md:py-40 overflow-hidden border-y border-theme">
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
@@ -92,7 +96,7 @@ export default function ByTheNumbers() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {METRICS.map((m, i) => (
+          {metrics.map((m: any, i: number) => (
             <MetricCard key={m.label} metric={m} index={i} />
           ))}
         </div>

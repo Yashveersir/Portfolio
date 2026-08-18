@@ -113,6 +113,13 @@ export const projects = [
       'Gemini-powered personalized presenter feedback',
       'Client-side media processing with FFmpeg',
     ],
+    slug: 'present-ai',
+    caseStudy: {
+      overview: 'Present AI is a video analysis platform designed to help users improve their public speaking skills. By recording a presentation, the system analyzes multiple aspects of the user\'s performance and provides a comprehensive score and actionable feedback.',
+      architecture: 'The frontend is built with React 18 and uses Firebase for authentication and media storage. The core processing pipeline utilizes FFmpeg running client-side via WebAssembly to extract audio and video frames. Audio is processed by the Whisper API for Speech-to-Text, analyzing filler words and clarity. Video frames are analyzed using MediaPipe for eye-contact and facial expression tracking. The final metrics are sent to the Gemini API, which acts as an AI coach to generate personalized feedback.',
+      challenges: 'One of the biggest challenges was handling large video files in the browser without crashing the tab or requiring massive server-side computing power. Additionally, syncing the audio transcripts from Whisper with the video timestamps from MediaPipe required precise timing logic.',
+      solutions: 'We solved the processing bottleneck by utilizing FFmpeg.wasm, allowing us to downsample and extract only the necessary audio and frames directly in the browser before sending them to the APIs. This drastically reduced bandwidth and server costs. For the timing sync, we built a custom event-loop that correlated Whisper\'s word-level timestamps with MediaPipe\'s frame index.'
+    },
     github: 'https://github.com/Yashveersir/AI-Presentation-Evaluator',
     demo: 'https://presentai-eval-yash2026.web.app/',
     featured: true,
@@ -140,6 +147,13 @@ export const projects = [
       'Event-based notification engine',
       'Admin dashboard with analytics',
     ],
+    slug: 'green-valley-farm',
+    caseStudy: {
+      overview: 'Green Valley Poultry Farm is a full-stack e-commerce solution tailored for agricultural and poultry sales. It digitizes the ordering process, replacing manual tracking with a robust web platform that features live inventory updates and secure customer onboarding.',
+      architecture: 'The backend is powered by Node.js and Express, connected to a MongoDB database. It exposes a REST API consumed by a Vanilla JavaScript frontend. Authentication is handled entirely via an OTP-based flow (no passwords required), ensuring high security and low friction for rural customers. An event-driven architecture is used for the notification engine, triggering emails and SMS messages upon order placement or status changes.',
+      challenges: 'A major issue was "overselling" — multiple customers trying to purchase the last remaining batch of poultry simultaneously. Another challenge was ensuring the authentication flow was simple enough for users who might not be tech-savvy.',
+      solutions: 'To solve the overselling issue, we implemented database-level locking and atomic transactions in MongoDB, ensuring that inventory checks and deductions happen in a single, uninterrupted operation. For authentication, we opted for a passwordless OTP flow using a third-party SMS gateway, which proved to be highly effective for the target demographic.'
+    },
     github: 'https://github.com/Yashveersir/green-valley-farm',
     demo: 'https://www.green-valley-farm.online/',
     featured: true,
@@ -167,6 +181,13 @@ export const projects = [
       'Dashboard with priority-based analytics',
       'JWT authentication & data isolation',
     ],
+    slug: 'taskflow',
+    caseStudy: {
+      overview: 'TaskFlow is a production-ready task management system built during my internship at Vaidsys Technologies. It facilitates multi-tenant collaboration, allowing different teams to manage their sprints using a real-time Kanban board with invite-based workspace access.',
+      architecture: 'The application is a MERN stack monolithic architecture (MongoDB, Express, React, Node.js). The UI is built with React and styled using Tailwind CSS for a clean, responsive layout. The core real-time functionality is powered by Socket.io, which syncs drag-and-drop events across all connected clients instantly. Authentication and data isolation are managed via JWT, ensuring users can only access their authorized workspaces.',
+      challenges: 'Managing real-time state across multiple clients was highly complex. When a user dragged a task from "To Do" to "Done", we needed to instantly update their UI for a snappy experience (Optimistic UI), while ensuring the server validated the move and broadcasted it to all other users without causing race conditions or state desyncs.',
+      solutions: 'We implemented a robust event-sourcing model over WebSockets. Drag actions instantly update the local React state, while a queued event is sent to the Node.js server. The server acts as the single source of truth, updating MongoDB and broadcasting a strict state-diff to other clients. If the server rejects the move, the local client rolls back the state.'
+    },
     github: 'https://github.com/Yashveersir/Task-Manager',
     demo: 'https://task-manager-theta-ten-91.vercel.app/',
     featured: true,
@@ -194,6 +215,13 @@ export const projects = [
       'Email notifications',
       'Transaction history',
     ],
+    slug: 'ledger-system',
+    caseStudy: {
+      overview: 'The Ledger System is a secure financial REST API designed to handle protected account access, fund transfers, and automated transactional notifications. It acts as the backbone for a hypothetical banking or wallet application.',
+      architecture: 'Built strictly as a backend service using Node.js, Express, and MongoDB. Security is paramount, so all passwords are hashed using bcrypt, and API access is secured via JWT. The core ledger logic is written as a series of modular controllers that validate balances, handle concurrent transfers, and emit events to a notification service that triggers email alerts (via Nodemailer) for transaction confirmations.',
+      challenges: 'Financial systems cannot tolerate errors or partial updates. If a transfer deducts money from User A but fails before crediting User B, the funds are lost. Additionally, validating inputs to prevent negative transfers or overflow attacks was critical.',
+      solutions: 'We utilized MongoDB ACID transactions to ensure that fund transfers are atomic — either the entire transfer succeeds, or the whole operation is rolled back, guaranteeing zero data inconsistency. We also implemented strict input validation middleware (using Joi) to sanitize all incoming requests before they ever touch the database logic.'
+    },
     github: 'https://github.com/Yashveersir/Backend-Ledger',
     demo: 'https://backend-ledger-8to4.onrender.com/',
     featured: true,

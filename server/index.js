@@ -3,7 +3,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
-
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const Portfolio = require('./models/Portfolio');
 const app = express();
 
 // Middleware
@@ -308,6 +310,85 @@ app.post('/api/contact', async (req, res) => {
       details: error.message,
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
     });
+  }
+});
+
+// ----------------------------------------------------------------------------
+// Portfolio Admin & Data Endpoints
+// ----------------------------------------------------------------------------
+
+// Store the hash of "Yashveer@2003" as the default if no env variable is set
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '$2b$10$p0r95X8aWBP6oaP6AicFQe0h.bzB0TdnYYEMJDrjwiE.NLqwmCnDm';
+const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-jwt-key';
+
+// Middleware to verify JWT token
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+// 1. Admin Login
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { password } = req.body;
+    
+    // Compare provided password with the stored hash
+    const isMatch = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+    
+    if (isMatch) {
+      const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '24h' });
+      res.json({ token });
+    } else {
+      res.status(401).json({ error: 'Invalid password' });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// 2. Get Portfolio Data (Public)
+app.get('/api/portfolio', async (req, res) => {
+  try {
+    let portfolio = await Portfolio.findOne();
+    if (!portfolio) {
+      // If none exists, create a default one
+      portfolio = new Portfolio();
+      await portfolio.save();
+    }
+    res.json(portfolio);
+  } catch (error) {
+    console.error('Error fetching portfolio:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// 3. Update Portfolio Data (Protected)
+app.put('/api/portfolio', authenticateToken, async (req, res) => {
+  try {
+    const updateData = req.body;
+    let portfolio = await Portfolio.findOne();
+    
+    if (!portfolio) {
+      portfolio = new Portfolio(updateData);
+    } else {
+      // Update fields
+      Object.assign(portfolio, updateData);
+    }
+    
+    await portfolio.save();
+    res.json({ success: true, message: 'Portfolio updated successfully', portfolio });
+  } catch (error) {
+    console.error('Error updating portfolio:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

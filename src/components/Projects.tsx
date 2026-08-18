@@ -2,17 +2,19 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { motion, useInView, useTransform } from 'framer-motion';
-import { projects } from '@/lib/constants';
+import { projects as DEFAULT_PROJECTS } from '@/lib/constants';
 import { FaGithub } from 'react-icons/fa';
-import { ExternalLink } from 'lucide-react';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
+import { ExternalLink, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useMousePosition } from '@/hooks/useMousePosition';
 import CharSplitHeading from './CharSplitHeading';
 
 // Per-project accent colors from spec
 const PROJECT_ACCENTS = ['var(--cyan)', 'var(--amber)', 'var(--violet)'];
 
-function ProjectCard({ project, index }: { project: typeof projects[0]; index: number }) {
+function ProjectCard({ project, index }: { project: any; index: number }) {
   const accent = PROJECT_ACCENTS[index % PROJECT_ACCENTS.length];
   const num = String(index + 1).padStart(2, '0');
 
@@ -61,19 +63,19 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
 
         {/* Project Image */}
         {project.images?.[0] && (
-          <div className="relative w-full h-56 overflow-hidden border-b border-theme">
+          <div className="relative aspect-[16/10] w-full max-w-[90%] mx-auto mt-8 border border-theme bg-theme-shift/30 p-2 overflow-hidden group-hover/card:border-cyan-400/20 transition-colors duration-500">
             <Image 
               src={project.images[0]} 
               alt={`Interface of ${project.title}`} 
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="w-full h-full object-cover object-top grayscale group-hover/card:grayscale-0 group-hover/card:scale-105 transition-all duration-1000"
+              className="object-cover opacity-80 group-hover/card:opacity-100 group-hover/card:scale-105 transition-all duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/20 to-transparent opacity-60" />
+            <div className="absolute inset-0 bg-gradient-to-t from-theme-card via-transparent to-transparent opacity-80" />
             
             {/* HUD element on image */}
             <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-2.5">
                 <div className="w-12 h-[1px] bg-theme-muted" />
                 <span className="text-[8px] font-bold text-theme-muted uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)' }}>DEPLOYMENT_READY</span>
               </div>
@@ -119,7 +121,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
 
           {/* Tags — consistent mono style */}
           <div className="flex flex-wrap gap-2 mb-6 md:mb-8">
-            {project.tags.map((tag) => (
+            {project.tags?.map((tag: string, i: number) => (
               <span
                 key={tag}
                 className="px-2.5 py-1 border border-theme bg-theme-card text-[9px] font-bold uppercase tracking-widest text-theme-muted"
@@ -130,14 +132,27 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
             ))}
           </div>
 
-          {/* Technical spec label */}
-          <div className="pt-4 md:pt-5 border-t border-theme flex items-center justify-between">
-            <span className="text-[9px] uppercase tracking-[0.2em] text-theme-muted font-bold" style={{ fontFamily: 'var(--font-mono)' }}>
-              RESULT // 0x{index.toString(16)}
-            </span>
-            <span className="text-[9px] uppercase tracking-[0.1em] text-cyan-400/80 font-bold max-w-[70%] text-right" style={{ fontFamily: 'var(--font-mono)' }}>
-              {project.outcome.replace('Outcome: ', '')}
-            </span>
+          {/* Technical spec label and Case Study Link */}
+          <div className="pt-4 md:pt-5 border-t border-theme flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] uppercase tracking-[0.2em] text-theme-muted font-bold" style={{ fontFamily: 'var(--font-mono)' }}>
+                RESULT // 0x{index.toString(16)}
+              </span>
+              <span className="text-[9px] uppercase tracking-[0.1em] text-cyan-400/80 font-bold max-w-[70%] text-right" style={{ fontFamily: 'var(--font-mono)' }}>
+                {project.outcome?.replace('Outcome: ', '') || 'Deployed & Active'}
+              </span>
+            </div>
+            
+            {project.slug && project.caseStudy && (
+              <Link 
+                href={`/projects/${project.slug}`}
+                className="mt-2 flex items-center justify-center gap-2 py-3 px-4 border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-widest transition-all hover:scale-[1.02]"
+                style={{ fontFamily: 'var(--font-mono)' }}
+              >
+                Read Case Study
+                <ChevronRight size={14} />
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -334,6 +349,9 @@ function HoloGridBg() {
 }
 
 export default function Projects() {
+  const { data } = usePortfolioData();
+  const projects = data?.projects?.length > 0 ? data.projects : DEFAULT_PROJECTS;
+
   return (
     <section id="projects" className="relative py-28 md:py-40 overflow-hidden">
       <HoloGridBg />
@@ -370,7 +388,7 @@ export default function Projects() {
 
         {/* Cards — different heights, NOT uniform */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {projects.map((project, i) => (
+          {projects.map((project: any, i: number) => (
             <ProjectCard key={project.title} project={project} index={i} />
           ))}
         </div>

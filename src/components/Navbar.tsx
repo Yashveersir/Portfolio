@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { navLinks } from '@/lib/constants';
 import ThemeToggle from './ThemeToggle';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
 
 // Scramble effect characters
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
@@ -59,9 +60,10 @@ function ScrambleText({ text, active }: { text: string; active?: boolean }) {
 }
 
 export default function Navbar() {
+  const [active, setActive] = useState('about');
   const [scrolled, setScrolled] = useState(false);
-  const [active, setActive] = useState('');
   const [open, setOpen] = useState(false);
+  const { data } = usePortfolioData();
 
   useEffect(() => {
     const onScroll = () => {
@@ -171,7 +173,7 @@ export default function Navbar() {
           <ThemeToggle />
           
           <a
-            href="/api/resume"
+            href={data?.resumeUrl || "/api/resume"}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:block group relative px-4 py-2 overflow-hidden border border-amber-500/40 text-[9px] font-bold uppercase tracking-[0.2em] text-amber-500 transition-all hover:text-black"
@@ -230,7 +232,7 @@ export default function Navbar() {
                 </a>
               ))}
               <a
-                href="/api/resume"
+                href={data?.resumeUrl || "/api/resume"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-4 border border-amber-500/40 px-10 py-4 text-[11px] font-bold uppercase tracking-widest text-amber-500 rounded-full hover:bg-amber-500/10 transition-colors"

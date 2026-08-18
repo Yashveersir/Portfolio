@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { socialLinks } from '@/lib/constants';
+import { socialLinks as DEFAULT_SOCIAL_LINKS } from '@/lib/constants';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
 import { Mail, ArrowRight, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import CharSplitHeading from './CharSplitHeading';
@@ -197,6 +198,8 @@ export default function Contact() {
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const { data } = usePortfolioData();
+  const socialLinks = data?.socialLinks?.email ? data.socialLinks : DEFAULT_SOCIAL_LINKS;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

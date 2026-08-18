@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useInView, useSpring, useTransform, useMotionValue } from 'framer-motion';
 import Image from 'next/image';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
+import Hero3D from './Hero3D';
 
-const ROLES = [
+const DEFAULT_ROLES = [
   'Full-Stack Developer',
   'Generative AI Enthusiast',
   'Backend Systems Engineer',
@@ -12,13 +14,14 @@ const ROLES = [
 ];
 
 /* ──────────────── typing effect ──────────────── */
-function TypingEffect() {
+function TypingEffect({ roles }: { roles: string[] }) {
   const [idx, setIdx] = useState(0);
   const [text, setText] = useState('');
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const current = ROLES[idx];
+    if (!roles || roles.length === 0) return;
+    const current = roles[idx % roles.length];
     
     if (text === current && !deleting) {
       const timeout = setTimeout(() => {
@@ -27,7 +30,7 @@ function TypingEffect() {
       return () => clearTimeout(timeout);
     } else if (text === '' && deleting) {
       setDeleting(false);
-      setIdx((p) => (p + 1) % ROLES.length);
+      setIdx((p) => (p + 1) % roles.length);
       return;
     }
 
@@ -53,7 +56,7 @@ function TypingEffect() {
 import HeroBg from './HeroBg';
 
 /* ──────────────── photo frame ──────────────── */
-function PhotoFrame() {
+function PhotoFrame({ heroImage }: { heroImage?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { margin: '0px' });
 
@@ -173,7 +176,7 @@ function PhotoFrame() {
           }}
         >
           <Image
-            src="/myImage.jpeg"
+            src={heroImage || "/myImage.jpeg"}
             alt="Yashveer Singh"
             width={400}
             height={500}
@@ -222,6 +225,12 @@ function PhotoFrame() {
 /* ──────────────── main hero ──────────────── */
 export default function Hero() {
   const springConfig = { type: 'spring' as const, stiffness: 100, damping: 15 };
+  const { data, loading } = usePortfolioData();
+
+  const heroHeadline1 = data?.heroHeadline1 || 'I Build';
+  const heroHeadline2 = data?.heroHeadline2 || 'Things';
+  const heroHeadline3 = data?.heroHeadline3 || 'That Live Online.';
+  const roles = data?.heroRoles?.length > 0 ? data.heroRoles : DEFAULT_ROLES;
 
   return (
     <section
@@ -231,6 +240,7 @@ export default function Hero() {
       suppressHydrationWarning
     >
       <HeroBg />
+      <Hero3D />
       <div className="absolute inset-0 dot-grid pointer-events-none" style={{ opacity: 0.05 }} />
       
       {/* Decorative vertical line */}
@@ -276,7 +286,7 @@ export default function Hero() {
                     color: 'var(--text)', opacity: 0.95, letterSpacing: '-0.02em',
                   }}
                 >
-                  I Build
+                  {heroHeadline1}
                 </motion.div>
               </div>
 
@@ -295,7 +305,7 @@ export default function Hero() {
                     filter: 'drop-shadow(0 2px 10px rgba(0,0,0,0.1))'
                   }}
                 >
-                  Things
+                  {heroHeadline2}
                 </motion.div>
               </div>
 
@@ -310,13 +320,13 @@ export default function Hero() {
                     color: 'var(--text)', opacity: 0.85, letterSpacing: '-0.01em',
                   }}
                 >
-                  That Live Online.
+                  {heroHeadline3}
                 </motion.div>
               </div>
             </div>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="mb-12 h-6 flex justify-center lg:justify-start">
-              <TypingEffect />
+              <TypingEffect roles={roles} />
             </motion.div>
 
             <motion.div
@@ -345,7 +355,7 @@ export default function Hero() {
               </a>
 
               <a
-                href="/api/resume?download=true"
+                href={`${data?.resumeUrl || '/api/resume'}?download=true`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative px-10 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--amber)] border border-[var(--amber)]/30 overflow-hidden hover:text-[var(--amber)] hover:border-[var(--amber)] transition-all cursor-pointer shadow-[0_0_15px_rgba(255,100,0,0.1)] hover:shadow-[0_0_20px_rgba(255,100,0,0.2)] text-center inline-block"
@@ -359,8 +369,8 @@ export default function Hero() {
           </div>
 
           {/* RIGHT — photo */}
-          <div className="flex-shrink-0 lg:mr-10">
-            <PhotoFrame />
+          <div className="w-full lg:w-1/2 flex justify-center lg:justify-end mt-16 lg:mt-0 lg:pr-12">
+            <PhotoFrame heroImage={data?.heroImage} />
           </div>
 
         </div>

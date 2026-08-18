@@ -3,8 +3,9 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import CharSplitHeading from './CharSplitHeading';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
 
-const BIO_WORDS = [
+const DEFAULT_BIO_WORDS = [
   'I', 'am', 'a', 'Software', 'Engineer', 'and', 'Designer', 'dedicated', 'to',
   'crafting', 'high-performance', 'web', 'experiences.', 'My', 'work', 'merges',
   'technical', 'precision', 'with', 'minimalist', 'aesthetics,', 'specializing',
@@ -32,7 +33,7 @@ function HandUnderline() {
   );
 }
 
-function WordReveal() {
+function WordReveal({ bioWords }: { bioWords: string[] }) {
   const [mounted, setMounted] = useState(false);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-10% 0px -10% 0px' });
@@ -49,7 +50,7 @@ function WordReveal() {
       className="drop-cap text-lg md:text-xl leading-relaxed text-theme-dim font-light"
       style={{ maxWidth: '520px' }}
     >
-      {BIO_WORDS.map((word, i) => {
+      {bioWords.map((word, i) => {
         // Mark "Generative AI" words for underline
         const isHighlight = i === 26 || i === 27;
         return (
@@ -71,7 +72,7 @@ function WordReveal() {
   );
 }
 
-const STATS = [
+const DEFAULT_STATS = [
   { value: '8.6', label: 'CGPA', color: '#ff6400' },
   { value: 'MERN', label: 'Specialization', color: '#22d3ee' },
   { value: '3+', label: 'Live Projects', color: '#7c6fff' },
@@ -310,7 +311,7 @@ function NeuralBg() {
   );
 }
 
-function Terminal() {
+function Terminal({ terminalData }: { terminalData?: any }) {
   const [mounted, setMounted] = useState(false);
   const terminalRef = useRef<HTMLDivElement>(null);
   const isTerminalInView = useInView(terminalRef, { once: true, margin: '-50px' });
@@ -320,8 +321,17 @@ function Terminal() {
     setMounted(true);
   }, []);
 
+  const data = terminalData || {
+    name: 'Yashveer Singh',
+    role: 'Full-Stack & AI Engineer',
+    location: 'Burdwan, WB, India',
+    email: 'singhyash9631@gmail.com',
+    stack: ['React', 'Node', 'AI'],
+    openToWork: true
+  };
+
   const copyEmail = () => {
-    navigator.clipboard.writeText('singhyash9631@gmail.com');
+    navigator.clipboard.writeText(data.email);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -360,12 +370,12 @@ function Terminal() {
 
       <div className="p-6" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', lineHeight: 1.8 }}>
         <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}><span className="text-[#c084fc]">const</span> <span className="text-[#60a5fa]">developer</span> <span className="text-theme-muted">=</span> {'{'}</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">name:</span> <span className="text-[#fbbf24]">&apos;Yashveer Singh&apos;</span>,</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">role:</span> <span className="text-[#fbbf24]">&apos;Full-Stack &amp; AI Engineer&apos;</span>,</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">location:</span> <span className="text-[#fbbf24]">&apos;Burdwan, WB, India&apos;</span>,</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">email:</span> <span className="text-[#fbbf24]">&apos;singhyash9631@gmail.com&apos;</span>,</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">stack:</span> [<span className="text-[#22d3ee]">&apos;React&apos;</span>, <span className="text-[#22d3ee]">&apos;Node&apos;</span>, <span className="text-[#22d3ee]">&apos;AI&apos;</span>],</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">openToWork:</span> <span className="text-[#c084fc]">true</span>,</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">name:</span> <span className="text-[#fbbf24]">&apos;{data.name}&apos;</span>,</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">role:</span> <span className="text-[#fbbf24]">&apos;{data.role}&apos;</span>,</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">location:</span> <span className="text-[#fbbf24]">&apos;{data.location}&apos;</span>,</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">email:</span> <span className="text-[#fbbf24]">&apos;{data.email}&apos;</span>,</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">stack:</span> [{data.stack.map((s: string, i: number) => <span key={i}><span className="text-[#22d3ee]">&apos;{s}&apos;</span>{i < data.stack.length - 1 ? ', ' : ''}</span>)}],</motion.p>
+        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">openToWork:</span> <span className="text-[#c084fc]">{data.openToWork ? 'true' : 'false'}</span>,</motion.p>
         <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>{'}'}</motion.p>
         <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="mt-3 text-theme-muted animate-pulse">▌</motion.p>
       </div>
@@ -396,6 +406,11 @@ export default function About() {
   const sectionRef = useRef<HTMLElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const locationRef = useRef<HTMLDivElement>(null);
+
+  const { data, loading } = usePortfolioData();
+  const bioWords = data?.aboutBio ? data.aboutBio.split(' ') : DEFAULT_BIO_WORDS;
+  const stats = data?.aboutStats?.length > 0 ? data.aboutStats : DEFAULT_STATS;
+  const terminalData = data?.aboutTerminal;
 
   useEffect(() => {
     setMounted(true);
@@ -464,10 +479,10 @@ export default function About() {
               </div>
             </div>
 
-            <WordReveal />
+            <WordReveal bioWords={bioWords} />
 
             <div ref={statsRef} className="grid grid-cols-2 gap-4 mt-12">
-              {STATS.map((s, i) => (
+              {stats.map((s: any, i: number) => (
                 <motion.div
                   key={s.label}
                   initial={{ opacity: 0, y: 20 }}
@@ -492,7 +507,7 @@ export default function About() {
 
           {/* Right col — code terminal */}
           <div className="w-full lg:w-1/2 lg:pt-16">
-            <Terminal />
+            <Terminal terminalData={terminalData} />
 
             {/* Location + availability note */}
             <motion.div

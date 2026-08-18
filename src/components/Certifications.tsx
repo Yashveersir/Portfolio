@@ -2,14 +2,17 @@
 
 import { useRef } from 'react';
 import { motion, useInView, useTransform } from 'framer-motion';
-import { certifications } from '@/lib/constants';
+import { certifications as DEFAULT_CERTIFICATIONS } from '@/lib/constants';
 import { ExternalLink } from 'lucide-react';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
 import { useMousePosition } from '@/hooks/useMousePosition';
 import CharSplitHeading from './CharSplitHeading';
 
 
 export default function Certifications() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { data } = usePortfolioData();
+  const certifications = data?.certifications?.length > 0 ? data.certifications : DEFAULT_CERTIFICATIONS;
 
   return (
     <section
@@ -53,7 +56,7 @@ export default function Certifications() {
           ref={scrollRef}
           className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory cert-scrollbar"
         >
-          {certifications.map((cert, i) => (
+          {certifications.map((cert: any, i: number) => (
             <CertCard key={cert.title} cert={cert} index={i} />
           ))}
         </div>
@@ -74,7 +77,7 @@ export default function Certifications() {
   );
 }
 
-function CertCard({ cert, index }: { cert: typeof certifications[0]; index: number }) {
+function CertCard({ cert, index }: { cert: any; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-40px' });
   const { mouseX, mouseY, handleMouseMove } = useMousePosition(ref);

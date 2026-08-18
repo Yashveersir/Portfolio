@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { socialLinks } from '@/lib/constants';
+import { socialLinks as DEFAULT_SOCIAL_LINKS } from '@/lib/constants';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
 import { FaArrowUp, FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
 export default function Footer() {
@@ -11,6 +12,8 @@ export default function Footer() {
   const [mounted, setMounted] = useState(false);
   const [year, setYear] = useState(2026);
   const [time, setTime] = useState('');
+  const { data } = usePortfolioData();
+  const socialLinks = data?.socialLinks?.email ? data.socialLinks : DEFAULT_SOCIAL_LINKS;
 
   useEffect(() => {
     setMounted(true);
