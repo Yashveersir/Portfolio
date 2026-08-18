@@ -30,9 +30,11 @@ export default function ThemeProvider() {
     <style dangerouslySetInnerHTML={{
       __html: `
         :root {
-          --cyan: ${primaryRgb || '34,211,238'};
-          --purple-500: ${secondaryRgb || '168,85,247'};
-          --theme: rgb(var(--cyan));
+          --cyan: ${primaryColor || '#22d3ee'};
+          --cyan-rgb: ${primaryRgb || '34,211,238'};
+          --purple-500: ${secondaryColor || '#a855f7'};
+          --purple-rgb: ${secondaryRgb || '168,85,247'};
+          --theme: var(--cyan);
         }
       `
     }} />
