@@ -10,6 +10,9 @@ import ThemeProvider from '@/components/ThemeProvider';
 import { PortfolioProvider } from '@/hooks/usePortfolioData';
 import { Analytics } from "@vercel/analytics/next";
 
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 async function getPortfolioData() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
   const baseUrl = backendUrl.replace(/\/$/, '');
