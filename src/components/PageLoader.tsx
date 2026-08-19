@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePortfolioData } from '@/hooks/usePortfolioData';
 
 const LOADING_STEPS = [
   'INITIALIZING_CORE_SYSTEM',
@@ -14,6 +15,7 @@ const LOADING_STEPS = [
 export default function PageLoader() {
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const { loading: dataLoading } = usePortfolioData();
 
   useEffect(() => {
     // Lock scroll
@@ -27,6 +29,11 @@ export default function PageLoader() {
       setProgress((prev) => {
         const next = prev + increment;
         if (next >= 100) {
+          // If progress is full but data is still loading, hover at 99%
+          if (dataLoading) {
+            return 99;
+          }
+
           clearInterval(timer);
           setTimeout(() => {
             setIsComplete(true);
@@ -42,7 +49,7 @@ export default function PageLoader() {
       clearInterval(timer);
       document.body.style.overflow = 'unset';
     };
-  }, []);
+  }, [dataLoading]);
 
   const step = Math.floor((progress / 100) * (LOADING_STEPS.length - 1));
 

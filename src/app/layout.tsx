@@ -10,25 +10,6 @@ import ThemeProvider from '@/components/ThemeProvider';
 import { PortfolioProvider } from '@/hooks/usePortfolioData';
 import { Analytics } from "@vercel/analytics/next";
 
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
-
-async function getPortfolioData() {
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-  const baseUrl = backendUrl.replace(/\/$/, '');
-  try {
-    const res = await fetch(`${baseUrl}/api/portfolio`, {
-      next: { revalidate: 0 } // Always get fresh data for layout, but SWR/CDN will handle caching
-    });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (error) {
-    console.error('Failed to fetch portfolio data on server:', error);
-  }
-  return null;
-}
-
 const syne = Syne({
   subsets: ['latin'],
   variable: '--font-syne',
@@ -98,12 +79,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const portfolioData = await getPortfolioData();
   return (
     <html lang="en" className={`scroll-smooth ${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
@@ -161,7 +141,7 @@ export default async function RootLayout({
             })
           }}
         />
-        <PortfolioProvider initialData={portfolioData}>
+        <PortfolioProvider>
           <div className="noise-overlay" />
           <ThemeProvider />
           <PageLoader />

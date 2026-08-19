@@ -12,13 +12,13 @@ interface PortfolioContextType {
 
 const PortfolioContext = createContext<PortfolioContextType>({ data: null, loading: true });
 
-export function PortfolioProvider({ children, initialData }: { children: React.ReactNode, initialData: PortfolioData | null }) {
-  const [data, setData] = useState<PortfolioData | null>(initialData);
+export function PortfolioProvider({ children, initialData }: { children: React.ReactNode, initialData?: PortfolioData | null }) {
+  const [data, setData] = useState<PortfolioData | null>(initialData || null);
   const [loading, setLoading] = useState(!initialData);
 
-  // Still fetch on client just to keep it fresh if needed (optional), but initialData makes it instant.
+  // Fetch on client if no server data was provided
   useEffect(() => {
-    if (initialData) return; // If we already have server data, no need to fetch on mount
+    if (initialData) return;
 
     const fetchPortfolio = async () => {
       try {
