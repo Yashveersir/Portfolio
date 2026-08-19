@@ -29,9 +29,11 @@ function TypingEffect({ roles }: { roles: string[] }) {
       }, 1800);
       return () => clearTimeout(timeout);
     } else if (text === '' && deleting) {
-      setDeleting(false);
-      setIdx((p) => (p + 1) % roles.length);
-      return;
+      const timeout = setTimeout(() => {
+        setDeleting(false);
+        setIdx((p) => (p + 1) % roles.length);
+      }, 0);
+      return () => clearTimeout(timeout);
     }
 
     const speed = deleting ? 28 : 72;
@@ -44,7 +46,7 @@ function TypingEffect({ roles }: { roles: string[] }) {
     }, speed);
 
     return () => clearTimeout(timeout);
-  }, [text, deleting, idx]);
+  }, [text, deleting, idx, roles]);
 
   return (
     <span className="text-[var(--cyan)]" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem' }}>
@@ -56,24 +58,31 @@ function TypingEffect({ roles }: { roles: string[] }) {
 import HeroBg from './HeroBg';
 
 /* ──────────────── photo frame ──────────────── */
-function PhotoFrame({ heroImage }: { heroImage?: string }) {
+function PhotoFrame({ heroImage, dataUpdatedAt }: { heroImage?: string, dataUpdatedAt?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { margin: '0px' });
 
-  // 3D Tilt state
+  // 3D Tilt & Parallax state
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const mouseX = useSpring(x, { stiffness: 100, damping: 25 });
-  const mouseY = useSpring(y, { stiffness: 100, damping: 25 });
+  const mouseX = useSpring(x, { stiffness: 60, damping: 20 });
+  const mouseY = useSpring(y, { stiffness: 60, damping: 20 });
 
-  const rotateX = useTransform(mouseY, [-0.5, 0.5], ['12deg', '-12deg']);
-  const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-12deg', '12deg']);
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], ['2deg', '-2deg']);
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-2deg', '2deg']);
+  
+  // Subtle parallax for layers
+  const bgTranslateX = useTransform(mouseX, [-0.5, 0.5], ['-5px', '5px']);
+  const bgTranslateY = useTransform(mouseY, [-0.5, 0.5], ['-5px', '5px']);
+  const fgTranslateX = useTransform(mouseX, [-0.5, 0.5], ['8px', '-8px']);
+  const fgTranslateY = useTransform(mouseY, [-0.5, 0.5], ['8px', '-8px']);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
+    // Disable heavy parallax on very small touch devices implicitly by tracking mouse
     const mouseXPos = e.clientX - rect.left;
     const mouseYPos = e.clientY - rect.top;
     x.set(mouseXPos / width - 0.5);
@@ -85,138 +94,142 @@ function PhotoFrame({ heroImage }: { heroImage?: string }) {
     y.set(0);
   };
 
+  // Use the exact URL from the backend to avoid breaking signed URLs or strict APIs
+  const isValidUrl = heroImage && heroImage.trim().length > 5 && heroImage !== 'null' && heroImage !== 'undefined';
+  const imageSrc = isValidUrl ? heroImage : "/cutout.png";
+
   return (
     <motion.div
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 2.2 }}
-      className="relative flex-shrink-0 perspective-1200"
+      transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1], delay: 1.2 }}
+      className="relative flex-shrink-0 perspective-1200 w-[85%] max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[400px] mx-auto lg:mx-auto group/wrapper"
       style={{ transformStyle: 'preserve-3d' }}
     >
-      {/* HUD Label: TOP LEFT */}
-      <motion.div 
-        className="absolute -top-12 -left-8 z-20 pointer-events-none"
-        style={{ translateZ: '60px' }}
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <div className="flex flex-col gap-1.5">
-          <span className="text-[10px] font-bold text-cyan-400/80 uppercase tracking-[0.3em]" style={{ fontFamily: 'var(--font-mono)' }}>
-            [ SYSTEM_READY ]
-          </span>
-          <div className="flex gap-1">
-            <div className="w-8 h-[1px] bg-cyan-400/40" />
-            <div className="w-2 h-[1px] bg-cyan-400/20" />
-          </div>
-        </div>
-      </motion.div>
-
-      {/* HUD Label: BOTTOM RIGHT */}
-      <motion.div 
-        className="absolute -bottom-8 -right-12 z-20 pointer-events-none"
-        style={{ translateZ: '70px' }}
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-      >
-        <div className="flex items-center gap-3 border border-theme bg-theme-card backdrop-blur-md px-4 py-2 pixel-border">
-          <div className="w-2 h-2 rounded-none bg-[var(--cyan)] animate-pulse" />
-          <span className="text-[9px] font-bold text-theme-muted uppercase tracking-[0.25em]" style={{ fontFamily: 'var(--font-mono)' }}>
-            CORE_ID // YS.V26
-          </span>
-        </div>
-      </motion.div>
-
       <motion.div
         style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-        className="relative group/photo"
+        className="relative w-full flex justify-center"
       >
-        {/* Outer glow ring */}
-        <div
-          className="absolute inset-[-20px] rounded-full pointer-events-none opacity-0 group-hover/photo:opacity-100 transition-opacity duration-700"
-          style={{
-            background: 'radial-gradient(circle at 50% 50%, var(--cyan) 0%, transparent 70%)',
-            filter: 'blur(24px)',
-            opacity: 0.2,
-            transform: 'translateZ(-20px)'
-          }}
-        />
-
-        {/* Animated dashed border */}
-        <svg
-          className="absolute inset-[-10px] w-[calc(100%+20px)] h-[calc(100%+20px)] pointer-events-none"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          style={{ overflow: 'visible', transform: 'translateZ(15px)' }}
+        {/* LAYER 1: Environment - Atmospheric bridge to typography */}
+        <motion.div
+          style={{ x: bgTranslateX, y: bgTranslateY, transform: 'translateZ(-40px)' }}
+          className="absolute inset-0 -left-20 -right-10 -top-10 -bottom-10 pointer-events-none opacity-50 group-hover/wrapper:opacity-80 transition-opacity duration-1000"
         >
-          <motion.rect
-            x="0" y="0" width="100" height="100"
-            fill="none"
-            stroke="var(--cyan)"
-            style={{ opacity: 0.4 }}
-            strokeWidth="0.5"
-            strokeDasharray="4 6"
-            animate={isInView ? { strokeDashoffset: [0, -100] } : { strokeDashoffset: 0 }}
-            transition={{ repeat: Infinity, duration: 10, ease: 'linear' }}
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
+          {/* Base ambient glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--cyan)_0%,transparent_65%)] blur-[50px] opacity-40 mix-blend-screen" />
+          {/* Directional light spill pointing left toward typography */}
+          <div className="absolute inset-y-0 left-0 w-1/2 bg-[radial-gradient(ellipse_at_right,var(--cyan)_0%,transparent_70%)] blur-[40px] opacity-20 mix-blend-screen" />
+        </motion.div>
 
-        {/* Photo container */}
-        <div
-          className="relative overflow-hidden scanline"
-          style={{
-            width: 'clamp(240px, 25vw, 380px)',
-            height: 'clamp(300px, 32vw, 480px)',
-            clipPath: 'polygon(0 0, 92% 0, 100% 8%, 100% 100%, 8% 100%, 0 92%)',
-            transform: 'translateZ(30px)',
-            border: '1px solid var(--card-border)'
-          }}
+        {/* Floating motion container for Portrait & HUD */}
+        <motion.div
+          animate={{ y: [-4, 4, -4] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="relative w-full aspect-[4/5] z-10"
+          style={{ transformStyle: 'preserve-3d' }}
         >
-          <Image
-            src={heroImage || "/myImage.jpeg"}
-            alt="Yashveer Singh"
-            width={400}
-            height={500}
-            priority
-            className="w-full h-full object-cover object-top scale-105 group-hover/photo:scale-110 transition-transform duration-1000"
-            style={{ filter: 'contrast(1.1) saturate(0.85) brightness(0.95)' }}
-          />
+          {/* LAYER 2: Portrait - The emergent shape */}
           <div
-            className="absolute inset-0 bg-[var(--cyan)]/5 mix-blend-overlay"
-          />
-          <motion.div
-            className="absolute left-0 right-0 h-[1px] pointer-events-none z-20"
-            style={{ background: 'linear-gradient(90deg, transparent, var(--cyan), transparent)' }}
-            animate={isInView ? { top: ['-5%', '105%'] } : { top: '-5%' }}
-            transition={{ repeat: Infinity, duration: 4, ease: 'linear', repeatDelay: 2 }}
-          />
-        </div>
-
-        {/* Corner accents */}
-        {[
-          { top: -10, left: -10, rot: 0, z: '45px' },
-          { top: -10, right: -10, rot: 90, z: '45px' },
-          { bottom: -10, right: -10, rot: 180, z: '45px' },
-          { bottom: -10, left: -10, rot: 270, z: '45px' },
-        ].map((pos, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-6 h-6 pointer-events-none"
+            className="absolute inset-0 flex justify-center items-end"
             style={{
-              ...('top' in pos ? { top: pos.top } : { bottom: (pos as { bottom: number }).bottom }),
-              ...('left' in pos ? { left: pos.left } : { right: (pos as { right: number }).right }),
-              border: '2px solid var(--cyan)',
-              opacity: 0.6,
-              clipPath: 'polygon(0 0, 35% 0, 35% 35%, 100% 35%, 100% 100%, 0 100%)',
-              transform: `rotate(${pos.rot}deg) translateZ(${pos.z})`,
+              transform: 'translateZ(10px)'
             }}
-            animate={{ opacity: [0.3, 0.8, 0.3] }}
-            transition={{ repeat: Infinity, duration: 3, delay: i * 0.7 }}
-          />
-        ))}
+          >
+            {/* Subtle atmospheric glow behind the person (not a gradient overlay) */}
+            <div className="absolute inset-x-0 bottom-0 top-[30%] bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.1)_0%,transparent_70%)] pointer-events-none" style={{ transform: 'translateZ(-10px)' }} />
+
+            {/* The Image (Cutout) */}
+            <img
+              src={imageSrc}
+              alt="Yashveer Singh"
+              className="absolute inset-x-0 bottom-0 w-full h-[110%] object-contain object-bottom transition-transform duration-1000 ease-out z-10"
+              style={{ 
+                filter: 'contrast(1.02) saturate(0.95) brightness(0.98) drop-shadow(-10px 0 15px rgba(34,211,238,0.15)) drop-shadow(10px 0 15px rgba(168,85,247,0.15)) drop-shadow(0 20px 30px rgba(0,0,0,0.6))',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+                maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
+              }}
+            />
+            
+            {/* Atmospheric energy wisps overlapping silhouette edges */}
+            <div className="absolute inset-0 pointer-events-none z-20 mix-blend-screen opacity-40" style={{ transform: 'translateZ(15px)' }}>
+               <div className="absolute top-[40%] -left-[10%] w-32 h-32 bg-[radial-gradient(circle_at_center,var(--cyan)_0%,transparent_60%)] blur-[25px]" />
+               <div className="absolute bottom-[20%] -right-[10%] w-40 h-40 bg-[radial-gradient(circle_at_center,var(--purple)_0%,transparent_60%)] blur-[30px]" />
+            </div>
+          </div>
+
+          {/* LAYER 3: Interface & Parallax FG */}
+          <motion.div style={{ x: fgTranslateX, y: fgTranslateY, transformStyle: 'preserve-3d', transform: 'translateZ(30px)' }} className="absolute inset-0 pointer-events-none">
+            
+
+
+            {/* Top Left Corner - Near shoulder */}
+            <div className="absolute top-[20%] left-[5%] w-8 h-8 opacity-60">
+               <svg width="100%" height="100%" viewBox="0 0 56 56" fill="none">
+                  <path d="M0 56V14L14 0H56" stroke="var(--cyan)" strokeWidth="1.5" strokeOpacity="0.8" />
+                  <path d="M4 56V16L16 4H56" stroke="var(--cyan)" strokeWidth="0.5" strokeOpacity="0.3" />
+               </svg>
+            </div>
+            
+            {/* Bottom Right Corner - Near hip */}
+            <div className="absolute bottom-[25%] right-[5%] w-6 h-6 opacity-60">
+               <svg width="100%" height="100%" viewBox="0 0 40 40" fill="none">
+                  <path d="M40 0V30L30 40H0" stroke="var(--cyan)" strokeWidth="1.5" strokeOpacity="0.6" />
+               </svg>
+            </div>
+
+            {/* Technical Microcopy - Tracking beside the head */}
+            <div className="absolute top-[30%] -right-[5%] z-30 hidden md:block" style={{ transform: 'translateZ(40px)' }}>
+              <div className="flex flex-col gap-1 text-[7.5px] font-bold text-cyan-400/80 uppercase tracking-[0.3em]" style={{ fontFamily: 'var(--font-mono)' }}>
+                <span>SYS_OPT // 99</span>
+                <div className="flex gap-1.5 items-center mt-0.5">
+                  <motion.div 
+                    animate={{ opacity: [1, 0.3, 1] }} 
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                    className="w-1.5 h-1.5 bg-cyan-400 shadow-[0_0_5px_var(--cyan)]" 
+                  />
+                  <span className="text-cyan-400">ACTIVE</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Data Bar - Tracking the torso */}
+            <div className="absolute bottom-[15%] -left-[5%] z-30 hidden md:block" style={{ transform: 'translateZ(30px)' }}>
+              <div className="flex items-center gap-3 border border-cyan-400/15 bg-theme-card/30 backdrop-blur-md px-3 py-1.5 shadow-[0_4px_20px_rgba(0,255,255,0.05)]" style={{ clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0 100%)' }}>
+                <span className="text-[7px] font-bold text-cyan-400/90 uppercase tracking-[0.25em]" style={{ fontFamily: 'var(--font-mono)' }}>
+                  ID_VERIFIED
+                </span>
+                <div className="flex gap-0.5">
+                  {[1, 2, 3].map((i) => (
+                    <motion.div
+                      key={i}
+                      className="w-0.5 h-2.5 bg-cyan-400/70"
+                      animate={{ scaleY: [0.3, 1, 0.3] }}
+                      transition={{ duration: 1, repeat: Infinity, delay: i * 0.2, ease: 'easeInOut' }}
+                      style={{ originY: 1 }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* Signature Visual Element: Rotating Orbital Ring (Behind subject lower left) */}
+            <div className="absolute bottom-[5%] left-[5%] w-48 h-48 opacity-25 mix-blend-screen" style={{ transform: 'translateZ(-10px)' }}>
+              <motion.svg 
+                width="100%" height="100%" viewBox="0 0 100 100" fill="none"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+              >
+                <circle cx="50" cy="50" r="48" stroke="var(--cyan)" strokeWidth="0.5" strokeDasharray="2 8" />
+                <circle cx="50" cy="50" r="40" stroke="var(--cyan)" strokeWidth="1" strokeDasharray="20 40" strokeOpacity="0.5" />
+                <circle cx="50" cy="90" r="2.5" fill="var(--cyan)" />
+              </motion.svg>
+            </div>
+
+          </motion.div>
+        </motion.div>
       </motion.div>
     </motion.div>
   );
@@ -225,7 +238,7 @@ function PhotoFrame({ heroImage }: { heroImage?: string }) {
 /* ──────────────── main hero ──────────────── */
 export default function Hero() {
   const springConfig = { type: 'spring' as const, stiffness: 100, damping: 15 };
-  const { data, loading } = usePortfolioData();
+  const { data } = usePortfolioData();
 
   const heroHeadline1 = data?.heroHeadline1 || 'I Build';
   const heroHeadline2 = data?.heroHeadline2 || 'Things';
@@ -367,8 +380,8 @@ export default function Hero() {
           </div>
 
           {/* RIGHT — photo */}
-          <div className="w-full lg:w-1/2 flex justify-center lg:justify-end mt-16 lg:mt-0 lg:pr-12">
-            <PhotoFrame heroImage={data?.heroImage} />
+          <div className="w-full lg:w-1/2 flex justify-center lg:justify-center mt-12 md:mt-16 lg:mt-0 relative z-20">
+            <PhotoFrame heroImage={data?.heroImage} dataUpdatedAt={data?.updatedAt} />
           </div>
 
         </div>
