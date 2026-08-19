@@ -7,7 +7,24 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PageLoader from '@/components/PageLoader';
 import ThemeProvider from '@/components/ThemeProvider';
+import { PortfolioProvider } from '@/hooks/usePortfolioData';
 import { Analytics } from "@vercel/analytics/next";
+
+async function getPortfolioData() {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+  const baseUrl = backendUrl.replace(/\/$/, '');
+  try {
+    const res = await fetch(`${baseUrl}/api/portfolio`, {
+      next: { revalidate: 0 } // Always get fresh data for layout, but SWR/CDN will handle caching
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (error) {
+    console.error('Failed to fetch portfolio data on server:', error);
+  }
+  return null;
+}
 
 const syne = Syne({
   subsets: ['latin'],
@@ -78,11 +95,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const portfolioData = await getPortfolioData();
   return (
     <html lang="en" className={`scroll-smooth ${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
@@ -140,14 +158,16 @@ export default function RootLayout({
             })
           }}
         />
-        <div className="noise-overlay" />
-        <ThemeProvider />
-        <PageLoader />
-        <CustomCursor />
-        <ScrollProgress />
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <PortfolioProvider initialData={portfolioData}>
+          <div className="noise-overlay" />
+          <ThemeProvider />
+          <PageLoader />
+          <CustomCursor />
+          <ScrollProgress />
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </PortfolioProvider>
         <Analytics />
       </body>
     </html>
