@@ -7,28 +7,9 @@ import Image from 'next/image';
 import { projects as DEFAULT_PROJECTS } from '@/lib/constants';
 
 async function getProject(slug: string) {
-  // Use absolute URL since fetch runs on server during build/SSR
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-  const baseUrl = backendUrl.replace(/\/$/, '');
-  
-  try {
-    const res = await fetch(`${baseUrl}/api/portfolio`, {
-      next: { revalidate: 60 } // Cache for 60 seconds
-    });
-    
-    let projects = DEFAULT_PROJECTS;
-    if (res.ok) {
-      const data = await res.json();
-      if (data.projects && data.projects.length > 0) {
-        projects = data.projects;
-      }
-    }
-    
-    return projects.find((p: any) => p.slug === slug);
-  } catch (err) {
-    console.error('Failed to fetch project:', err);
-    return DEFAULT_PROJECTS.find((p: any) => p.slug === slug);
-  }
+  // Use static data since we removed backend portfolio fetching
+  const projects = DEFAULT_PROJECTS;
+  return projects.find((p: any) => p.slug === slug);
 }
 
 export default async function ProjectCaseStudy({ params }: { params: Promise<{ slug: string }> }) {
