@@ -86,10 +86,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`scroll-smooth ${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`scroll-smooth overflow-x-clip w-full max-w-[100vw] ${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
       </head>
-      <body className={`${dmSans.className} antialiased min-h-screen selection:bg-[var(--cyan)]/30`} suppressHydrationWarning>
+      <body className={`${dmSans.className} antialiased min-h-screen overflow-x-clip w-full max-w-[100vw] selection:bg-[var(--cyan)]/30`} suppressHydrationWarning>
         <Script
           id="structured-data"
           type="application/ld+json"

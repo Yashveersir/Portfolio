@@ -49,14 +49,19 @@
 }
 
 /* ── Base ── */
-html { background: transparent; }
+html { 
+  background-color: var(--bg);
+  overflow-x: clip;
+  max-width: 100vw;
+}
 
 body {
   color: var(--text);
-  background: transparent;
+  background-color: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100vw;
 }
 
 ::selection { background: var(--selection); }
