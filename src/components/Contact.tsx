@@ -1,198 +1,140 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
 import { socialLinks as DEFAULT_SOCIAL_LINKS } from '@/lib/constants';
 import { usePortfolioData } from '@/hooks/usePortfolioData';
 import { Mail, ArrowRight, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import CharSplitHeading from './CharSplitHeading';
 
-function NetworkBg() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: -999, y: -999, rippleR: 0, rippling: false });
-  const [isVisible, setIsVisible] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-
-  useEffect(() => {
-    // Initial theme
-    const currentTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
-    setTheme(currentTheme);
-
-    // Observe theme changes
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'data-theme') {
-          const newTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
-          setTheme(newTheme);
-        }
-      });
-    });
-
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
-  }, []);
+function Closing3DObject() {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current.x = e.clientX;
-      mouseRef.current.y = e.clientY;
-    };
-    const handleClick = (e: MouseEvent) => {
-      mouseRef.current.x = e.clientX;
-      mouseRef.current.y = e.clientY;
-      mouseRef.current.rippleR = 0;
-      mouseRef.current.rippling = true;
+      const x = (e.clientX / window.innerWidth - 0.5) * 60;
+      const y = (e.clientY / window.innerHeight - 0.5) * -60;
+      mouseX.set(x);
+      mouseY.set(y);
     };
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('click', handleClick);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('click', handleClick);
-    };
-  }, []);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [mouseX, mouseY]);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.05 }
-    );
-
-    observer.observe(canvas);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !isVisible) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
-    if (!ctx) return;
-    let animationFrameId: number;
-    let w = 0, h = 0;
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = canvas.parentElement?.clientHeight || window.innerHeight;
-      w = canvas.width; h = canvas.height;
-    };
-    window.addEventListener('resize', resize); resize();
-
-    const particles = Array.from({ length: 30 }, () => ({
-      x: Math.random() * (w || 1400), y: Math.random() * (h || 800),
-      vx: (Math.random()-0.5)*0.22, vy: (Math.random()-0.5)*0.22,
-      size: Math.random()*1.6+0.4, alpha: Math.random()*0.45+0.1,
-      phase: Math.random()*Math.PI*2,
-      isCyan: Math.random() > 0.4,
-    }));
-
-    let time = 0;
-    let lastFrame = 0;
-    const FRAME_INTERVAL = 1000 / 30;
-    const draw = (now: number) => {
-      animationFrameId = requestAnimationFrame(draw);
-      const elapsed = now - lastFrame;
-      if (elapsed < FRAME_INTERVAL) return;
-      lastFrame = now - (elapsed % FRAME_INTERVAL);
-      time += 0.004;
-      ctx.clearRect(0, 0, w, h);
-
-      const isLight = theme === 'light';
-      
-      // Palette adjustments for light mode contrast
-      const cyan = isLight ? '8,145,178' : '34,211,238';
-      const purple = isLight ? '124,58,237' : '124,111,255';
-      const blue = isLight ? '37,99,235' : '96,165,250';
-
-      // Strong ambient breathing orbs
-      const breath = Math.sin(time * 0.9) * 0.5 + 0.5;
-      ctx.globalCompositeOperation = isLight ? 'multiply' : 'screen';
-      const orbs = [
-        { cx: w*0.3, cy: h*0.4, r: Math.max(w,h)*0.55, c: purple, a: (0.07+breath*0.04) * (isLight ? 0.4 : 1) },
-        { cx: w*0.7, cy: h*0.6, r: Math.max(w,h)*0.5,  c: cyan,   a: (0.06+breath*0.03) * (isLight ? 0.4 : 1) },
-        { cx: w*0.5, cy: h*0.2, r: Math.max(w,h)*0.35, c: blue,   a: (0.04+breath*0.02) * (isLight ? 0.4 : 1) },
-      ];
-      orbs.forEach(({cx,cy,r,c,a}) => {
-        const g = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
-        g.addColorStop(0,`rgba(${c},${a})`); g.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-      });
-      ctx.globalCompositeOperation = 'source-over';
-
-      // Mouse-following glow
-      const mx = mouseRef.current.x, my = mouseRef.current.y;
-      if (mx>0 && my>0) {
-        const mg = ctx.createRadialGradient(mx,my,0,mx,my,320);
-        mg.addColorStop(0, isLight ? `rgba(${cyan},0.04)` : `rgba(${cyan},0.09)`); mg.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.fillStyle=mg; ctx.fillRect(0,0,w,h);
-      }
-
-      // Move particles
-      particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy;
-        if (p.x<0||p.x>w) p.vx*=-1; if (p.y<0||p.y>h) p.vy*=-1;
-      });
-
-      // Connections between nearby particles
-      const CONN = 100*100;
-      ctx.lineWidth = 0.7;
-      for (let i=0;i<particles.length;i++) {
-        for (let j=i+1;j<particles.length;j++) {
-          const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
-          const d2=dx*dx+dy*dy;
-          if (d2<CONN) {
-            const a=(1-d2/CONN)* (isLight ? 0.1 : 0.15);
-            const col = particles[i].isCyan ? cyan : purple;
-            ctx.strokeStyle=`rgba(${col},${a})`;
-            ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.stroke();
-          }
-        }
-      }
-
-      // Draw particles with glow halos
-      particles.forEach(p => {
-        const pa = p.alpha*(Math.sin(time*0.9+p.phase)*0.4+0.6);
-        const col = p.isCyan ? cyan : purple;
-        const halo = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*5);
-        halo.addColorStop(0,`rgba(${col},${pa* (isLight ? 0.2 : 0.5)})`); halo.addColorStop(1,`rgba(${col},0)`);
-        ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(p.x,p.y,p.size*5,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle=`rgba(${col},${pa})`;
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
-      });
-
-      // Multi-ring click ripple
-      if (mouseRef.current.rippling) {
-        for (let ring=0;ring<3;ring++) {
-          const rr = mouseRef.current.rippleR - ring*25;
-          if (rr>0) {
-            const ra = Math.max(0, 0.4-rr/200);
-            const rc = ring===1 ? purple : cyan;
-            ctx.strokeStyle=`rgba(${rc},${ra})`;
-            ctx.lineWidth=1.5-ring*0.4;
-            ctx.beginPath(); ctx.arc(mx,my,rr,0,Math.PI*2); ctx.stroke();
-          }
-        }
-        mouseRef.current.rippleR += 5;
-        if (mouseRef.current.rippleR>280) mouseRef.current.rippling=false;
-      }
-    };
-    animationFrameId = requestAnimationFrame(draw);
-    return () => { window.removeEventListener('resize',resize); cancelAnimationFrame(animationFrameId); };
-  }, [isVisible]);
+  const rotateX = useSpring(mouseY, { damping: 50, stiffness: 100 });
+  const rotateY = useSpring(mouseX, { damping: 50, stiffness: 100 });
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex: 0 }}
-    />
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[800px] pointer-events-none perspective-[1200px] opacity-[0.065] z-0 overflow-hidden">
+      <motion.div 
+        style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full"
+      >
+        <motion.div 
+          animate={{ rotateX: [0, 360], rotateY: [0, 360] }} 
+          transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-[var(--cyan)] rounded-full"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div 
+              key={i} 
+              className="absolute inset-0 border border-[var(--cyan)] rounded-full"
+              style={{ transform: `rotateY(${i * 30}deg) rotateX(${i * 20}deg)` }}
+            />
+          ))}
+        </motion.div>
+      </motion.div>
+    </div>
   );
 }
 
+function SocialCard({ href, label, value, icon: Icon, colorRGB = "34, 211, 238" }: { href: string, label: string, value: string, icon: any, colorRGB?: string }) {
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotateX = useSpring(useMotionValue(0), { damping: 30, stiffness: 100 });
+  const rotateY = useSpring(useMotionValue(0), { damping: 30, stiffness: 100 });
 
+  function handleMouseMove(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    mouseX.set(x);
+    mouseY.set(y);
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    rotateX.set(((y - centerY) / centerY) * -15);
+    rotateY.set(((x - centerX) / centerX) * 15);
+  }
+
+  function handleMouseLeave() {
+    rotateX.set(0);
+    rotateY.set(0);
+  }
+
+  return (
+    <motion.a
+      ref={cardRef}
+      href={href}
+      target={href.startsWith('mailto') ? '_self' : '_blank'}
+      rel={href.startsWith('mailto') ? '' : 'noopener noreferrer'}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+      className="group/social relative p-[1px] rounded-2xl block w-full sm:w-auto"
+    >
+      {/* Default Border */}
+      <div className="absolute inset-0 rounded-2xl bg-white/5 transition-opacity duration-500 group-hover/social:opacity-0" />
+      
+      {/* Tracking Spotlight Border */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover/social:opacity-100"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              150px circle at ${mouseX}px ${mouseY}px,
+              rgba(${colorRGB}, 1),
+              transparent 80%
+            )
+          `,
+        }}
+      />
+
+      <div className="relative h-full bg-[#04060C]/40 backdrop-blur-xl rounded-2xl p-4 flex items-center gap-4 overflow-hidden shadow-xl">
+        <div className="absolute inset-0 blueprint-grid opacity-[0.03]" />
+        
+        {/* Inner Glowing Spotlight */}
+        <motion.div
+          className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover/social:opacity-100"
+          style={{
+            background: useMotionTemplate`
+              radial-gradient(
+                200px circle at ${mouseX}px ${mouseY}px,
+                rgba(${colorRGB}, 0.1),
+                transparent 70%
+              )
+            `,
+          }}
+        />
+
+        <div className="relative z-10 w-12 h-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center transition-colors duration-300" style={{ transform: 'translateZ(20px)' }}>
+          <Icon size={18} className="text-white/60 transition-colors duration-300 group-hover/social:text-white" />
+        </div>
+        
+        <div className="relative z-10 flex flex-col" style={{ transform: 'translateZ(20px)' }}>
+          <span className="text-[9px] uppercase tracking-widest text-white/40 font-mono mb-1">{label}</span>
+          <span className="text-sm font-bold text-white transition-colors duration-300 font-syne group-hover/social:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">{value}</span>
+        </div>
+      </div>
+    </motion.a>
+  );
+}
 
 export default function Contact() {
   const [name, setName] = useState('');
@@ -201,6 +143,17 @@ export default function Contact() {
   const { data } = usePortfolioData();
   const socialLinks = data?.socialLinks?.email ? data.socialLinks : DEFAULT_SOCIAL_LINKS;
 
+  const formRef = useRef<HTMLDivElement>(null);
+  const formMouseX = useMotionValue(0);
+  const formMouseY = useMotionValue(0);
+
+  function handleFormMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!formRef.current) return;
+    const rect = formRef.current.getBoundingClientRect();
+    formMouseX.set(e.clientX - rect.left);
+    formMouseY.set(e.clientY - rect.top);
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -208,7 +161,6 @@ export default function Contact() {
     try {
       const formData = new FormData(e.currentTarget);
       const data = Object.fromEntries(formData.entries());
-
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
       const apiEndpoint = backendUrl ? `${backendUrl.replace(/\/$/, '')}/api/contact` : '/api/contact';
 
@@ -223,19 +175,15 @@ export default function Contact() {
         (e.target as HTMLFormElement).reset();
         setName('');
       } else {
-        const errBody = await response.json().catch(() => ({}));
-        console.error('[Contact] Server error:', response.status, errBody);
         setSubmitStatus('error');
       }
     } catch (err) {
-      console.error('[Contact] Network/fetch error:', err);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Auto-dismiss success/error messages
   useEffect(() => {
     if (submitStatus !== 'idle') {
       const timer = setTimeout(() => setSubmitStatus('idle'), 5000);
@@ -246,207 +194,171 @@ export default function Contact() {
   const dynamicHeading = name.trim() ? `Let's Talk, ${name.trim()}.` : "Let's build\nsomething great.";
 
   return (
-    <section id="contact" className="relative py-28 md:py-40 overflow-hidden">
-      <NetworkBg />
-      {/* Decorative bracket */}
-      <div
-        className="pointer-events-none absolute bottom-0 right-8 select-none z-0"
-        style={{
-          fontFamily: 'var(--font-syne)',
-          fontSize: 'clamp(6rem, 18vw, 14rem)',
-          color: 'var(--cyan)',
-          opacity: 0.03,
-          fontWeight: 900,
-          lineHeight: 1,
-        }}
-      >
-        ]
-      </div>
+    <section id="contact" className="relative min-h-screen py-28 md:py-40 bg-transparent flex items-center overflow-hidden text-white">
+      
+      <Closing3DObject />
+      
+      {/* Background ambient lighting */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,var(--cyan)_0%,transparent_50%)] opacity-[0.03] pointer-events-none" />
 
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
-          {/* Left — heading + social */}
-          <div className="w-full lg:w-1/2">
-            <div className="flex items-start gap-6 mb-8">
-              <span
-                className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-theme-muted -rotate-90 origin-left whitespace-nowrap pt-8"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                / CONTACT
-              </span>
-              <div>
-                {/* Live-updating headline as user types their name */}
-                <div className="min-h-[120px]">
-                  <CharSplitHeading text={dynamicHeading.split('\n')[0]} fontSize="clamp(2.4rem, 5vw, 3.5rem)" lineHeight={1.05} />
-                  {dynamicHeading.includes('\n') && (
-                    <div className="mt-1">
-                      <CharSplitHeading text={dynamicHeading.split('\n')[1]} fontSize="clamp(2.4rem, 5vw, 3.5rem)" lineHeight={1.05} />
-                    </div>
-                  )}
+      <div className="mx-auto max-w-7xl px-6 relative z-10 w-full">
+        <div className="flex flex-col lg:flex-row gap-20 lg:gap-32 items-center">
+          
+          {/* Left: Dramatic Typography */}
+          <div className="w-full lg:w-[55%] flex flex-col">
+            <span className="text-[10px] uppercase tracking-[0.4em] text-[var(--cyan)] font-mono mb-8 block flex items-center gap-4">
+              <span className="w-8 h-[1px] bg-[var(--cyan)]"></span>
+              CONTACT
+            </span>
+            
+            <div className="min-h-[160px] md:min-h-[200px] mb-8">
+              <CharSplitHeading text={dynamicHeading.split('\n')[0]} fontSize="clamp(2.5rem, 8vw, 6rem)" />
+              {dynamicHeading.includes('\n') && (
+                <div className="mt-2">
+                  <CharSplitHeading text={dynamicHeading.split('\n')[1]} fontSize="clamp(2.5rem, 8vw, 6rem)" />
                 </div>
-              </div>
+              )}
             </div>
 
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="text-theme-dim text-base leading-relaxed max-w-sm mb-10"
-              style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}
-            >
+            <p className="text-[var(--text-dim)] text-base md:text-lg leading-relaxed max-w-md mb-12 font-dm-sans">
               Currently open for new opportunities. Whether you have a project, a question, or just want to say hi — I&apos;ll get back to you.
-            </motion.p>
+            </p>
 
-            {/* Social links */}
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+              <SocialCard 
+                href={`mailto:${socialLinks.email}`} 
+                label="Direct Message" 
+                value={socialLinks.email} 
+                icon={Mail} 
+                colorRGB="34, 211, 238" 
+              />
+              <div className="flex gap-4">
+                <SocialCard 
+                  href={socialLinks.github} 
+                  label="Code" 
+                  value="GitHub" 
+                  icon={FaGithub} 
+                  colorRGB="167, 139, 250" 
+                />
+                <SocialCard 
+                  href={socialLinks.linkedin} 
+                  label="Network" 
+                  value="LinkedIn" 
+                  icon={FaLinkedin} 
+                  colorRGB="96, 165, 250" 
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Premium Form */}
+          <div className="w-full lg:w-[45%]">
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.45 }}
-              className="flex flex-col gap-5"
+              transition={{ duration: 0.8 }}
+              className="relative p-[1px] rounded-3xl group/form"
             >
-              <a
-                href={`mailto:${socialLinks.email}`}
-                className="group flex items-center gap-4 text-theme-dim hover:text-cyan-400 transition-colors cursor-pointer"
-                aria-label={`Send an email to ${socialLinks.email}`}
-              >
-                <div className="w-10 h-10 border border-theme bg-theme-card flex items-center justify-center group-hover:border-cyan-400/40 group-hover:bg-cyan-400/8 transition-all">
-                  <Mail size={16} aria-hidden="true" />
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-widest text-theme-muted mb-0.5" style={{ fontFamily: 'var(--font-mono)' }}>Email</p>
-                  <p className="text-sm font-medium text-theme group-hover:text-cyan-400 group-hover:underline underline-offset-4 transition-colors">{socialLinks.email}</p>
-                </div>
-              </a>
+              {/* Form Default Border */}
+              <div className="absolute inset-0 rounded-3xl bg-white/10 transition-opacity duration-500 group-hover/form:opacity-0" />
+              
+              {/* Form Tracking Spotlight Border */}
+              <motion.div
+                className="absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-500 group-hover/form:opacity-100"
+                style={{
+                  background: useMotionTemplate`
+                    radial-gradient(
+                      400px circle at ${formMouseX}px ${formMouseY}px,
+                      rgba(34, 211, 238, 1),
+                      transparent 80%
+                    )
+                  `,
+                }}
+              />
 
-              <div className="flex gap-3">
-                <a
-                  href={socialLinks.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 border border-theme bg-theme-card flex items-center justify-center text-theme-muted hover:text-theme hover:border-theme transition-all"
-                  aria-label="GitHub Profile"
-                >
-                  <FaGithub size={16} aria-hidden="true" />
-                </a>
-                <a
-                  href={socialLinks.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 border border-theme bg-theme-card flex items-center justify-center text-theme-muted hover:text-blue-400 hover:border-blue-400/30 transition-all"
-                  aria-label="LinkedIn Profile"
-                >
-                  <FaLinkedin size={16} aria-hidden="true" />
-                </a>
+              <div 
+                ref={formRef}
+                onMouseMove={handleFormMouseMove}
+                className="relative bg-[#04060C]/40 backdrop-blur-3xl rounded-3xl p-8 md:p-12 shadow-[0_20px_40px_rgba(0,0,0,0.4)] overflow-hidden"
+              >
+                <div className="absolute inset-0 blueprint-grid opacity-[0.03]" />
+                
+                {/* Inner Glowing Spotlight */}
+                <motion.div
+                  className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover/form:opacity-100"
+                  style={{
+                    background: useMotionTemplate`
+                      radial-gradient(
+                        500px circle at ${formMouseX}px ${formMouseY}px,
+                        rgba(34, 211, 238, 0.08),
+                        transparent 70%
+                      )
+                    `,
+                  }}
+                />
+
+                <form onSubmit={handleSubmit} className="flex flex-col gap-6 relative z-10">
+                  <div className="flex flex-col gap-3 group">
+                    <label htmlFor="name" className="text-[10px] uppercase tracking-[0.2em] text-white/50 font-mono transition-colors group-focus-within:text-[var(--cyan)]">Name</label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="John Doe"
+                      className="bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[var(--cyan)] focus:bg-[var(--cyan)]/5 transition-all shadow-inner font-mono"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-3 group">
+                    <label htmlFor="email" className="text-[10px] uppercase tracking-[0.2em] text-white/50 font-mono transition-colors group-focus-within:text-[var(--cyan)]">Email</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      placeholder="john@example.com"
+                      className="bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[var(--cyan)] focus:bg-[var(--cyan)]/5 transition-all shadow-inner font-mono"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-3 group">
+                    <label htmlFor="message" className="text-[10px] uppercase tracking-[0.2em] text-white/50 font-mono transition-colors group-focus-within:text-[var(--cyan)]">Message</label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      required
+                      rows={4}
+                      placeholder="What are we building together?"
+                      className="bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[var(--cyan)] focus:bg-[var(--cyan)]/5 transition-all shadow-inner font-mono resize-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="mt-6 w-full bg-white text-black px-6 py-4 rounded-xl font-bold uppercase tracking-[0.2em] text-[11px] font-mono hover:bg-[var(--cyan)] hover:text-black transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] flex items-center justify-center gap-3 disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <span className="animate-pulse">Transmitting...</span>
+                    ) : (
+                      <>
+                        Send Message <ArrowRight size={14} />
+                      </>
+                    )}
+                  </button>
+                </form>
               </div>
             </motion.div>
           </div>
 
-          {/* Right — form */}
-          <div className="w-full lg:w-1/2">
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-              className="border border-theme bg-theme-card backdrop-blur-xl p-8 relative overflow-hidden tilt-card"
-            >
-              {/* Cyan glow top-right */}
-              <div className="absolute top-0 right-0 w-60 h-60 rounded-full pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.07) 0%, transparent 70%)', transform: 'translate(30%, -30%)' }}
-              />
-
-              <form onSubmit={handleSubmit} className="flex flex-col gap-5 relative z-10">
-                {/* Name */}
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="name"
-                    className="text-[10px] uppercase tracking-widest text-theme-muted"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    maxLength={100}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="bg-theme-card border border-theme px-4 py-3 text-theme text-sm placeholder-theme-muted focus:outline-none focus:border-cyan-400/50 transition-colors"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                    placeholder="John Doe"
-                  />
-                </div>
-
-                {/* Email */}
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="email"
-                    className="text-[10px] uppercase tracking-widest text-theme-muted"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    maxLength={254}
-                    className="bg-theme-card border border-theme px-4 py-3 text-theme text-sm placeholder-theme-muted focus:outline-none focus:border-cyan-400/50 transition-colors"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                    placeholder="john@example.com"
-                  />
-                </div>
-
-                {/* Message */}
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="message"
-                    className="text-[10px] uppercase tracking-widest text-theme-muted"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    required
-                    rows={4}
-                    minLength={10}
-                    maxLength={2000}
-                    className="bg-theme-card border border-theme px-4 py-3 text-theme text-sm placeholder-theme-muted focus:outline-none focus:border-cyan-400/50 transition-colors resize-none"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                    placeholder="What are we building together?"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="group mt-2 w-full border border-cyan-400 bg-cyan-400 px-6 py-3 text-sm font-bold uppercase tracking-widest text-black transition-all hover:bg-transparent hover:text-cyan-400 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed dark:text-black dark:hover:text-cyan-400"
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
-                  {isSubmitting ? (
-                    <span className="animate-pulse">Sending...</span>
-                  ) : (
-                    <>
-                      Send Message
-                      <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
-
-              </form>
-            </motion.div>
-          </div>
         </div>
       </div>
 
-      {/* Popup Modal */}
+      {/* Modal */}
       <AnimatePresence>
         {(isSubmitting || submitStatus !== 'idle') && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -454,75 +366,43 @@ export default function Contact() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-md"
-              onClick={() => {
-                if (!isSubmitting) setSubmitStatus('idle');
-              }}
+              className="absolute inset-0 bg-[#04060C]/80 backdrop-blur-md"
+              onClick={() => { if (!isSubmitting) setSubmitStatus('idle'); }}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-sm bg-theme-card border border-theme rounded-2xl p-8 shadow-2xl flex flex-col items-center text-center overflow-hidden"
+              className="relative w-full max-w-sm bg-[#04060C] border border-white/10 rounded-3xl p-8 shadow-[0_30px_60px_rgba(0,0,0,0.6)] flex flex-col items-center text-center overflow-hidden"
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500" />
-              
-              {isSubmitting && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="flex flex-col items-center"
-                >
-                  <Loader2 className="w-16 h-16 text-cyan-400 animate-spin mb-6" />
-                  <h3 className="text-2xl font-bold text-theme mb-3" style={{ fontFamily: 'var(--font-syne)' }}>Sending...</h3>
-                  <p className="text-theme-dim text-sm" style={{ fontFamily: 'var(--font-mono)' }}>Please wait while your message is delivered.</p>
-                </motion.div>
-              )}
-              
-              {!isSubmitting && submitStatus === 'success' && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="flex flex-col items-center w-full"
-                >
-                  <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mb-6 text-green-400 shadow-[0_0_30px_rgba(74,222,128,0.2)]">
-                    <CheckCircle2 className="w-10 h-10" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-theme mb-3" style={{ fontFamily: 'var(--font-syne)' }}>Delivered Successfully!</h3>
-                  <p className="text-theme-dim text-sm mb-8" style={{ fontFamily: 'var(--font-mono)' }}>Thank you for reaching out. I&apos;ll get back to you as soon as possible.</p>
-                  <button
-                    onClick={() => setSubmitStatus('idle')}
-                    className="w-full bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-3 rounded-xl hover:bg-green-500/20 hover:border-green-500/50 transition-all text-sm font-bold tracking-widest uppercase"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
-                    Close
-                  </button>
-                </motion.div>
-              )}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.1),transparent_70%)] pointer-events-none" />
+              <div className="absolute inset-0 blueprint-grid opacity-[0.05]" />
 
-              {!isSubmitting && submitStatus === 'error' && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="flex flex-col items-center w-full"
-                >
-                  <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-400 shadow-[0_0_30px_rgba(248,113,113,0.2)]">
-                    <XCircle className="w-10 h-10" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-theme mb-3" style={{ fontFamily: 'var(--font-syne)' }}>Delivery Failed</h3>
-                  <p className="text-theme-dim text-sm mb-8" style={{ fontFamily: 'var(--font-mono)' }}>Something went wrong. Please try emailing me directly.</p>
-                  <button
-                    onClick={() => setSubmitStatus('idle')}
-                    className="w-full bg-red-500/10 border border-red-500/30 text-red-400 px-6 py-3 rounded-xl hover:bg-red-500/20 hover:border-red-500/50 transition-all text-sm font-bold tracking-widest uppercase"
-                    style={{ fontFamily: 'var(--font-mono)' }}
-                  >
-                    Close
-                  </button>
-                </motion.div>
-              )}
+              <div className="relative z-10 flex flex-col items-center">
+                {isSubmitting && (
+                  <>
+                    <Loader2 className="w-12 h-12 text-[var(--cyan)] animate-spin mb-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" />
+                    <h3 className="text-xl font-bold text-white font-syne mb-2 tracking-wide">Transmitting</h3>
+                    <p className="text-xs text-[var(--cyan)] font-mono uppercase tracking-[0.2em] animate-pulse">Establishing Secure Uplink...</p>
+                  </>
+                )}
+                {!isSubmitting && submitStatus === 'success' && (
+                  <>
+                    <CheckCircle2 className="w-16 h-16 text-emerald-400 mb-4 drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]" />
+                    <h3 className="text-xl font-bold text-white font-syne mb-2 tracking-wide">Transmission Successful</h3>
+                    <p className="text-sm text-white/60 font-dm-sans mb-8">Your message has been received. I will respond to your channel shortly.</p>
+                    <button onClick={() => setSubmitStatus('idle')} className="w-full px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-mono text-xs uppercase tracking-[0.2em] hover:bg-white/10 transition-colors">Acknowledge</button>
+                  </>
+                )}
+                {!isSubmitting && submitStatus === 'error' && (
+                  <>
+                    <XCircle className="w-16 h-16 text-red-400 mb-4 drop-shadow-[0_0_15px_rgba(248,113,113,0.4)]" />
+                    <h3 className="text-xl font-bold text-white font-syne mb-2 tracking-wide">Transmission Failed</h3>
+                    <p className="text-sm text-white/60 font-dm-sans mb-8">The secure connection dropped. Please email me directly instead.</p>
+                    <button onClick={() => setSubmitStatus('idle')} className="w-full px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-mono text-xs uppercase tracking-[0.2em] hover:bg-white/10 transition-colors">Acknowledge</button>
+                  </>
+                )}
+              </div>
             </motion.div>
           </div>
         )}

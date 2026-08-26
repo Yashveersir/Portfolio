@@ -1,20 +1,18 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView, useReducedMotion } from 'framer-motion';
 
 /**
- * ScrollReveal — wraps any section with scroll-triggered parallax + fade.
- * Each section gets a different entrance direction for visual variety.
+ * ScrollReveal — wraps any section with scroll-triggered entrance.
+ * Respects prefers-reduced-motion for accessibility.
  */
 type Direction = 'up' | 'left' | 'right' | 'scale';
 
 interface Props {
   children: React.ReactNode;
   direction?: Direction;
-  /** Extra class on wrapper */
   className?: string;
-  /** Parallax amount (px) */
   parallax?: number;
 }
 
@@ -22,27 +20,31 @@ export default function ScrollReveal({
   children,
   direction = 'up',
   className = '',
-  parallax = 40,
+  parallax = 30,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const prefersReduced = useReducedMotion();
 
-  // Single observer for entrance animation (once)
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
 
-  // Scroll-linked parallax
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start end', 'end start'],
   });
-  const yParallax = useTransform(scrollYProgress, [0, 1], [parallax, -parallax]);
+  const yParallax = useTransform(scrollYProgress, [0, 1], [prefersReduced ? 0 : parallax, prefersReduced ? 0 : -parallax]);
+
+  if (prefersReduced) {
+    // No animation — just render children directly
+    return <div className={className}>{children}</div>;
+  }
 
   const variants = {
     hidden: {
       opacity: 0,
-      ...(direction === 'up' && { y: 60 }),
-      ...(direction === 'left' && { x: -60 }),
-      ...(direction === 'right' && { x: 60 }),
-      ...(direction === 'scale' && { scale: 0.92 }),
+      ...(direction === 'up'    && { y: 50 }),
+      ...(direction === 'left'  && { x: -50 }),
+      ...(direction === 'right' && { x: 50 }),
+      ...(direction === 'scale' && { scale: 0.94 }),
     },
     visible: {
       opacity: 1,
@@ -57,10 +59,10 @@ export default function ScrollReveal({
       ref={ref}
       style={{ y: yParallax }}
       initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
+      animate={isInView ? 'visible' : 'hidden'}
       variants={variants}
       transition={{
-        duration: 0.8,
+        duration: 0.85,
         ease: [0.16, 1, 0.3, 1],
       }}
       className={className}

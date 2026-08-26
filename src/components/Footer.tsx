@@ -27,7 +27,7 @@ export default function Footer() {
 
     const observer = new IntersectionObserver(
       ([entry]) => setAtBottom(entry.isIntersecting),
-      { threshold: 0.6 }
+      { threshold: 0.1 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => {
@@ -39,25 +39,29 @@ export default function Footer() {
   return (
     <footer
       ref={ref}
-      className="relative border-t border-theme pt-14 pb-8 overflow-hidden"
-      style={{ background: 'var(--bg)' }}
+      className="relative overflow-hidden bg-transparent pt-32 pb-8"
       suppressHydrationWarning
     >
-      {/* Infinite scrolling marquee background */}
-      <div className="absolute top-0 left-0 w-full overflow-hidden border-b border-theme py-3 pointer-events-none select-none bg-theme-card">
+      {/* ─── Glowing Depth Overlay ─── */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120vw] h-[300px] bg-[radial-gradient(ellipse_at_bottom,rgba(34,211,238,0.15)_0%,transparent_60%)] pointer-events-none" />
+
+      {/* ─── Massive Cinematic Marquee ─── */}
+      <div className="w-full overflow-hidden border-y border-white/5 py-6 mb-16 bg-[#04060C]/40 backdrop-blur-xl relative z-10 pointer-events-none select-none">
         <motion.div
           className="flex whitespace-nowrap"
           animate={atBottom && mounted ? { x: ['0%', '-50%'] } : { x: '0%' }}
-          transition={{ repeat: Infinity, ease: 'linear', duration: 20 }}
+          transition={{ repeat: Infinity, ease: 'linear', duration: 40 }}
         >
-          <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[var(--cyan)] opacity-50 mr-4" style={{ fontFamily: 'var(--font-syne)' }}>
-            LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH · LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH · LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH · LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH · LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH · LET&apos;S BUILD SOMETHING GREAT · OPEN TO WORK · GET IN TOUCH ·
+          <span className="text-[6vw] leading-none font-black uppercase text-transparent bg-clip-text bg-gradient-to-b from-white/90 to-white/10 tracking-tighter mr-8" style={{ fontFamily: 'var(--font-syne)' }}>
+            YASHVEER SINGH <span className="text-[var(--cyan)]">•</span> FULL-STACK ENGINEER <span className="text-[var(--cyan)]">•</span> YASHVEER SINGH <span className="text-[var(--cyan)]">•</span> FULL-STACK ENGINEER <span className="text-[var(--cyan)]">•</span>
           </span>
         </motion.div>
       </div>
-      <div className="mx-auto max-w-7xl px-6 pt-8">
+
+      <div className="mx-auto max-w-7xl px-6 relative z-10">
+        
         {/* Back to top button */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-16">
           <button
             onClick={() => {
               const win = window as unknown as { lenis?: { scrollTo: (y: number) => void } };
@@ -67,67 +71,57 @@ export default function Footer() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }
             }}
-            className="w-10 h-10 rounded-full border border-theme bg-theme-card flex items-center justify-center text-theme-dim hover:text-[var(--cyan)] hover:border-[var(--cyan)]/50 hover:bg-[var(--cyan)]/10 transition-all group"
+            className="w-12 h-12 rounded-full border border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-center text-white/50 hover:text-[var(--cyan)] hover:border-[var(--cyan)]/50 hover:bg-[var(--cyan)]/10 transition-all group shadow-[0_0_20px_rgba(0,0,0,0.5)]"
             aria-label="Back to top"
           >
-            <FaArrowUp size={14} className="group-hover:-translate-y-1 transition-transform" />
+            <FaArrowUp size={16} className="group-hover:-translate-y-1 transition-transform" />
           </button>
         </div>
 
         {/* Bottom row */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-8 border-t border-theme">
-          {/* Left — copyright & time */}
-          <div className="flex flex-col items-center md:items-start gap-2">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-8 border-t border-white/10">
+          
+          {/* Left — Copyright & Time */}
+          <div className="flex flex-col items-center md:items-start gap-2 w-full md:w-1/3">
             <p
-              className="text-[10px] uppercase tracking-[0.2em] text-theme-muted"
+              className="text-[10px] uppercase tracking-[0.2em] text-white/40"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
               © {mounted ? year : '2026'} Yashveer Singh
             </p>
             <div className="flex items-center gap-2">
-              <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
-              <p className="text-[9px] text-theme-muted uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" />
+              <p className="text-[9px] text-white/40 uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)' }}>
                 Burdwan, IN — {mounted ? time : '--:-- --'} IST
               </p>
             </div>
           </div>
 
-          {/* Center — hire me & social */}
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex gap-4">
-              <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="text-theme-muted hover:text-theme transition-colors" aria-label="GitHub Profile">
-                <FaGithub size={16} aria-hidden="true" />
+          {/* Center — Social Pill */}
+          <div className="flex justify-center w-full md:w-1/3">
+            <div className="flex items-center gap-6 px-8 py-3 bg-[#04060C]/60 backdrop-blur-md border border-white/10 rounded-full shadow-xl">
+              <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white hover:scale-110 transition-all duration-300" aria-label="GitHub Profile">
+                <FaGithub size={18} aria-hidden="true" />
               </a>
-              <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-theme-muted hover:text-blue-400 transition-colors" aria-label="LinkedIn Profile">
-                <FaLinkedin size={16} aria-hidden="true" />
+              <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-[#0077b5] hover:scale-110 transition-all duration-300" aria-label="LinkedIn Profile">
+                <FaLinkedin size={18} aria-hidden="true" />
               </a>
-              <a href="mailto:yashveersingh.work@gmail.com" className="text-theme-muted hover:text-[var(--cyan)] transition-colors" aria-label="Send Email">
-                <FaEnvelope size={16} aria-hidden="true" />
+              <a href="mailto:yashveersingh.work@gmail.com" className="text-white/50 hover:text-[var(--cyan)] hover:scale-110 transition-all duration-300" aria-label="Send Email">
+                <FaEnvelope size={18} aria-hidden="true" />
               </a>
             </div>
-            <AnimatePresence>
-              {atBottom && (
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.6 }}
-                  className="text-[10px] text-[var(--cyan)] opacity-40 uppercase tracking-[0.2em]"
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
-                  Ready for new challenges.
-                </motion.p>
-              )}
-            </AnimatePresence>
           </div>
 
-          {/* Right — built with */}
-          <p
-            className="text-[10px] uppercase tracking-widest text-theme-muted"
-            style={{ fontFamily: 'var(--font-mono)', opacity: 0.7 }}
-          >
-            Designed & Built by Yashveer Singh
-          </p>
+          {/* Right — Built with */}
+          <div className="flex justify-center md:justify-end w-full md:w-1/3">
+            <p
+              className="text-[10px] uppercase tracking-widest text-white/40 text-center md:text-right"
+              style={{ fontFamily: 'var(--font-mono)' }}
+            >
+              Designed & Built by<br />Yashveer Singh
+            </p>
+          </div>
+
         </div>
       </div>
     </footer>

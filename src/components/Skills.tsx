@@ -1,449 +1,273 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
-import { motion, useMotionValue, useSpring, useTransform, useInView } from 'framer-motion';
+import { useState, useRef } from 'react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { skillCategories as DEFAULT_SKILLS } from '@/lib/constants';
 import CharSplitHeading from './CharSplitHeading';
 import { usePortfolioData } from '@/hooks/usePortfolioData';
 
-// 3D tilt card with glassmorphism
-function BentoCell({
-  children,
-  color,
-  className = '',
-  rotate = 0,
-  animFrom = 'bottom',
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  color: string;
-  className?: string;
-  rotate?: number;
-  animFrom?: 'left' | 'bottom' | 'scale';
-  delay?: number;
+// Replaced heavy canvas with a subtle CSS blueprint grid
+function CoreSystemBg() {
+  return (
+    <div className="absolute inset-0 blueprint-grid opacity-[0.025] pointer-events-none" aria-hidden="true" />
+  );
+}
+
+function ConstellationNode({ 
+  category, 
+  index, 
+  total,
+  selectedCategory,
+  setSelectedCategory
+}: { 
+  category: any; 
+  index: number; 
+  total: number;
+  selectedCategory: string | null;
+  setSelectedCategory: (s: string | null) => void;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-60px' });
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 250, damping: 28 });
-  const sy = useSpring(my, { stiffness: 250, damping: 28 });
-  const rotX = useTransform(sy, [-0.5, 0.5], ['8deg', '-8deg']);
-  const rotY = useTransform(sx, [-0.5, 0.5], ['-8deg', '8deg']);
-
-  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    mx.set((e.clientX - r.left) / r.width - 0.5);
-    my.set((e.clientY - r.top) / r.height - 0.5);
-  };
-  const onLeave = () => { mx.set(0); my.set(0); };
-
-  const initAnim =
-    animFrom === 'left'
-      ? { x: -50, opacity: 0 }
-      : animFrom === 'scale'
-      ? { scale: 0.8, opacity: 0 }
-      : { y: 50, opacity: 0 };
+  const angle = (index / total) * Math.PI * 2 - Math.PI / 2; // start from top
+  const radius = 280; // Distance from center
+  const x = Math.cos(angle) * radius;
+  const y = Math.sin(angle) * radius;
+  
+  const isSelected = selectedCategory === category.title;
+  const isFaded = selectedCategory !== null && !isSelected;
+  const isBottom = y > 100; // Determine if node is in the bottom half
 
   return (
     <motion.div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{ rotateX: rotX, rotateY: rotY, transformStyle: 'preserve-3d', rotate }}
-      initial={initAnim}
-      animate={isInView ? { x: 0, y: 0, scale: 1, opacity: 1 } : initAnim}
-      transition={{ type: 'spring' as const, stiffness: 100, damping: 18, delay }}
-      className={`relative border border-theme bg-theme-card backdrop-blur-xl overflow-hidden group scanline pixel-border ${className}`}
+      className="absolute top-1/2 left-1/2 hidden lg:flex flex-col items-center justify-center cursor-pointer"
+      style={{ 
+        x: `calc(-50% + ${x}px)`, 
+        y: `calc(-50% + ${y}px)`,
+        zIndex: isSelected ? 50 : 20
+      }}
+      initial={{ opacity: 0, scale: 0 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.2 + index * 0.1, duration: 0.5, type: 'spring' }}
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelectedCategory(isSelected ? null : category.title);
+      }}
+      animate={{
+        opacity: isFaded ? 0.3 : 1,
+        scale: isSelected ? 1.05 : 1,
+      }}
+      whileHover={{ scale: isSelected ? 1.05 : 1.1 }}
     >
-      {/* Color glow on hover */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-        style={{ background: `radial-gradient(circle at 50% 0%, ${color}15, transparent 70%)` }}
-      />
-      {/* HUD readout detail */}
-      <div className="absolute top-2 right-2 flex gap-1 opacity-20 group-hover:opacity-40 transition-opacity">
-        <div className="w-1 h-1 bg-current" />
-        <div className="w-4 h-1 bg-current" />
+      <div className="relative flex items-center justify-center">
+        {isSelected && (
+          <motion.div layoutId="glow" className="absolute inset-0 rounded-full blur-[20px]" style={{ background: category.color || '#22d3ee', opacity: 0.4 }} />
+        )}
+        <div 
+          className="relative px-6 py-3 border border-[var(--card-border)] bg-[#0B1120]/40 backdrop-blur-md rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-colors"
+          style={{ borderColor: isSelected ? category.color : 'var(--card-border)' }}
+        >
+          <span className="text-[10px] uppercase tracking-[0.2em] font-bold" style={{ color: category.color || '#22d3ee', fontFamily: 'var(--font-mono)' }}>
+            {category.title}
+          </span>
+        </div>
       </div>
-      {/* Content at z30 for 3D depth */}
-      <div className="relative z-10 h-full" style={{ transform: 'translateZ(30px)' }}>
-        {children}
-      </div>
+      
+      {/* Beautiful Inside Content */}
+      <AnimatePresence>
+        {isSelected && (
+          <motion.div 
+            initial={{ opacity: 0, y: isBottom ? 20 : -20, x: '-50%', scale: 0.9, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, x: '-50%', scale: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: isBottom ? 20 : -20, x: '-50%', scale: 0.9, filter: 'blur(10px)' }}
+            transition={{ delay: 0.4, type: 'spring', damping: 20, stiffness: 100 }}
+            className={`absolute ${isBottom ? 'bottom-full mb-6' : 'top-full mt-6'} left-1/2 w-[90vw] sm:w-[340px] bg-[#050914]/40 backdrop-blur-2xl border p-6 rounded-2xl shadow-2xl z-50 pointer-events-auto`}
+            style={{ 
+               borderColor: `${category.color}40`,
+               boxShadow: `0 30px 60px rgba(0,0,0,0.8), inset 0 0 0 1px ${category.color}20`,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={`absolute ${isBottom ? 'bottom-0' : 'top-0'} left-1/2 -translate-x-1/2 w-1/2 h-[2px]`} style={{ background: `linear-gradient(90deg, transparent, ${category.color}, transparent)` }} />
+            <div className={`absolute ${isBottom ? 'bottom-0' : 'top-0'} left-1/2 -translate-x-1/2 w-1/4 h-[10px] blur-[10px]`} style={{ background: category.color, opacity: 0.5 }} />
+            
+            <div className="flex flex-col gap-6 relative z-10">
+               <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--card-border)' }}>
+                 <h4 className="text-[12px] uppercase tracking-[0.3em] font-bold text-white/90" style={{ fontFamily: 'var(--font-mono)' }}>
+                   {category.title}
+                 </h4>
+                 <div className="text-[10px] text-white/40 font-mono tracking-widest">
+                   [{category.skills?.length || 0} SYS]
+                 </div>
+               </div>
+               
+               <div className="grid grid-cols-2 gap-2">
+                {category.skills?.map((s: any, idx: number) => (
+                  <motion.div 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + idx * 0.05 }}
+                    key={s.name} 
+                    className="px-3 py-2 border border-white/5 bg-white/[0.02] hover:bg-white/[0.08] transition-colors rounded-lg text-[10px] uppercase tracking-widest text-[var(--text-dim)] flex items-center gap-2" 
+                    style={{ fontFamily: 'var(--font-mono)' }}
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: category.color, boxShadow: `0 0 5px ${category.color}` }} />
+                    <span className="truncate">{s.name}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
 
-function CoreSystemBg() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current.targetX = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseRef.current.targetY = (e.clientY / window.innerHeight) * 2 - 1;
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.05 }
-    );
-
-    observer.observe(canvas);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !isVisible) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
-    if (!ctx) return;
-
-    let w = 0, h = 0;
-    const resize = () => {
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      const rect = parent.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = rect.width; h = rect.height;
-      canvas.width = w * dpr; canvas.height = h * dpr;
-      ctx.scale(dpr, dpr);
-    };
-    window.addEventListener('resize', resize);
-    resize();
-
-    let frameId: number;
-    let time = 0;
-
-    // Orbiting data particles on 3 rings — dual-color
-    const RING_RADII = [180, 270, 360];
-    const orbiters = RING_RADII.flatMap((r, ri) =>
-      Array.from({ length: 5 + ri * 2 }, (_, i) => ({
-        angle: (i / (5 + ri * 2)) * Math.PI * 2,
-        speed: (0.007 - ri * 0.0015) * (i % 2 === 0 ? 1 : -1),
-        radius: r,
-        size: 2 - ri * 0.2,
-        alpha: 0.75 - ri * 0.1,
-        isCyan: i % 3 !== 0,
-      }))
-    );
-
-    // Star-field background
-    const stars = Array.from({ length: 40 }, () => ({
-      x: Math.random(), y: Math.random(),
-      s: Math.random() * 1 + 0.3,
-      a: Math.random() * 0.25 + 0.05,
-      phase: Math.random() * Math.PI * 2,
-    }));
-
-    let lastFrame = 0;
-    const FRAME_INTERVAL = 1000 / 30;
-    const draw = (now: number) => {
-      frameId = requestAnimationFrame(draw);
-      const elapsed = now - lastFrame;
-      if (elapsed < FRAME_INTERVAL) return;
-      lastFrame = now - (elapsed % FRAME_INTERVAL);
-      time += 0.005;
-      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.04;
-      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.04;
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
-
-      ctx.clearRect(0, 0, w, h);
-
-      // Core center — offset by mouse for parallax
-      const cx = w * 0.82 + mx * -40;
-      const cy = h * 0.5 + my * -30;
-
-      ctx.save();
-      ctx.translate(cx, cy);
-      // Slight perspective tilt based on mouse
-      ctx.transform(1, my * 0.04, mx * 0.04, 1, 0, 0);
-
-      const pulse = Math.sin(time * 2) * 0.5 + 0.5;
-
-      // ── Background concentric rings ──
-      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-      for (let i = 1; i <= 6; i++) {
-        ctx.strokeStyle = isLight ? `rgba(34,211,238,${0.015 + (i === 3 ? 0.01 : 0)})` : `rgba(34,211,238,${0.025 + (i === 3 ? 0.02 : 0)})`;
-        ctx.lineWidth = 0.5;
-        ctx.setLineDash([]);
-        ctx.beginPath(); ctx.arc(0, 0, i * 100, 0, Math.PI * 2); ctx.stroke();
-      }
-
-      // ── Main tech rings ──
-      // Inner — violet dashes, slow CW
-      ctx.save(); ctx.rotate(time * 0.22);
-      ctx.strokeStyle = isLight ? `rgba(124,111,255,${0.25 + pulse * 0.1})` : `rgba(124,111,255,${0.35 + pulse * 0.15})`;
-      ctx.lineWidth = 1.5; ctx.setLineDash([6, 14, 40, 14]);
-      ctx.beginPath(); ctx.arc(0, 0, 180, 0, Math.PI * 2); ctx.stroke();
-      ctx.restore();
-
-      // Middle — cyan dashes, slow CCW
-      ctx.save(); ctx.rotate(-time * 0.14);
-      ctx.strokeStyle = isLight ? `rgba(34,211,238,${0.2 + pulse * 0.08})` : `rgba(34,211,238,${0.4 + pulse * 0.1})`;
-      ctx.lineWidth = 1.2; ctx.setLineDash([90, 45, 3, 10, 3, 10]);
-      ctx.beginPath(); ctx.arc(0, 0, 270, 0, Math.PI * 2); ctx.stroke();
-      ctx.restore();
-
-      // Outer — thin cyan, very slow CW
-      ctx.save(); ctx.rotate(time * 0.08);
-      ctx.strokeStyle = isLight ? `rgba(34,211,238,0.08)` : `rgba(34,211,238,0.12)`;
-      ctx.lineWidth = 1.8; ctx.setLineDash([200, 120]);
-      ctx.beginPath(); ctx.arc(0, 0, 360, 0, Math.PI * 2); ctx.stroke();
-      ctx.restore();
-
-      ctx.setLineDash([]);
-
-      // ── Radial spokes ──
-      ctx.strokeStyle = isLight ? `rgba(124,111,255,0.04)` : `rgba(124,111,255,0.06)`;
-      ctx.lineWidth = 0.8;
-      for (let i = 0; i < 16; i++) {
-        const angle = (i / 16) * Math.PI * 2 + time * 0.04;
-        ctx.beginPath();
-        ctx.moveTo(Math.cos(angle) * 80, Math.sin(angle) * 80);
-        ctx.lineTo(Math.cos(angle) * 500, Math.sin(angle) * 500);
-        ctx.stroke();
-      }
-
-      // ── Multi-ring pulse emission ──
-      for (let wave = 0; wave < 3; wave++) {
-        const wt = ((time + wave * 0.66) % 2);
-        const pulseR = wt * 420;
-        const pulseAlpha = Math.max(0, 0.35 - wt * 0.18);
-        const wColor = wave === 1 ? `rgba(124,111,255,${pulseAlpha})` : `rgba(34,211,238,${pulseAlpha})`;
-        ctx.strokeStyle = wColor;
-        ctx.lineWidth = 2 - wt * 1.2;
-        ctx.beginPath(); ctx.arc(0, 0, pulseR, 0, Math.PI * 2); ctx.stroke();
-      }
-
-      // ── Orbiting data particles — dual-color with halos ──
-      orbiters.forEach((o) => {
-        o.angle += o.speed;
-        const px = Math.cos(o.angle) * o.radius;
-        const py = Math.sin(o.angle) * o.radius;
-        const col = (o as typeof o & { isCyan: boolean }).isCyan ? '34,211,238' : '124,111,255';
-        // Halo
-        const halo = ctx.createRadialGradient(px, py, 0, px, py, 7);
-        halo.addColorStop(0, `rgba(${col},${o.alpha * 0.5})`);
-        halo.addColorStop(1, `rgba(${col},0)`);
-        ctx.fillStyle = halo;
-        ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI * 2); ctx.fill();
-        // Core dot
-        ctx.fillStyle = `rgba(${col},${o.alpha})`;
-        ctx.beginPath(); ctx.arc(px, py, o.size, 0, Math.PI * 2); ctx.fill();
-      });
-
-      // ── Inner core glow — dual layer ──
-      const coreGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 70);
-      coreGrad.addColorStop(0, `rgba(200,180,255,${0.55 + pulse * 0.2})`);
-      coreGrad.addColorStop(0.4, `rgba(124,111,255,${0.25 + pulse * 0.1})`);
-      coreGrad.addColorStop(1, 'rgba(124,111,255,0)');
-      ctx.fillStyle = coreGrad;
-      ctx.beginPath(); ctx.arc(0, 0, 70, 0, Math.PI * 2); ctx.fill();
-
-      // Bright center pinpoint
-      const pin = ctx.createRadialGradient(0, 0, 0, 0, 0, 12);
-      pin.addColorStop(0, `rgba(255,255,255,${0.6 + pulse * 0.3})`);
-      pin.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = pin;
-      ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill();
-
-      ctx.restore();
-
-      // ── Star-field (outside translate scope) ──
-      stars.forEach(s => {
-        const sa = s.a * (Math.sin(time * 0.6 + s.phase) * 0.4 + 0.6);
-        ctx.fillStyle = `rgba(200,220,255,${sa})`;
-        ctx.beginPath(); ctx.arc(s.x * w, s.y * h, s.s, 0, Math.PI * 2); ctx.fill();
-      });
-
-    };
-    frameId = requestAnimationFrame(draw);
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(frameId);
-    };
-  }, [isVisible]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex: 0 }}
-    />
-  );
-}
-
 export default function Skills() {
-  const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { data } = usePortfolioData();
   const skillCategories = (data && Array.isArray(data.skills) && data.skills.length > 0) ? data.skills : DEFAULT_SKILLS;
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ rotateX: 0, rotateY: 0 });
 
-
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    // Max rotation 8 degrees for a subtle 3D tilt
+    const rotateX = ((y - centerY) / centerY) * -8;
+    const rotateY = ((x - centerX) / centerX) * 8;
+    setMousePos({ rotateX, rotateY });
+  };
 
   return (
-    <section
-      id="skills"
-      className="relative py-28 md:py-40 overflow-hidden"
-    >
+    <section id="skills" className="relative py-28 md:py-40 overflow-hidden bg-transparent min-h-[900px]" onClick={() => setSelectedCategory(null)}>
       <CoreSystemBg />
-      <div className="relative z-10 mx-auto max-w-7xl px-6">
+      
+      <div className="relative z-10 mx-auto max-w-7xl px-6 h-full flex flex-col">
         {/* Header */}
-        <div className="flex items-start gap-6 mb-16">
-          <span
-            className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-theme-muted -rotate-90 origin-left whitespace-nowrap pt-8"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            / SKILLS
+        <div className="flex flex-col items-center text-center mb-16 lg:mb-0 relative z-20">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-[var(--cyan)] mb-4" style={{ fontFamily: 'var(--font-mono)' }}>
+            / STACK
           </span>
-          <div>
-            <CharSplitHeading text="Tech Stack" />
-            <p className="mt-3 text-sm text-theme-muted max-w-md" style={{ fontFamily: 'var(--font-mono)' }}>
-              Tools I think in, not just tools I&apos;ve touched.
-            </p>
-          </div>
+          <CharSplitHeading text="Technology" fontSize="clamp(3rem, 7vw, 6rem)" />
+          <p className="mt-4 text-base md:text-lg text-[var(--text-dim)] max-w-lg" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+            The languages, frameworks, and tools I use to build scalable, high-performance systems.
+          </p>
         </div>
 
-        {/* Bento grid — intentionally NOT a clean rectangle */}
-        <div
-          className="grid gap-4"
-          style={{
-            gridTemplateColumns: 'repeat(12, 1fr)',
-            gridTemplateRows: 'auto auto',
-          }}
+        {/* Desktop Constellation */}
+        <div 
+          className="hidden lg:block relative flex-1 min-h-[600px] mt-12"
+          ref={containerRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => setMousePos({ rotateX: 0, rotateY: 0 })}
+          style={{ perspective: 1200 }}
         >
-          {/* Backend — Row 1 left (6 cols) */}
-          <BentoCell
-            color={skillCategories[0].color}
-            className="col-span-12 md:col-span-6 p-8"
-            animFrom="left"
-            delay={0}
+          <motion.div 
+            className="absolute inset-0 w-full h-full"
+            animate={{ rotateX: mousePos.rotateX, rotateY: mousePos.rotateY }}
+            transition={{ type: 'spring', stiffness: 100, damping: 30, mass: 1 }}
+            style={{ transformStyle: 'preserve-3d' }}
           >
-            <CellContent category={skillCategories[0]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight={false} />
-          </BentoCell>
+            <div style={{ transform: 'translateZ(50px)' }} className="absolute inset-0 w-full h-full">
+              {/* SVG Lines */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" style={{ overflow: 'visible' }}>
+            <g style={{ transform: 'translate(50%, 50%)' }}>
+              {skillCategories.map((cat: any, i: number) => {
+                const angle = (i / skillCategories.length) * Math.PI * 2 - Math.PI / 2;
+                const radius = 280;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                const isSelected = selectedCategory === cat.title;
+                
+                return (
+                  <g key={`line-${cat.title}`}>
+                    <line x1="0" y1="0" x2={x} y2={y} stroke="var(--card-border)" strokeWidth="1" opacity="0.3" />
+                    <AnimatePresence>
+                      {isSelected && (
+                        <motion.line 
+                          initial={{ pathLength: 0, opacity: 0 }}
+                          animate={{ pathLength: 1, opacity: 1 }}
+                          exit={{ pathLength: 0, opacity: 0 }}
+                          transition={{ duration: 0.5, ease: 'easeInOut' }}
+                          x1="0" y1="0" x2={x} y2={y} 
+                          stroke={cat.color || '#22d3ee'} 
+                          strokeWidth="2"
+                          style={{ filter: `drop-shadow(0 0 8px ${cat.color || '#22d3ee'})` }}
+                        />
+                      )}
+                    </AnimatePresence>
+                  </g>
+                )
+              })}
+            </g>
+          </svg>
 
-          {/* Frontend — Row 1 right (6 cols) */}
-          <BentoCell
-            color={skillCategories[1].color}
-            className="col-span-12 md:col-span-6 p-8"
-            animFrom="scale"
-            delay={0.1}
-          >
-            <CellContent category={skillCategories[1]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight={false} />
-          </BentoCell>
+              {/* Central Node */}
+              <motion.div 
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center z-30 pointer-events-none"
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, type: 'spring' }}
+              >
+                <div className="relative flex items-center justify-center w-40 h-40">
+                  <div className="absolute inset-0 rounded-full border border-[var(--cyan)]/30 bg-[var(--cyan)]/[0.05] shadow-[0_0_40px_rgba(34,211,238,0.2)] animate-[spin_10s_linear_infinite]" style={{ borderTopColor: 'transparent', borderBottomColor: 'transparent' }} />
+                  <div className="absolute inset-2 rounded-full border border-[var(--cyan)]/20 animate-[spin_15s_linear_infinite_reverse]" style={{ borderLeftColor: 'transparent', borderRightColor: 'transparent' }} />
+                  <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,var(--cyan)_0%,transparent_60%)] blur-[20px] opacity-[0.15] animate-pulse" />
+                  <span className="relative text-[11px] font-bold uppercase tracking-[0.3em] text-white text-center leading-relaxed" style={{ fontFamily: 'var(--font-mono)', textShadow: '0 0 10px rgba(34,211,238,0.8)' }}>
+                    Engineering<br/>Stack
+                  </span>
+                </div>
+              </motion.div>
 
-          {/* Programming — Row 2 left (4 cols) */}
-          <BentoCell
-            color={skillCategories[2].color}
-            className="col-span-12 md:col-span-4 p-5"
-            rotate={1}
-            animFrom="left"
-            delay={0.15}
-          >
-            <CellContent category={skillCategories[2]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight />
-          </BentoCell>
+          {/* Orbiting Nodes */}
+          {skillCategories.map((cat: any, i: number) => (
+            <ConstellationNode 
+              key={cat.title} 
+              category={cat} 
+              index={i} 
+              total={skillCategories.length} 
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+            />
+          ))}
+            </div>
+          </motion.div>
+        </div>
 
-          {/* Database & Cloud — Row 2 center (4 cols) */}
-          <BentoCell
-            color={skillCategories[3].color}
-            className="col-span-12 md:col-span-4 p-6"
-            animFrom="scale"
-            delay={0.2}
-          >
-            <CellContent category={skillCategories[3]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight={false} />
-          </BentoCell>
-
-          {/* DevOps & Tools — Row 2 right (4 cols) */}
-          <BentoCell
-            color={skillCategories[4].color}
-            className="col-span-12 md:col-span-4 p-6"
-            animFrom="bottom"
-            delay={0.25}
-          >
-            <CellContent category={skillCategories[4]} hoveredSkill={hoveredSkill} setHoveredSkill={setHoveredSkill} tight={false} />
-          </BentoCell>
+        {/* Mobile/Tablet Grid Fallback */}
+        <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
+          {skillCategories.map((cat: any, i: number) => (
+            <motion.div 
+              key={cat.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+              className="p-6 md:p-8 flex flex-col justify-between relative overflow-hidden group bg-gradient-to-br from-[#0B1120]/40 to-[#050810]/40 backdrop-blur-2xl border border-[var(--card-border)] rounded-3xl shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+            >
+              <div className="absolute inset-0 rounded-3xl border border-white/0 group-hover:border-[var(--cyan)]/30 transition-colors duration-500 pointer-events-none" />
+              <div className="flex items-center gap-3 mb-6 relative z-10">
+                <div className="w-2 h-2 rounded-full shadow-[0_0_10px_var(--cyan)] animate-pulse" style={{ background: cat.color || '#22d3ee', boxShadow: `0 0 15px ${cat.color || '#22d3ee'}` }} />
+                <h3 className="text-[12px] uppercase tracking-[0.3em] font-bold text-white/90" style={{ fontFamily: 'var(--font-mono)' }}>
+                  {cat.title}
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-2 relative z-10">
+                {cat.skills?.map((s: any) => (
+                  <div key={s.name} className="px-3 py-1.5 border border-white/5 bg-white/[0.02] rounded-lg text-[10px] uppercase tracking-widest text-[var(--text-dim)] flex items-center gap-2" style={{ fontFamily: 'var(--font-mono)' }}>
+                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: cat.color || '#22d3ee' }} />
+                    {s.name}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
-
-function CellContent({
-  category,
-  hoveredSkill,
-  setHoveredSkill,
-  tight,
-}: {
-  category: { title: string; color?: string; skills?: Array<{ name: string; icon?: string | null; image?: string | null }> };
-  hoveredSkill: string | null;
-  setHoveredSkill: (s: string | null) => void;
-  tight: boolean;
-}) {
-  if (!category) return null;
-  const skillsArray: Array<{ name: string; icon?: string | null; image?: string | null }> = category.skills || [];
-
-  return (
-    <>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-2 h-2" style={{ background: category.color || '#22d3ee', boxShadow: `0 0 10px ${category.color || '#22d3ee'}80` }} />
-          <h3
-            className="text-[10px] uppercase tracking-[0.3em] font-bold"
-            style={{ color: category.color || '#22d3ee', fontFamily: 'var(--font-mono)' }}
-          >
-            {category.title}
-          </h3>
-        </div>
-        <span className="text-[8px] text-theme-muted font-mono tracking-widest uppercase">MODULE_v4.2</span>
-      </div>
-      <div className={`flex flex-wrap ${tight ? 'gap-2' : 'gap-3'}`}>
-        {skillsArray.map((skill) => {
-          const isGlowing = hoveredSkill !== null && hoveredSkill === skill.name;
-          const isFaded = hoveredSkill !== null && hoveredSkill !== skill.name;
-          return (
-            <motion.div
-              key={skill.name}
-              className="flex items-center gap-2 border border-theme bg-theme-card px-3 py-2 cursor-pointer transition-all hover:bg-theme-shift"
-              onHoverStart={() => setHoveredSkill(skill.name)}
-              onHoverEnd={() => setHoveredSkill(null)}
-              whileHover={{ y: -2 }}
-              animate={{
-                borderColor: isGlowing ? `${category.color || '#22d3ee'}40` : 'var(--card-border)',
-                opacity: isFaded ? 0.3 : 1,
-              }}
-              transition={{ duration: 0.2 }}
-            >
-              {skill.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={skill.image} alt={skill.name} className="w-4 h-4 object-contain grayscale group-hover:grayscale-0 transition-all" />
-              ) : (
-                <div className="w-1.5 h-1.5 rotate-45" style={{ background: category.color || '#22d3ee' }} />
-              )}
-              <span
-                className="text-[10px] text-theme-dim font-bold uppercase tracking-widest whitespace-nowrap"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                {skill.name}
-              </span>
-            </motion.div>
-          );
-        })}
-      </div>
-    </>
-  );
-}
-
-

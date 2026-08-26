@@ -8,12 +8,13 @@ import About from '@/components/About';
 import Skills from '@/components/Skills';
 import ByTheNumbers from '@/components/ByTheNumbers';
 import ScrollReveal from '@/components/ScrollReveal';
-import SectionBg from '@/components/SectionBg';
 
-const Projects = dynamic(() => import('@/components/Projects'), { ssr: true });
+const AboutBackground3D = dynamic(() => import('@/components/AboutBackground3D'), { ssr: false });
+
+const Projects      = dynamic(() => import('@/components/Projects'),      { ssr: true });
 const Certifications = dynamic(() => import('@/components/Certifications'), { ssr: true });
-const Experience = dynamic(() => import('@/components/Experience'), { ssr: true });
-const Contact = dynamic(() => import('@/components/Contact'), { ssr: true });
+const Experience    = dynamic(() => import('@/components/Experience'),    { ssr: true });
+const Contact       = dynamic(() => import('@/components/Contact'),       { ssr: true });
 
 export default function Home() {
   useEffect(() => {
@@ -27,70 +28,58 @@ export default function Home() {
       touchMultiplier: 2,
     });
 
-    // Expose lenis to window for use in other components (e.g., Footer)
     (window as unknown as { lenis: Lenis }).lenis = lenis;
 
     function raf(time: number) {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }
-
     requestAnimationFrame(raf);
 
-    // Wake up Render backend if configured
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     if (backendUrl) {
-      console.log('⚡ Pinging backend to wake it up:', backendUrl);
-      fetch(backendUrl).catch((err) => console.warn('⚠️ Backend wakeup ping failed:', err));
+      fetch(backendUrl).catch(() => {});
     }
 
-    return () => {
-      lenis.destroy();
-    };
+    return () => { lenis.destroy(); };
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen" suppressHydrationWarning>
-      {/* Hero — no scroll reveal, has its own canvas bg */}
-      <Hero />
+    <div className="flex flex-col min-h-screen relative bg-[var(--bg)]" suppressHydrationWarning>
+      {/* Base Global 3D Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <AboutBackground3D />
+      </div>
 
-      {/* About */}
-      <ScrollReveal direction="left">
-        <About />
-      </ScrollReveal>
+      {/* Foreground Content */}
+      <div className="relative z-10 flex flex-col">
+        <Hero />
 
-      {/* Skills */}
-      <ScrollReveal direction="scale">
-        <Skills />
-      </ScrollReveal>
+        <ScrollReveal direction="left">
+          <About />
+        </ScrollReveal>
 
-      {/* By the Numbers */}
-      <ScrollReveal direction="up">
-        <ByTheNumbers />
-      </ScrollReveal>
+        <ScrollReveal direction="scale">
+          <Skills />
+        </ScrollReveal>
 
-      {/* Projects */}
-      <ScrollReveal direction="right">
-        <Projects />
-      </ScrollReveal>
+        <ScrollReveal direction="up">
+          <ByTheNumbers />
+        </ScrollReveal>
 
-      {/* Certifications — soft bokeh */}
-      <div className="relative">
-        <SectionBg variant="bokeh" color="#a855f7" opacity={0.6} />
+        <ScrollReveal direction="right">
+          <Projects />
+        </ScrollReveal>
+
         <ScrollReveal direction="up">
           <Certifications />
         </ScrollReveal>
-      </div>
 
-      {/* Experience */}
-      <ScrollReveal direction="left">
-        <Experience />
-      </ScrollReveal>
+        <ScrollReveal direction="left">
+          <Experience />
+        </ScrollReveal>
 
-      {/* Contact — back to glowing grid */}
-      <div className="relative">
-        <SectionBg variant="grid" color="#7c6fff" opacity={0.6} />
-        <ScrollReveal direction="scale" parallax={20}>
+        <ScrollReveal direction="scale">
           <Contact />
         </ScrollReveal>
       </div>

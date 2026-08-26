@@ -31,7 +31,7 @@ export default function CharSplitHeading({
       ref={ref}
       initial="hidden"
       animate={mounted && isInView ? "visible" : "hidden"}
-      className={`flex flex-wrap overflow-hidden ${className}`}
+      className={`flex flex-wrap pb-4 pt-2 -mt-2 ${className}`}
       aria-label={text}
       style={{
         fontFamily: 'var(--font-syne)',

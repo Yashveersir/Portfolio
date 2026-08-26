@@ -3,20 +3,22 @@
 import { useEffect, useState } from 'react';
 import { motion, useSpring, useMotionValue, AnimatePresence } from 'framer-motion';
 
+/*
+ * CustomCursor — Frosted Glass Lens
+ * Turns the cursor into a tiny magnifying glass with a glowing core.
+ */
 export default function CustomCursor() {
   const [mounted, setMounted] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [cursorText, setCursorText] = useState('');
   const [isMobile, setIsMobile] = useState(false);
 
-  // Mouse positions
-  const mouseX = useMotionValue(-100);
-  const mouseY = useMotionValue(-100);
+  const mouseX = useMotionValue(-200);
+  const mouseY = useMotionValue(-200);
 
-  // Spring physics for smooth trailing
-  const springConfig = { stiffness: 400, damping: 28, mass: 0.5 };
-  const trailX = useSpring(mouseX, springConfig);
-  const trailY = useSpring(mouseY, springConfig);
+  const springCfg = { stiffness: 400, damping: 28, mass: 0.5 };
+  const trailX = useSpring(mouseX, springCfg);
+  const trailY = useSpring(mouseY, springCfg);
 
   useEffect(() => {
     setMounted(true);
@@ -31,32 +33,24 @@ export default function CustomCursor() {
       mouseY.set(e.clientY);
 
       const target = e.target as HTMLElement;
-      const clickable = target.closest('a, button, [role="button"], input, select, textarea');
+      const clickable  = target.closest('a, button, [role="button"], input, select, textarea');
       const projectCard = target.closest('[data-project-card="true"]');
-      const heroHeadline = target.closest('[data-hero-headline="true"]');
 
-      let newIsHovering = false;
-      let newCursorText = '';
-
-      if (clickable) {
-        newIsHovering = true;
-      } else if (projectCard) {
-        newIsHovering = true;
-        newCursorText = 'VIEW';
-      } else if (heroHeadline) {
-        newIsHovering = true;
-        newCursorText = 'HI';
+      if (projectCard) {
+        setIsHovering(true);
+        setCursorText('VIEW');
+      } else if (clickable) {
+        setIsHovering(true);
+        setCursorText('');
+      } else {
+        setIsHovering(false);
+        setCursorText('');
       }
-
-      // Only update state if something changed to save renders
-      setIsHovering((prev) => (prev !== newIsHovering ? newIsHovering : prev));
-      setCursorText((prev) => (prev !== newCursorText ? newCursorText : prev));
     };
 
     if (!isMobile) {
       window.addEventListener('mousemove', handleMouseMove);
     }
-
     return () => {
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('mousemove', handleMouseMove);
@@ -67,88 +61,62 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Primary HUD Point */}
+      {/* Exact glowing core — follows mouse precisely */}
       <motion.div
-        className="fixed top-0 left-0 w-1 h-1 bg-[var(--cyan)] z-[9999] pointer-events-none"
+        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full bg-[var(--cyan)]"
         style={{
           x: mouseX,
           y: mouseY,
           translateX: '-50%',
           translateY: '-50%',
+          width: 5,
+          height: 5,
+          boxShadow: '0 0 10px rgba(34, 211, 238, 0.8), 0 0 20px rgba(34, 211, 238, 0.4)',
         }}
+        animate={{
+          scale: isHovering ? 0 : 1, // Core disappears when hovering over a button
+          opacity: isHovering ? 0 : 1,
+        }}
+        transition={{ duration: 0.2 }}
       />
 
-      {/* HUD Trailing Crosshair */}
+      {/* Frosted Glass Lens — spring physics trailing ring */}
       <motion.div
-        className="fixed top-0 left-0 z-[9998] pointer-events-none flex items-center justify-center"
+        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full flex items-center justify-center overflow-hidden"
         style={{
           x: trailX,
           y: trailY,
           translateX: '-50%',
           translateY: '-50%',
-          width: isHovering ? 60 : 32,
-          height: isHovering ? 60 : 32,
         }}
+        animate={{
+          width: isHovering ? 64 : 32,
+          height: isHovering ? 64 : 32,
+          // Use highly performant simple opacity/border changes
+          backgroundColor: isHovering ? 'rgba(34, 211, 238, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+          border: isHovering ? '1px solid rgba(34, 211, 238, 0.3)' : '1px solid rgba(255, 255, 255, 0.15)',
+          boxShadow: isHovering ? '0 0 20px rgba(34, 211, 238, 0.2)' : 'none',
+        }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
       >
-        {/* Corner Brackets */}
-        {[
-          { t: 0, l: 0, r: '0deg' },
-          { t: 0, right: 0, r: '90deg' },
-          { b: 0, right: 0, r: '180deg' },
-          { b: 0, l: 0, r: '270deg' },
-        ].map((p, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 border-t border-l border-[var(--cyan)]/60"
-            style={{
-              top: p.t, left: p.l, right: (p as { right?: number }).right, bottom: (p as { b?: number }).b,
-              transform: `rotate(${p.r})`,
-            }}
-            animate={{
-              scale: isHovering ? 1.5 : 1,
-              borderColor: isHovering ? 'var(--cyan)' : 'color-mix(in srgb, var(--cyan), transparent 40%)',
-            }}
-          />
-        ))}
-
-        {/* Center Cross Lines */}
-        <motion.div 
-          className="absolute w-full h-[1px] bg-[var(--cyan)]/10"
-          animate={{ scaleX: isHovering ? 1.2 : 0.4 }}
-        />
-        <motion.div 
-          className="absolute h-full w-[1px] bg-[var(--cyan)]/10"
-          animate={{ scaleY: isHovering ? 1.2 : 0.4 }}
-        />
-
         <AnimatePresence>
           {cursorText && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute -bottom-8 bg-theme-card border border-[var(--cyan)]/30 px-2 py-0.5 backdrop-blur-sm"
+            <motion.span
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="absolute inset-0 flex items-center justify-center text-[9px] font-black tracking-[0.2em] uppercase"
+              style={{ 
+                fontFamily: 'var(--font-mono)', 
+                whiteSpace: 'nowrap',
+                color: 'var(--cyan)'
+              }}
             >
-              <span className="text-[8px] font-bold tracking-[0.2em] text-[var(--cyan)] uppercase font-mono">
-                {cursorText}
-              </span>
-            </motion.div>
+              {cursorText}
+            </motion.span>
           )}
         </AnimatePresence>
       </motion.div>
-
-      {/* Reactive Glow */}
-      <motion.div
-        className="fixed top-0 left-0 w-48 h-48 rounded-full pointer-events-none z-[9997]"
-        style={{
-          x: trailX,
-          y: trailY,
-          translateX: '-50%',
-          translateY: '-50%',
-          background: 'radial-gradient(circle, color-mix(in srgb, var(--cyan), transparent 90%) 0%, transparent 70%)',
-          opacity: isHovering ? 0.3 : 0.1,
-        }}
-      />
     </>
   );
 }

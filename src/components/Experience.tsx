@@ -1,345 +1,248 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
-import { motion, useInView, useTransform } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView, useScroll, useTransform, useMotionTemplate, useMotionValue, useSpring } from 'framer-motion';
 import { experiences as DEFAULT_EXPERIENCES } from '@/lib/constants';
 import { usePortfolioData } from '@/hooks/usePortfolioData';
-import { useMousePosition } from '@/hooks/useMousePosition';
 import CharSplitHeading from './CharSplitHeading';
+import { ExternalLink } from 'lucide-react';
 
-function PathFlowBg() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: -999, y: -999 });
-  const [isVisible, setIsVisible] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window !== 'undefined') {
-      return document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
-    }
-    return 'dark';
-  });
+function ExperienceItem({ exp, index, total }: { exp: any; index: number; total: number }) {
+  const isEven = index % 2 === 0;
+  const isOngoing = exp.date.toLowerCase().includes('ongoing');
+  
+  const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Observe theme changes
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'data-theme') {
-          const newTheme = document.documentElement.getAttribute('data-theme') as 'dark' | 'light' || 'dark';
-          setTheme(newTheme);
-        }
-      });
-    });
+  // 3D Tilt & Spotlight states
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotateX = useSpring(useMotionValue(0), { damping: 30, stiffness: 100 });
+  const rotateY = useSpring(useMotionValue(0), { damping: 30, stiffness: 100 });
 
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
-  }, []);
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    mouseX.set(x);
+    mouseY.set(y);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => { mouseRef.current.x = e.clientX; mouseRef.current.y = e.clientY; };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    rotateX.set(((y - centerY) / centerY) * -5); // subtle 5 deg tilt
+    rotateY.set(((x - centerX) / centerX) * 5);
+  }
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  function handleMouseLeave() {
+    rotateX.set(0);
+    rotateY.set(0);
+  }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.05 }
-    );
-
-    observer.observe(canvas);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !isVisible) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
-    if (!ctx) return;
-    let animationFrameId: number;
-    let w = 0, h = 0;
-    interface Path { x: number; speed: number; pulseY: number; color: [number,number,number]; alpha: number; length: number; width: number; }
-    let paths: Path[] = [];
-    const isLight = theme === 'light';
-    const PALETTE: [number,number,number][] = isLight 
-      ? [[8,145,178], [124,58,237], [79,70,229]]
-      : [[34,211,238], [124,111,255], [168,85,247]];
-      
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = (canvas.parentElement?.clientHeight || window.innerHeight) * dpr;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${canvas.parentElement?.clientHeight || window.innerHeight}px`;
-      ctx.scale(dpr, dpr);
-      w = window.innerWidth; h = canvas.parentElement?.clientHeight || window.innerHeight;
-      
-      paths = [];
-      const n = Math.floor(w / 100); // Fewer paths
-      for (let i = 0; i < n; i++) {
-        paths.push({ x: (i/n)*w + Math.random()*40, speed: 0.5+Math.random()*0.8, pulseY: Math.random()*h,
-          color: PALETTE[Math.floor(Math.random()*PALETTE.length)], alpha: 0.15+Math.random()*0.2,
-          length: 70+Math.random()*100, width: 1 });
-      }
-    };
-    window.addEventListener('resize', resize); resize();
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h);
-      
-      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-      
-      // Draw grid only once or simplified
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i <= 6; i++) {
-        const gy = (h/6)*i;
-        ctx.strokeStyle = isLight ? `rgba(34,211,238,0.015)` : `rgba(34,211,238,0.025)`;
-        ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke();
-      }
-
-      paths.forEach(p => {
-        const [r,g,b]=p.color;
-        
-        // Background line
-        ctx.beginPath(); ctx.moveTo(p.x,0); ctx.lineTo(p.x,h);
-        ctx.strokeStyle=`rgba(${r},${g},${b},0.02)`; ctx.lineWidth=1; ctx.stroke();
-        
-        p.pulseY += p.speed;
-        if (p.pulseY > h+p.length) { p.pulseY=-p.length; p.x=Math.random()*w; }
-        
-        const py0=p.pulseY-p.length, py1=p.pulseY+p.length;
-        
-        // Simplified gradient pulse
-        ctx.beginPath(); ctx.moveTo(p.x,Math.max(0,py0)); ctx.lineTo(p.x,Math.min(h,py1));
-        const gr=ctx.createLinearGradient(0,py0,0,py1);
-        gr.addColorStop(0,`rgba(${r},${g},${b},0)`);
-        gr.addColorStop(0.5,`rgba(${r},${g},${b},${p.alpha})`);
-        gr.addColorStop(1,`rgba(${r},${g},${b},0)`);
-        ctx.strokeStyle=gr; ctx.lineWidth=p.width; ctx.stroke();
-
-        // Smaller glow
-        const glowR = 12;
-        const hg=ctx.createRadialGradient(p.x,p.pulseY,0,p.x,p.pulseY,glowR);
-        hg.addColorStop(0,`rgba(${r},${g},${b},${p.alpha*0.4})`); hg.addColorStop(1,`rgba(${r},${g},${b},0)`);
-        ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(p.x,p.pulseY,glowR,0,Math.PI*2); ctx.fill();
-      });
-      animationFrameId = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => { window.removeEventListener('resize',resize); cancelAnimationFrame(animationFrameId); };
-  }, [isVisible, theme]);
+  // Generate an RGBA color for the spotlight based on the primary cyan color or a custom hex
+  // Assuming exp.color might be a hex. If not provided, fallback to cyan.
+  const spotlightColor = exp.color ? `${exp.color}30` : 'rgba(34, 211, 238, 0.15)'; 
+  const nodeColor = exp.color || 'var(--cyan)';
 
   return (
-    <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }} />
+    <div className="relative flex flex-col md:flex-row items-center justify-between w-full mb-32 last:mb-0 group" style={{ perspective: 1200 }}>
+      
+      {/* Desktop Layout Helper: Left/Right Spacing */}
+      <div className={`hidden md:flex w-[45%] flex-col justify-center ${isEven ? 'order-1 items-end text-right pr-16' : 'order-2 items-start text-left pl-16'}`}>
+        <motion.div
+          initial={{ opacity: 0, x: isEven ? -30 : 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: '-20%' }}
+          transition={{ duration: 0.8, delay: 0.1, type: "spring" }}
+          className="flex flex-col relative"
+        >
+          <span className="text-[12px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: nodeColor, fontFamily: 'var(--font-mono)' }}>
+            {exp.date}
+          </span>
+          <h3 className="text-3xl font-bold text-white mb-2 tracking-tight" style={{ fontFamily: 'var(--font-syne)' }}>
+            {exp.title}
+          </h3>
+          <p className="text-base text-[var(--text-dim)] font-medium tracking-wide" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+            {exp.organization}
+          </p>
+        </motion.div>
+      </div>
+
+      {/* Central Node (Cyberpunk Diamond) */}
+      <div className="order-1 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 relative z-20 flex items-center justify-center mb-10 md:mb-0 group/node cursor-crosshair">
+        {/* Glow aura on hover */}
+        <div className="absolute inset-[-20px] rounded-full opacity-0 group-hover/node:opacity-100 blur-[15px] transition-opacity duration-500" style={{ background: nodeColor }} />
+        
+        <motion.div 
+          initial={{ scale: 0, opacity: 0, rotate: 45 }}
+          whileInView={{ scale: 1, opacity: 1, rotate: 45 }}
+          viewport={{ once: true, margin: '-5%' }}
+          transition={{ type: "spring", stiffness: 100, delay: 0.2 }}
+          className="w-6 h-6 bg-[#0B1120] border-2 relative z-20 transition-all duration-500 group-hover:scale-110 group-hover/node:scale-150 group-hover/node:rotate-[225deg] group-hover/node:border-white group-hover/node:bg-white"
+          style={{ 
+            borderColor: nodeColor,
+            boxShadow: `0 0 20px ${nodeColor}60`
+          }}
+        >
+          {isOngoing && (
+            <motion.div 
+              animate={{ scale: [1, 2.5], opacity: [0.8, 0] }}
+              transition={{ repeat: Infinity, duration: 2, ease: "easeOut" }}
+              className="absolute inset-0"
+              style={{ background: nodeColor }}
+            />
+          )}
+          {/* Inner core */}
+          <div className="absolute inset-[3px] opacity-50 transition-all duration-300 group-hover:opacity-100 group-hover/node:opacity-0" style={{ background: nodeColor }} />
+        </motion.div>
+      </div>
+
+      {/* Mobile Title (Hidden on Desktop) */}
+      <div className="order-2 md:hidden w-full text-center mb-8 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <span className="text-[11px] font-bold uppercase tracking-[0.2em] mb-2 block" style={{ color: nodeColor, fontFamily: 'var(--font-mono)' }}>
+            {exp.date}
+          </span>
+          <h3 className="text-2xl font-bold text-white mb-1 tracking-tight" style={{ fontFamily: 'var(--font-syne)' }}>
+            {exp.title}
+          </h3>
+          <p className="text-sm text-[var(--text-dim)] font-medium" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+            {exp.organization}
+          </p>
+        </motion.div>
+      </div>
+
+      {/* Content Area (Spotlight 3D Card) */}
+      <div className={`w-full md:w-[45%] ${isEven ? 'order-2 pl-4 pr-4 md:pl-16 md:pr-0' : 'order-1 pl-4 pr-4 md:pr-16 md:pl-0'} relative z-30`}>
+        <motion.div
+          ref={ref}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-20%' }}
+          transition={{ duration: 0.8, delay: 0.3, type: "spring" }}
+          className="relative group/card rounded-3xl p-[1px] shadow-2xl"
+        >
+          {/* Default subtle border */}
+          <div className="absolute inset-0 rounded-3xl bg-white/5 transition-opacity duration-500 group-hover/card:opacity-0" />
+
+          {/* Dynamic Glowing Border tracking mouse */}
+          <motion.div
+            className="absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100"
+            style={{
+              background: useMotionTemplate`
+                radial-gradient(
+                  400px circle at ${mouseX}px ${mouseY}px,
+                  ${nodeColor},
+                  transparent 80%
+                )
+              `,
+            }}
+          />
+
+          {/* Inner Card Background */}
+          <div className="relative h-full w-full rounded-3xl bg-[#04060C]/40 backdrop-blur-3xl overflow-hidden p-8 md:p-10">
+            
+            {/* Subtle Blueprint Grid Texture */}
+            <div className="absolute inset-0 blueprint-grid opacity-[0.03]" />
+
+            {/* Spotlight Effect Overlay (Inside) */}
+            <motion.div
+              className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover/card:opacity-100"
+              style={{
+                background: useMotionTemplate`
+                  radial-gradient(
+                    500px circle at ${mouseX}px ${mouseY}px,
+                    ${spotlightColor},
+                    transparent 70%
+                  )
+                `,
+              }}
+            />
+
+            {/* Elevated Content */}
+            <div className="relative z-10" style={{ transform: 'translateZ(50px)' }}>
+              <p className="text-sm md:text-base text-[var(--text-dim)] leading-relaxed mb-8" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+                {exp.description}
+              </p>
+
+              <ul className="flex flex-col gap-5">
+                {exp.achievements.map((a: string, ai: number) => (
+                  <li key={ai} className="flex items-start gap-4 text-sm text-[var(--text-dim)] hover:text-white transition-colors duration-300" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+                    <span className="mt-1 shrink-0 text-[10px]" style={{ color: nodeColor }}>◆</span>
+                    <span className="leading-relaxed">{a}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {(exp as { certificate?: string }).certificate && (
+                <div className="mt-8 pt-6 border-t border-white/5">
+                  <a
+                    href={(exp as { certificate?: string }).certificate}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors font-mono group/btn"
+                  >
+                    <ExternalLink size={14} className="group-hover/btn:scale-110 group-hover/btn:rotate-12 transition-transform" /> View Certificate
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
 }
 
 export default function Experience() {
   const { data } = usePortfolioData();
   const experiences = (data && Array.isArray(data.experiences) && data.experiences.length > 0) ? data.experiences : DEFAULT_EXPERIENCES;
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start center", "end center"] });
+  const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
-    <section
-      id="experience"
-      className="relative py-28 md:py-40 overflow-hidden"
-    >
-      <PathFlowBg />
-      {/* Corner bracket decoration */}
-      <div
-        className="pointer-events-none absolute bottom-12 left-6 select-none text-theme"
-        style={{ fontFamily: 'var(--font-syne)', fontWeight: 900, fontSize: '12rem', lineHeight: 1, opacity: 0.03 }}
-      >
-        {'{'}
-      </div>
-
-      <div className="mx-auto max-w-7xl px-6 relative z-10">
-        <div className="flex items-start gap-6 mb-16">
-          <span
-            className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-theme-muted -rotate-90 origin-left whitespace-nowrap pt-8"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            / EXP
+    <section id="experience" className="relative py-28 md:py-40 bg-transparent min-h-screen">
+      
+      <div className="mx-auto max-w-6xl px-6 relative z-10">
+        <div className="flex flex-col items-center text-center mb-24 md:mb-32">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-[var(--cyan)] mb-4 font-mono">
+            / CAREER
           </span>
-          <div>
-            <CharSplitHeading text="Experience" />
-            <p className="mt-3 text-sm text-theme-muted max-w-md" style={{ fontFamily: 'var(--font-mono)' }}>
-              Work, community, and things that actually happened.
-            </p>
-          </div>
+          <CharSplitHeading text="Experience" fontSize="clamp(2.5rem, 8vw, 6rem)" />
+          <p className="mt-6 text-base text-[var(--text-dim)] max-w-lg font-dm-sans">
+            Professional trajectory and organizational impact.
+          </p>
         </div>
 
-        {/* Timeline */}
-        <div className="relative max-w-5xl mx-auto mt-10 md:mt-20">
-          {/* Vertical line */}
-          <div
-            className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-1/2"
-            style={{ background: 'linear-gradient(to bottom, rgba(34,211,238,0.3), rgba(168,85,247,0.1), transparent)' }}
+        <div ref={containerRef} className="relative mt-20">
+          {/* Central Line (Animated) - Glow enhanced */}
+          <div className="absolute left-1/2 top-0 bottom-0 w-[1px] -translate-x-1/2 bg-white/5 hidden md:block" />
+          <motion.div 
+            className="absolute left-1/2 top-0 bottom-0 w-[2px] -translate-x-1/2 hidden md:block origin-top shadow-[0_0_15px_var(--cyan)]"
+            style={{ 
+              scaleY,
+              background: 'linear-gradient(to bottom, var(--cyan), transparent)'
+            }}
           />
 
-          <div className="flex flex-col gap-10 md:gap-16">
+          <div className="flex flex-col relative z-10">
             {experiences.map((exp: any, i: number) => (
-              <ExperienceItem key={exp.title} exp={exp} index={i} />
+              <ExperienceItem key={exp.title} exp={exp} index={i} total={experiences.length} />
             ))}
           </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function ExperienceItem({ exp, index }: { exp: any; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, margin: '-60px' });
-  const { mouseX, mouseY, handleMouseMove } = useMousePosition(ref);
-
-  const isEven = index % 2 === 0;
-  const isOngoing = exp.date.toLowerCase().includes('ongoing');
-
-  // Motion values for radial gradient
-  const background = useTransform(
-    [mouseX, mouseY],
-    ([latestX, latestY]) => `radial-gradient(400px circle at ${latestX}px ${latestY}px, ${exp.color}08, transparent 40%)`
-  );
-
-  return (
-    <motion.div
-      ref={containerRef}
-      initial={{ opacity: 0, x: isEven ? -40 : 40 }}
-      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: isEven ? -40 : 40 }}
-      transition={{ type: 'spring' as const, stiffness: 90, damping: 18, delay: index * 0.1 }}
-      className={`relative flex w-full group md:justify-between items-center ${isEven ? 'md:flex-row-reverse' : 'md:flex-row'}`}
-    >
-      {/* Spacer for desktop */}
-      <div className="hidden md:block w-5/12" />
-
-      {/* Timeline dot */}
-      <div
-        className="absolute left-4 md:left-1/2 top-10 flex items-center justify-center transition-transform duration-300 group-hover:scale-125 group-hover:brightness-125 z-10"
-        style={{ width: 16, height: 16, transform: 'translate(-50%, -50%)' }}
-      >
-        <div
-          className="w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 relative"
-          style={{ borderColor: exp.color, background: '#0a0a14', boxShadow: `0 0 12px ${exp.color}60` }}
-        >
-          {isOngoing && (
-            <div 
-              className="absolute inset-[-4px] rounded-full border border-current animate-ping opacity-40"
-              style={{ color: exp.color }}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Card Wrapper */}
-      <div className={`w-full pl-12 md:pl-0 md:w-5/12 ${isEven ? 'md:pr-10' : 'md:pl-10'}`}>
-        <div
-          ref={ref}
-          onMouseMove={handleMouseMove}
-          className="bg-theme-card backdrop-blur-xl p-8 relative overflow-hidden transition-all border border-theme hover:border-cyan-400/30 group/expcard"
-          style={{ willChange: 'transform' }}
-        >
-          {/* HUD details: Corner markers */}
-          <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-theme opacity-30" />
-          <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-theme opacity-30" />
-          <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-theme opacity-30" />
-          <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-theme opacity-30" />
-
-          {/* HUD detail: Hex timestamp */}
-          <div className="absolute top-3 right-4 opacity-10 group-hover/expcard:opacity-30 transition-opacity">
-            <span className="text-[7px] font-mono tracking-widest text-theme uppercase">LOC_COORD: 23.23N 87.86E</span>
-          </div>
-
-          {/* Highlight line */}
-          <div 
-             className={`absolute inset-y-0 w-[1px] pointer-events-none left-0 ${isEven ? 'md:left-auto md:right-0' : ''}`}
-             style={{ backgroundColor: `${exp.color}40` }}
-          />
-        
-        {/* Dynamic glow tracking cursor */}
-        <motion.div
-          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-          style={{ background }}
-        />
-
-        {/* Header row */}
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 flex items-center justify-center bg-theme-shift border border-theme group-hover/expcard:border-cyan-400/30 transition-colors">
-              <span className="text-xl" role="img" aria-hidden="true">{exp.icon}</span>
-            </div>
-            <div>
-              <h3
-                className="text-lg font-bold group-hover/expcard:translate-x-1 transition-transform"
-                style={{ fontFamily: 'var(--font-syne)', color: exp.color }}
-              >
-                {exp.title}
-              </h3>
-              <p
-                className="text-[10px] uppercase tracking-[0.25em] text-theme-muted font-bold"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                {exp.organization}
-              </p>
-            </div>
-          </div>
-          <span
-            className="text-[9px] uppercase tracking-[0.2em] text-theme-dim whitespace-nowrap border border-theme px-3 py-1.5 bg-theme-card backdrop-blur-sm"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            {exp.date}
-          </span>
-        </div>
-
-        {/* Description */}
-        <p className="text-[13px] text-theme-dim leading-relaxed mb-6" style={{ fontFamily: 'var(--font-dm-sans)' }}>
-          {exp.description}
-        </p>
-
-        {/* Achievements */}
-        <ul className="flex flex-col gap-3">
-          {exp.achievements.map((a: string, ai: number) => (
-            <li
-              key={ai}
-              className="flex items-start gap-3 text-[11px] text-theme-muted group-hover/expcard:text-theme-dim transition-colors"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              <span style={{ color: exp.color, marginTop: 1, flexShrink: 0 }} className="group-hover/expcard:translate-x-1 transition-transform" aria-hidden="true">»</span>
-              <span className="leading-relaxed">{a}</span>
-            </li>
-          ))}
-        </ul>
-
-        {/* View Certificate */}
-        {(exp as { certificate?: string }).certificate && (
-          <div className="mt-5 flex">
-            <a
-              href={(exp as { certificate?: string }).certificate}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-amber-500 hover:text-amber-400 border border-amber-500/25 hover:border-amber-500/50 px-4 py-2 bg-amber-500/5 hover:bg-amber-500/10 transition-all duration-300"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="8" r="7" />
-                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-              </svg>
-              View Certificate
-            </a>
-          </div>
-        )}
-
-        {/* Card footer detail */}
-        <div className="mt-8 pt-4 border-t border-theme flex justify-between items-center">
-          <div className="flex gap-1">
-             {[0,1,2].map(i => <div key={i} className="w-1 h-1 bg-theme-muted opacity-20" />)}
-          </div>
-          <span className="text-[7px] font-mono text-theme-muted opacity-30 tracking-[0.4em]">SYSTEM_VERIFIED_LOG_0x{index.toString(16).toUpperCase()}</span>
-        </div>
-      </div>
-      </div>
-    </motion.div>
   );
 }

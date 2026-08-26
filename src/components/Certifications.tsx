@@ -1,187 +1,185 @@
 'use client';
 
-import { useRef } from 'react';
-import { motion, useInView, useTransform } from 'framer-motion';
+import { useRef, useState } from 'react';
+import { motion, useInView, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { certifications as DEFAULT_CERTIFICATIONS } from '@/lib/constants';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Award } from 'lucide-react';
 import { usePortfolioData } from '@/hooks/usePortfolioData';
-import { useMousePosition } from '@/hooks/useMousePosition';
 import CharSplitHeading from './CharSplitHeading';
 
+const CERT_COLORS = [
+  '34, 211, 238',   // cyan
+  '167, 139, 250',  // purple
+  '244, 114, 182',  // pink
+  '52, 211, 153',   // emerald
+  '251, 191, 36',   // amber
+  '96, 165, 250',   // blue
+  '248, 113, 113',  // red
+];
 
-export default function Certifications() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const { data } = usePortfolioData();
-  const certifications = (data && Array.isArray(data.certifications) && data.certifications.length > 0) ? data.certifications : DEFAULT_CERTIFICATIONS;
+// Extracted into a separate component so each card manages its own spotlight coordinates efficiently
+function CertificationCard({ 
+  cert, 
+  index, 
+  isHovered, 
+  isDimmed, 
+  onMouseEnter, 
+  onMouseLeave 
+}: { 
+  cert: any; 
+  index: number; 
+  isHovered: boolean; 
+  isDimmed: boolean;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+}) {
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const colorRGB = CERT_COLORS[index % CERT_COLORS.length];
+
+  function handleMouseMove(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    mouseX.set(e.clientX - rect.left);
+    mouseY.set(e.clientY - rect.top);
+  }
 
   return (
-    <section
-      id="certifications"
-      className="relative py-28 md:py-40 overflow-hidden"
+    <motion.a
+      ref={cardRef}
+      href={cert.pdf}
+      target="_blank"
+      rel="noopener noreferrer"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.5) }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onMouseMove={handleMouseMove}
+      className={`group/cert relative p-[1px] rounded-2xl transition-all duration-500 min-h-[180px] block ${
+        isDimmed ? 'opacity-30 scale-[0.98]' : 'opacity-100'
+      } ${isHovered ? 'z-10 scale-[1.02] -translate-y-1 shadow-[0_20px_40px_rgba(0,0,0,0.5)]' : 'z-0'}`}
     >
-      {/* Large watermark */}
-      <div
-        className="pointer-events-none absolute top-0 right-0 select-none"
+      {/* Subtle Default Border */}
+      <div className="absolute inset-0 rounded-2xl bg-white/5 transition-opacity duration-500 group-hover/cert:opacity-0" />
+
+      {/* Glowing Spotlight Border */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover/cert:opacity-100"
         style={{
-          fontFamily: 'var(--font-syne)',
-          fontSize: 'clamp(6rem, 18vw, 13rem)',
-          color: 'rgba(168,85,247,0.03)',
-          fontWeight: 900,
-          lineHeight: 1,
-          userSelect: 'none',
+          background: useMotionTemplate`
+            radial-gradient(
+              300px circle at ${mouseX}px ${mouseY}px,
+              rgba(${colorRGB}, 1),
+              transparent 80%
+            )
+          `,
         }}
-      >
-        13+
-      </div>
+      />
 
-      <div className="mx-auto max-w-7xl px-6">
-        {/* Header */}
-        <div className="flex items-start gap-6 mb-14">
-          <span
-            className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-theme-muted -rotate-90 origin-left whitespace-nowrap pt-8"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            / CERTS
-          </span>
-          <div>
-            <CharSplitHeading text="Certifications" fontSize="clamp(1.8rem, 8vw, 4rem)" />
-            <p className="mt-3 text-sm text-theme-muted max-w-md" style={{ fontFamily: 'var(--font-mono)' }}>
-              13 verified credentials across AI, cloud, and full-stack development.
-            </p>
+      {/* Inner Glass Card */}
+      <div className="relative h-full bg-[#04060C]/40 backdrop-blur-3xl rounded-2xl p-6 flex flex-col justify-between overflow-hidden">
+        {/* Blueprint Texture */}
+        <div className="absolute inset-0 blueprint-grid opacity-[0.03]" />
+        
+        {/* Inner Glowing Spotlight */}
+        <motion.div
+          className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover/cert:opacity-100"
+          style={{
+            background: useMotionTemplate`
+              radial-gradient(
+                400px circle at ${mouseX}px ${mouseY}px,
+                rgba(${colorRGB}, 0.08),
+                transparent 70%
+              )
+            `,
+          }}
+        />
+
+        <div className="relative z-10">
+          <div className="flex justify-between items-start mb-6">
+            <span className="text-[10px] font-mono text-white/30 tracking-[0.2em]">
+              #{String(index + 1).padStart(3, '0')}
+            </span>
+            <div 
+              className={`p-2 rounded-full transition-colors duration-300 ${isHovered ? '' : 'bg-white/5 text-white/40'}`}
+              style={isHovered ? { backgroundColor: `rgba(${colorRGB}, 0.2)`, color: `rgb(${colorRGB})` } : {}}
+            >
+              <Award size={16} />
+            </div>
           </div>
+          
+          <h3 className="text-sm md:text-base font-bold text-white mb-2 leading-snug drop-shadow-md" style={{ fontFamily: 'var(--font-syne)' }}>
+            {cert.title}
+          </h3>
         </div>
-
-        {/* Horizontal scroll strip */}
-        <div
-          ref={scrollRef}
-          className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory cert-scrollbar"
-        >
-          {certifications.map((cert: any, i: number) => (
-            <CertCard key={cert.title} cert={cert} index={i} />
-          ))}
+        
+        <div className="relative z-10 flex items-center justify-between mt-6">
+          <div className="flex items-center gap-2">
+            <div 
+              className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isHovered ? '' : 'bg-white/20'}`} 
+              style={isHovered ? { backgroundColor: `rgb(${colorRGB})`, boxShadow: `0 0 10px rgb(${colorRGB})` } : {}}
+            />
+            <span className="text-[9px] uppercase tracking-[0.2em] text-white/60 font-mono">
+              {cert.issuer}
+            </span>
+          </div>
+          <ExternalLink 
+            size={14} 
+            className={`transition-all duration-300 ${isHovered ? 'translate-x-1 -translate-y-1' : 'text-transparent'}`} 
+            style={isHovered ? { color: `rgb(${colorRGB})` } : {}}
+          />
         </div>
-
-        {/* Scroll hint */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="mt-5 text-[10px] uppercase tracking-widest text-theme-muted text-right"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
-          ← scroll to explore →
-        </motion.p>
       </div>
-    </section>
+    </motion.a>
   );
 }
 
-function CertCard({ cert, index }: { cert: any; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-40px' });
-  const { mouseX, mouseY, handleMouseMove } = useMousePosition(ref);
-
-  const background = useTransform(
-    [mouseX, mouseY],
-    ([latestX, latestY]) => `radial-gradient(400px circle at ${latestX}px ${latestY}px, ${cert.color}15, transparent 40%)`
-  );
+export default function Certifications() {
+  const { data } = usePortfolioData();
+  const certifications = (data && Array.isArray(data.certifications) && data.certifications.length > 0) ? data.certifications : DEFAULT_CERTIFICATIONS;
+  
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ type: 'spring' as const, stiffness: 100, damping: 16, delay: Math.min(index * 0.06, 0.5) }}
-      className="snap-start flex-shrink-0 relative border border-theme bg-theme-card backdrop-blur-xl overflow-hidden group/cert hover-float-card pixel-border scanline"
-      style={{
-        width: 'clamp(240px, 32vw, 300px)',
-      }}
-    >
-      {/* Dynamic glow tracking cursor */}
-      <motion.div
-        className="pointer-events-none absolute inset-0 opacity-0 group-hover/cert:opacity-100 transition-opacity duration-700"
-        style={{ background }}
-      />
+    <section id="certifications" className="relative py-32 md:py-48 bg-transparent">
+      
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-full h-[800px] bg-[radial-gradient(ellipse_at_top_right,rgba(34,211,238,0.05),transparent_50%)] pointer-events-none" />
 
-      {/* Holographic overlay effect */}
-      <div className="absolute inset-0 opacity-0 group-hover/cert:opacity-20 transition-opacity duration-700 pointer-events-none"
-        style={{
-          background: `linear-gradient(135deg, transparent 45%, ${cert.color} 50%, transparent 55%)`,
-          backgroundSize: '200% 200%',
-          animation: 'hologram 3s linear infinite'
-        }}
-      />
-
-      <style jsx>{`
-        @keyframes hologram {
-          0% { background-position: 200% 0%; }
-          100% { background-position: -200% 0%; }
-        }
-      `}</style>
-
-      <div className="p-8 flex flex-col h-full min-h-[200px] relative z-10">
-        {/* Header row: ID + Icon */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="w-12 h-12 flex items-center justify-center bg-theme-shift border border-theme group-hover/cert:border-cyan-400/30 transition-colors">
-            <span
-              className="text-2xl grayscale group-hover/cert:grayscale-0 transition-all duration-500"
-              role="img"
-              aria-label={cert.title}
-            >
-              {cert.icon}
-            </span>
-          </div>
-          <div className="text-right">
-            <p className="text-[8px] font-mono text-theme-muted uppercase tracking-widest mb-1">CRED_ID</p>
-            <p
-              className="text-[10px] font-mono font-bold tracking-widest"
-              style={{ color: cert.color }}
-            >
-              #{String(index + 1).padStart(3, '0')}
-            </p>
-          </div>
-        </div>
-
-        {/* Title */}
-        <h3
-          className="text-sm font-bold leading-tight mb-2 flex-1 text-theme group-hover/cert:text-cyan-400 transition-colors"
-          style={{ fontFamily: 'var(--font-syne)' }}
-        >
-          {cert.title}
-        </h3>
-
-        {/* Issuer */}
-        <div className="flex items-center gap-2 mb-6">
-          <div className="w-1 h-1 rounded-none rotate-45" style={{ background: cert.color }} />
-          <p
-            className="text-[9px] uppercase tracking-[0.2em] text-theme-muted font-bold"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            {cert.issuer}
+      <div className="mx-auto max-w-7xl px-6 relative z-10">
+        
+        {/* Header (Stacked like Projects section) */}
+        <div className="flex flex-col items-start gap-6 mb-16 md:mb-24">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-[var(--cyan)] font-mono flex items-center gap-4">
+            <span className="w-8 h-[1px] bg-[var(--cyan)]"></span>
+            CREDENTIALS
+          </span>
+          <CharSplitHeading text="Certifications" fontSize="clamp(3rem, 7vw, 6rem)" />
+          
+          <p className="text-base md:text-lg text-white/60 font-light leading-relaxed max-w-2xl mt-4" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+            13+ verified credentials across AI, cloud architecture, and full-stack engineering, presented in a secure digital archive.
           </p>
         </div>
 
-        {/* Action row */}
-        <div className="flex items-center justify-between pt-4 border-t border-theme">
-          <a
-            href={cert.pdf}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all group/link"
-            style={{ color: cert.color, fontFamily: 'var(--font-mono)' }}
-            aria-label={`View certificate for ${cert.title}`}
-          >
-            <ExternalLink size={12} aria-hidden="true" />
-            <span className="group-hover/link:underline">VERIFY_KEY</span>
-          </a>
-          <div className="flex gap-1">
-             <div className="w-1 h-1 bg-theme-muted opacity-20" />
-             <div className="w-3 h-1 bg-theme-muted opacity-20" />
-          </div>
+        {/* Dense Archive Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {certifications.map((cert: any, i: number) => (
+            <CertificationCard
+              key={cert.title}
+              cert={cert}
+              index={i}
+              isHovered={hoveredIndex === i}
+              isDimmed={hoveredIndex !== null && hoveredIndex !== i}
+              onMouseEnter={() => setHoveredIndex(i)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            />
+          ))}
         </div>
       </div>
-    </motion.div>
+    </section>
   );
 }

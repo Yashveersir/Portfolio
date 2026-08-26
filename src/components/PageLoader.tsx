@@ -2,43 +2,43 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePortfolioData } from '@/hooks/usePortfolioData';
 
-const LOADING_STEPS = [
-  'INITIALIZING_CORE_SYSTEM',
-  'ESTABLISHING_NEURAL_LINK',
-  'LOADING_ASSETS_CACHE',
-  'SYNCING_UI_MODULES',
-  'SYSTEM_READY',
+const LOADING_MESSAGES = [
+  'INITIALIZING SYSTEM',
+  'LOADING NEURAL NETWORKS',
+  'COMPILING 3D SHADERS',
+  'ESTABLISHING CONNECTION',
+  'SYSTEM READY'
 ];
 
 export default function PageLoader() {
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const { loading: dataLoading } = usePortfolioData();
+  const [messageIndex, setMessageIndex] = useState(0);
 
   useEffect(() => {
-    // Lock scroll
     document.body.style.overflow = 'hidden';
 
-    const duration = 800; // 0.8 seconds for the loader
-    const interval = 10;
+    const duration = 1600; // slightly longer for dramatic effect
+    const interval = 16;
     const increment = 100 / (duration / interval);
 
     const timer = setInterval(() => {
       setProgress((prev) => {
         const next = prev + increment;
-        if (next >= 100) {
-          // If progress is full but data is still loading, hover at 99%
-          if (dataLoading) {
-            return 99;
-          }
+        
+        // Update message based on progress
+        if (next > 85) setMessageIndex(4);
+        else if (next > 65) setMessageIndex(3);
+        else if (next > 40) setMessageIndex(2);
+        else if (next > 15) setMessageIndex(1);
 
+        if (next >= 100) {
           clearInterval(timer);
           setTimeout(() => {
             setIsComplete(true);
             document.body.style.overflow = 'unset';
-          }, 500);
+          }, 300); // Brief pause at 100% before opening doors
           return 100;
         }
         return next;
@@ -49,93 +49,93 @@ export default function PageLoader() {
       clearInterval(timer);
       document.body.style.overflow = 'unset';
     };
-  }, [dataLoading]);
-
-  const step = Math.floor((progress / 100) * (LOADING_STEPS.length - 1));
+  }, []);
 
   return (
     <AnimatePresence>
       {!isComplete && (
         <motion.div
-          initial={{ opacity: 1 }}
-          exit={{ 
-            opacity: 0,
-            y: -20,
+          initial={{ scale: 1, opacity: 1 }}
+          exit={{
+            scale: 1.5, // Flies towards the camera
+            opacity: 0, // Fades out simultaneously
             transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] }
           }}
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#05050f]"
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#05070B] overflow-hidden origin-center"
         >
-          {/* Background Grid */}
-          <div className="absolute inset-0 dot-grid opacity-[0.03]" />
+          {/* Subtle dot grid */}
+          <div className="absolute inset-0 dot-grid opacity-10 pointer-events-none" />
           
-          <div className="relative w-full max-w-xs px-6">
-            {/* Logo Scramble/Reveal */}
-            <div className="mb-12 flex justify-center">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="relative w-16 h-16 flex items-center justify-center border border-[var(--cyan)]/30 bg-[var(--cyan)]/5 overflow-hidden"
+          {/* Huge glowing background aura */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vh] bg-[radial-gradient(ellipse_at_center,rgba(34,211,238,0.05)_0%,transparent_70%)] pointer-events-none" />
+
+          <div className="relative flex flex-col items-center gap-12 w-full max-w-[320px] px-6">
+
+            {/* Monogram / Logo Section */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col items-center gap-3 relative"
+            >
+              <div className="absolute -inset-10 bg-[var(--cyan)]/5 blur-3xl rounded-full" />
+              <span
+                className="text-[64px] font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 tracking-[-0.05em] leading-none drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] relative z-10"
+                style={{ fontFamily: 'var(--font-syne)' }}
               >
-                <div className="absolute inset-0 bg-[var(--cyan)]/10" />
-                <motion.span 
-                  className="relative text-3xl font-black text-[var(--cyan)]"
-                  style={{ fontFamily: 'var(--font-syne)' }}
-                >
-                  Y
-                </motion.span>
-                {/* Scanning line */}
-                <motion.div 
-                  className="absolute inset-x-0 h-[2px] bg-[var(--cyan)]/50 z-10"
-                  animate={{ top: ['-10%', '110%'] }}
-                  transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
-                />
-              </motion.div>
-            </div>
-
-            {/* Progress Info */}
-            <div className="flex justify-between items-end mb-2">
-              <div className="flex flex-col">
-                <span className="text-[10px] text-[var(--cyan)]/60 font-mono tracking-widest uppercase mb-1">
-                  Status
-                </span>
-                <span className="text-[11px] text-[var(--cyan)] font-mono tracking-[0.2em] h-4">
-                  {LOADING_STEPS[step]}
-                </span>
-              </div>
-              <span className="text-xl font-black text-theme" style={{ fontFamily: 'var(--font-syne)' }}>
-                {Math.round(progress)}%
+                YS
               </span>
-            </div>
+              <div className="h-px w-12 bg-gradient-to-r from-transparent via-[var(--cyan)] to-transparent relative z-10" />
+              <span
+                className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--cyan)] relative z-10"
+                style={{ fontFamily: 'var(--font-mono)' }}
+              >
+                Portfolio // 26
+              </span>
+            </motion.div>
 
-            {/* Progress Bar */}
-            <div className="relative h-[2px] w-full bg-white/5 overflow-hidden">
-              <motion.div
-                className="absolute inset-y-0 left-0 bg-[var(--cyan)] shadow-[0_0_10px_var(--cyan)]"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.1 }}
-              />
-            </div>
-
-            {/* Subtext */}
-            <div className="mt-8 flex justify-center">
-              <div className="flex gap-1">
-                {[...Array(4)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="w-1 h-1 bg-[var(--cyan)]/20"
-                    animate={{ opacity: [0.2, 1, 0.2] }}
-                    transition={{ repeat: Infinity, duration: 1, delay: i * 0.2 }}
-                  />
-                ))}
+            {/* Terminal & Progress Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="w-full flex flex-col gap-3"
+            >
+              {/* Terminal Text */}
+              <div className="flex justify-between items-end">
+                <span
+                  key={messageIndex}
+                  className="text-[8px] text-[var(--text-muted)] uppercase tracking-[0.2em] animate-pulse"
+                  style={{ fontFamily: 'var(--font-mono)' }}
+                >
+                  &gt; {LOADING_MESSAGES[messageIndex]}
+                </span>
+                <span
+                  className="text-[10px] font-bold text-white tabular-nums tracking-widest drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                  style={{ fontFamily: 'var(--font-mono)' }}
+                >
+                  {Math.round(progress)}%
+                </span>
               </div>
-            </div>
-          </div>
 
-          {/* Bottom readout */}
-          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-full px-12 flex justify-between items-center opacity-20">
-             <span className="text-[9px] font-mono tracking-[0.3em] uppercase">YS_V.2026_INITIALIZE</span>
-             <span className="text-[9px] font-mono tracking-[0.3em] uppercase">EST_LINK_88%</span>
+              {/* Laser Progress Bar */}
+              <div className="relative h-[2px] w-full bg-white/10 rounded-full overflow-hidden">
+                <motion.div
+                  className="absolute inset-y-0 left-0 bg-[var(--cyan)] rounded-full"
+                  style={{
+                    width: `${progress}%`,
+                    boxShadow: '0 0 15px var(--cyan), 0 0 5px white',
+                  }}
+                  transition={{ duration: 0.05, ease: "linear" }}
+                />
+                {/* Laser head glow */}
+                <motion.div 
+                  className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full blur-[4px]"
+                  style={{ left: `calc(${progress}% - 8px)` }}
+                />
+              </div>
+            </motion.div>
+
           </div>
         </motion.div>
       )}

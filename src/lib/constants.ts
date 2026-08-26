@@ -2,10 +2,10 @@
 
 /* ========== NAV LINKS ========== */
 export const navLinks = [
-  { id: 'about', title: 'Identity' },
-  { id: 'skills', title: 'Skills' },
-  { id: 'projects', title: 'Projects' },
-  { id: 'certifications', title: 'Certifications' },
+  { id: 'about', title: 'About' },
+  { id: 'skills', title: 'Stack' },
+  { id: 'projects', title: 'Work' },
+  { id: 'certifications', title: 'Credentials' },
   { id: 'experience', title: 'Experience' },
   { id: 'contact', title: 'Contact' },
 ];

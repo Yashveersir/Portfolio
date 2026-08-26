@@ -1,534 +1,211 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import CharSplitHeading from './CharSplitHeading';
 import { usePortfolioData } from '@/hooks/usePortfolioData';
 
-const DEFAULT_BIO_WORDS = [
-  'I', 'am', 'a', 'Software', 'Engineer', 'and', 'Designer', 'dedicated', 'to',
-  'crafting', 'high-performance', 'web', 'experiences.', 'My', 'work', 'merges',
-  'technical', 'precision', 'with', 'minimalist', 'aesthetics,', 'specializing',
-  'in', 'full-stack', 'systems', 'and', 'Generative', 'AI', 'integration.',
-];
-
-// Hand-drawn SVG underline for "Generative AI"
-function HandUnderline() {
-  return (
-    <svg
-      className="absolute -bottom-1 left-0 w-full overflow-visible pointer-events-none"
-      height="6"
-      viewBox="0 0 100 6"
-      preserveAspectRatio="none"
-    >
-      <path
-        d="M0,4 Q10,1 20,4 Q30,7 40,3 Q55,0 70,4 Q82,7 100,3"
-        fill="none"
-        stroke="#ff6400"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        className="draw-line"
-      />
-    </svg>
-  );
-}
-
-function WordReveal({ bioWords }: { bioWords: string[] }) {
-  const [mounted, setMounted] = useState(false);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-10% 0px -10% 0px' });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  return (
-    <motion.p
-      ref={ref}
-      initial="hidden"
-      animate={mounted && isInView ? "visible" : "hidden"}
-      className="drop-cap text-lg md:text-xl leading-relaxed text-theme-dim font-light"
-      style={{ maxWidth: '520px' }}
-    >
-      {bioWords.map((word, i) => {
-        // Mark "Generative AI" words for underline
-        const isHighlight = i === 26 || i === 27;
-        return (
-          <motion.span
-            key={i}
-            className={isHighlight ? 'relative inline-block' : 'inline-block mr-[0.35em]'}
-            variants={{
-              hidden: { opacity: 0, y: 12 },
-              visible: { opacity: 1, y: 0, transition: { delay: i * 0.04, duration: 0.4, ease: 'easeOut' } }
-            }}
-            style={{ marginRight: '0.35em' }}
-          >
-            {word}
-            {isHighlight && i === 27 && <HandUnderline />}
-          </motion.span>
-        );
-      })}
-    </motion.p>
-  );
-}
-
 const DEFAULT_STATS = [
-  { value: '8.6', label: 'CGPA', color: '#ff6400' },
-  { value: 'MERN', label: 'Specialization', color: '#22d3ee' },
-  { value: '3+', label: 'Live Projects', color: '#7c6fff' },
-  { value: '13+', label: 'Certifications', color: '#a855f7' },
+  { value: '8.6', label: 'CGPA', sub: 'Computer Science' },
+  { value: 'MERN', label: 'Specialization', sub: 'Full-Stack Architecture' },
+  { value: '3+', label: 'Live Projects', sub: 'Deployed in production' },
+  { value: '13+', label: 'Certifications', sub: 'Verified credentials' },
 ];
 
-function NeuralBg() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
-  const [isVisible, setIsVisible] = useState(false);
+function StatCard({ s, i, mounted, isStatsInView }: { s: any, i: number, mounted: boolean, isStatsInView: boolean }) {
+  const divRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current.targetX = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseRef.current.targetY = (e.clientY / window.innerHeight) * 2 - 1;
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.05 }
-    );
-
-    observer.observe(canvas);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !isVisible) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
-    if (!ctx) return;
-
-    let w = 0, h = 0;
-    const resize = () => {
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      const rect = parent.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = rect.width; h = rect.height;
-      canvas.width = w * dpr; canvas.height = h * dpr;
-      ctx.scale(dpr, dpr);
-      nodes.forEach(n => { n.x = Math.random() * w; n.y = Math.random() * h; });
-    };
-    window.addEventListener('resize', resize);
-
-    // More nodes, slightly faster
-    const nodes = Array.from({ length: 35 }, () => ({
-      x: Math.random() * 1400,
-      y: Math.random() * 800,
-      vx: (Math.random() - 0.5) * 0.18,
-      vy: (Math.random() - 0.5) * 0.18,
-      z: Math.random() * 1.8 + 0.5,
-      phase: Math.random() * Math.PI * 2,
-      isCyan: Math.random() > 0.5, // cyan or violet tint
-    }));
-
-    // Travelling light pulses on connections
-    interface Pulse { i: number; j: number; t: number; speed: number }
-    const pulses: Pulse[] = [];
-    let nextPulse = 40;
-
-    let frameId: number;
-    let time = 0;
-
-    resize();
-
-    let lastFrame = 0;
-    const FRAME_INTERVAL = 1000 / 30;
-
-    const draw = (now: number) => {
-      frameId = requestAnimationFrame(draw);
-      const elapsed = now - lastFrame;
-      if (elapsed < FRAME_INTERVAL) return;
-      lastFrame = now - (elapsed % FRAME_INTERVAL);
-      time += 0.005;
-      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05;
-      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05;
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
-
-      ctx.clearRect(0, 0, w, h);
-
-      // ── Ambient gradient orbs (depth feel) ──
-      const breath = Math.sin(time * 1.4) * 0.5 + 0.5;
-      ctx.globalCompositeOperation = 'screen';
-      const o1 = ctx.createRadialGradient(w * 0.15 + mx * -20, h * 0.3 + my * -15, 0, w * 0.15, h * 0.3, 350);
-      o1.addColorStop(0, `rgba(34,211,238,${0.05 + breath * 0.03})`);
-      o1.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = o1; ctx.fillRect(0, 0, w, h);
-
-      const o2 = ctx.createRadialGradient(w * 0.85 + mx * -15, h * 0.7 + my * -10, 0, w * 0.85, h * 0.7, 300);
-      o2.addColorStop(0, `rgba(124,111,255,${0.045 + breath * 0.025})`);
-      o2.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = o2; ctx.fillRect(0, 0, w, h);
-      ctx.globalCompositeOperation = 'source-over';
-
-      // ── Dot grid — theme aware ──
-      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-      const gs = 55;
-      const gox = ((mx * 14) % gs + gs) % gs;
-      const goy = ((my * 14) % gs + gs) % gs;
-      ctx.fillStyle = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.035)';
-      for (let gx = gox - gs; gx < w + gs; gx += gs) {
-        for (let gy = goy - gs; gy < h + gs; gy += gs) {
-          ctx.beginPath(); ctx.arc(gx, gy, 0.9, 0, Math.PI * 2); ctx.fill();
-        }
-      }
-
-      // ── Grid lines ──
-      const lgs = 110;
-      const lgox = ((mx * 22) % lgs + lgs) % lgs;
-      const lgoy = ((my * 22) % lgs + lgs) % lgs;
-      ctx.lineWidth = 0.5;
-      ctx.strokeStyle = 'rgba(34,211,238,0.04)';
-      ctx.beginPath();
-      for (let gx = lgox - lgs; gx < w + lgs; gx += lgs) { ctx.moveTo(gx, 0); ctx.lineTo(gx, h); }
-      for (let gy = lgoy - lgs; gy < h + lgs; gy += lgs) { ctx.moveTo(0, gy); ctx.lineTo(w, gy); }
-      ctx.stroke();
-
-      // Mouse world position (0..w, 0..h)
-      const mwx = (mx * 0.5 + 0.5) * w;
-      const mwy = (my * 0.5 + 0.5) * h;
-
-      // Move nodes + mouse attraction
-      nodes.forEach(n => {
-        const pdx = mwx - n.x, pdy = mwy - n.y;
-        const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
-        if (pdist < 200) {
-          const pull = (1 - pdist / 200) * 0.25;
-          n.vx += (pdx / pdist) * pull;
-          n.vy += (pdy / pdist) * pull;
-        }
-        n.vx *= 0.98; n.vy *= 0.98; // dampen
-        n.x += n.vx; n.y += n.vy;
-        if (n.x < 0 || n.x > w) n.vx *= -1;
-        if (n.y < 0 || n.y > h) n.vy *= -1;
-      });
-
-      // ── Connections — stronger, dual-color ──
-      const MAX_DIST2 = 150 * 150;
-      ctx.lineWidth = 0.8;
-      for (let i = 0; i < nodes.length; i++) {
-        const ni = nodes[i];
-        const px1 = ni.x + mx * 20 / ni.z, py1 = ni.y + my * 20 / ni.z;
-        for (let j = i + 1; j < nodes.length; j++) {
-          const nj = nodes[j];
-          const px2 = nj.x + mx * 20 / nj.z, py2 = nj.y + my * 20 / nj.z;
-          const dx = px1 - px2, dy = py1 - py2;
-          const dist2 = dx * dx + dy * dy;
-          if (dist2 < MAX_DIST2) {
-            const breathe = Math.sin(time * 1.1 + ni.phase + nj.phase) * 0.45 + 0.55;
-            const alpha = (1 - dist2 / MAX_DIST2) * 0.18 * breathe;
-            // Color: cyan lines for cyan nodes, violet otherwise
-            const isMixed = ni.isCyan !== nj.isCyan;
-            const lineColor = isMixed
-              ? `rgba(150,160,255,${alpha})`
-              : ni.isCyan
-                ? `rgba(34,211,238,${alpha})`
-                : `rgba(124,111,255,${alpha})`;
-            ctx.strokeStyle = lineColor;
-            ctx.beginPath(); ctx.moveTo(px1, py1); ctx.lineTo(px2, py2); ctx.stroke();
-          }
-        }
-      }
-
-      // ── Travelling pulses along connections ──
-      if (--nextPulse <= 0) {
-        const a = Math.floor(Math.random() * nodes.length);
-        let b = Math.floor(Math.random() * nodes.length);
-        while (b === a) b = Math.floor(Math.random() * nodes.length);
-        const dx = nodes[a].x - nodes[b].x, dy = nodes[a].y - nodes[b].y;
-        if (dx * dx + dy * dy < MAX_DIST2) pulses.push({ i: a, j: b, t: 0, speed: 0.006 + Math.random() * 0.006 });
-        nextPulse = 25 + Math.random() * 50;
-      }
-      for (let k = pulses.length - 1; k >= 0; k--) {
-        const p = pulses[k]; p.t += p.speed;
-        if (p.t >= 1) { pulses.splice(k, 1); continue; }
-        const na = nodes[p.i], nb = nodes[p.j];
-        const px = na.x + (nb.x - na.x) * p.t;
-        const py = na.y + (nb.y - na.y) * p.t;
-        const pa = Math.sin(p.t * Math.PI) * 0.9;
-        ctx.fillStyle = na.isCyan ? `rgba(34,211,238,${pa})` : `rgba(168,130,255,${pa})`;
-        ctx.beginPath(); ctx.arc(px, py, 2.2, 0, Math.PI * 2); ctx.fill();
-        // Trail glow
-        ctx.fillStyle = na.isCyan ? `rgba(34,211,238,${pa * 0.25})` : `rgba(168,130,255,${pa * 0.25})`;
-        ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
-      }
-
-      // ── Nodes — vivid glow, two colors ──
-      nodes.forEach((n) => {
-        const px = n.x + mx * 20 / n.z;
-        const py = n.y + my * 20 / n.z;
-        const pulse = Math.sin(time * 1.4 + n.phase) * 0.4 + 0.6;
-        const baseAlpha = (0.55 / n.z) * pulse;
-
-        // Outer glow halo
-        const haloR = 8 / n.z;
-        const halo = ctx.createRadialGradient(px, py, 0, px, py, haloR);
-        const c = n.isCyan ? '34,211,238' : '124,111,255';
-        halo.addColorStop(0, `rgba(${c},${baseAlpha * 0.5})`);
-        halo.addColorStop(1, `rgba(${c},0)`);
-        ctx.fillStyle = halo;
-        ctx.beginPath(); ctx.arc(px, py, haloR, 0, Math.PI * 2); ctx.fill();
-
-        // Core dot
-        ctx.fillStyle = n.isCyan
-          ? `rgba(34,211,238,${baseAlpha})`
-          : `rgba(168,130,255,${baseAlpha})`;
-        ctx.beginPath(); ctx.arc(px, py, 1.8 / n.z, 0, Math.PI * 2); ctx.fill();
-      });
-
-    };
-    frameId = requestAnimationFrame(draw);
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(frameId);
-    };
-  }, [isVisible]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex: 0 }}
-    />
-  );
-}
-
-function Terminal({ terminalData }: { terminalData?: any }) {
-  const [mounted, setMounted] = useState(false);
-  const terminalRef = useRef<HTMLDivElement>(null);
-  const isTerminalInView = useInView(terminalRef, { once: true, margin: '-50px' });
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const data = terminalData || {
-    name: 'Yashveer Singh',
-    role: 'Full-Stack & AI Engineer',
-    location: 'Burdwan, WB, India',
-    email: 'singhyash9631@gmail.com',
-    stack: ['React', 'Node', 'AI'],
-    openToWork: true
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!divRef.current) return;
+    const rect = divRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    setPosition({ x, y });
+    
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotX = ((y - centerY) / centerY) * -12; // Max 12 deg
+    const rotY = ((x - centerX) / centerX) * 12;
+    
+    setRotateX(rotX);
+    setRotateY(rotY);
   };
 
-  const copyEmail = () => {
-    navigator.clipboard.writeText(data.email);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleMouseLeave = () => {
+    setOpacity(0);
+    setRotateX(0);
+    setRotateY(0);
   };
 
   return (
-    <motion.div
-      ref={terminalRef}
-      initial="hidden"
-      animate={mounted && isTerminalInView ? "visible" : "hidden"}
-      variants={{
-        hidden: { opacity: 0, x: 40 },
-        visible: { 
-          opacity: 1, 
-          x: 0,
-          transition: { 
-            duration: 0.7, 
-            when: "beforeChildren",
-            staggerChildren: 0.1 
-          }
-        }
-      }}
-      className="group relative rounded-xl border border-theme bg-theme-card backdrop-blur-xl overflow-hidden shadow-2xl"
-    >
-      {/* Window bar */}
-      <div className="flex items-center gap-1.5 border-b border-theme bg-theme-card px-4 py-3">
-        <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
-        <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
-        <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
-        <span
-          className="ml-auto text-[10px] text-theme-muted"
-          style={{ fontFamily: 'var(--font-mono)' }}
+    <div style={{ perspective: 1200 }}>
+      <motion.div
+        ref={divRef}
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        animate={mounted && isStatsInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 30, scale: 0.95 }}
+        transition={{ duration: 0.8, delay: i * 0.1, type: 'spring' }}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setOpacity(1)}
+        onMouseLeave={handleMouseLeave}
+      >
+        <motion.div
+          animate={{ rotateX, rotateY }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 0.5 }}
+          className="p-8 md:p-10 flex flex-col justify-between min-h-[240px] relative overflow-hidden group bg-gradient-to-br from-[#0B1120]/40 to-[#050810]/40 backdrop-blur-2xl border border-[var(--card-border)] rounded-3xl shadow-[0_0_30px_rgba(0,0,0,0.5)] transition-shadow hover:shadow-[0_20px_60px_rgba(34,211,238,0.15)]"
+          style={{ transformStyle: 'preserve-3d' }}
         >
-          yashveer.ts
-        </span>
-      </div>
+          <div 
+            className="pointer-events-none absolute -inset-px opacity-0 transition duration-500 rounded-3xl"
+            style={{
+              opacity,
+              background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(34,211,238,0.2), transparent 40%)`
+            }}
+          />
+          
+          <div className="absolute inset-0 rounded-3xl border border-white/0 group-hover:border-[var(--cyan)]/30 transition-colors duration-500 pointer-events-none" style={{ transform: 'translateZ(20px)' }} />
+          
+          <div className="flex flex-col gap-1 z-10" style={{ transform: 'translateZ(30px)' }}>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--cyan)] font-bold flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--cyan)] shadow-[0_0_10px_var(--cyan)] animate-pulse" />
+              {String(i + 1).padStart(2, '0')} // {s.label}
+            </p>
+            <p className="text-xs text-white/40 font-dm-sans mt-2 tracking-wide uppercase">
+              {s.sub}
+            </p>
+          </div>
+          
+          <div className="mt-10 z-10 flex items-end justify-between" style={{ transform: 'translateZ(40px)' }}>
+            <p className={`font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/20 tracking-tighter ${String(s.value).length > 3 ? 'text-3xl sm:text-4xl' : 'text-5xl md:text-7xl'}`} style={{ fontFamily: 'var(--font-syne)' }}>
+              {s.value}
+            </p>
 
-      <div className="p-6" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', lineHeight: 1.8 }}>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}><span className="text-[#c084fc]">const</span> <span className="text-[#60a5fa]">developer</span> <span className="text-theme-muted">=</span> {'{'}</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">name:</span> <span className="text-[#fbbf24]">&apos;{data.name}&apos;</span>,</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">role:</span> <span className="text-[#fbbf24]">&apos;{data.role}&apos;</span>,</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">location:</span> <span className="text-[#fbbf24]">&apos;{data.location}&apos;</span>,</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">email:</span> <span className="text-[#fbbf24]">&apos;{data.email}&apos;</span>,</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">stack:</span> [{data.stack.map((s: string, i: number) => <span key={i}><span className="text-[#22d3ee]">&apos;{s}&apos;</span>{i < data.stack.length - 1 ? ', ' : ''}</span>)}],</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="pl-5"><span className="text-[#4ade80]">openToWork:</span> <span className="text-[#c084fc]">{data.openToWork ? 'true' : 'false'}</span>,</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>{'}'}</motion.p>
-        <motion.p variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="mt-3 text-theme-muted animate-pulse">▌</motion.p>
-      </div>
-
-      {/* Hover Copy Button */}
-      <AnimatePresence>
-        <motion.div 
-          className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <button
-            onClick={copyEmail}
-            className="flex items-center gap-2 px-3 py-1.5 border border-theme bg-theme-card backdrop-blur hover:bg-cyan-400/10 transition-colors text-[10px] uppercase tracking-widest text-theme-dim"
-            style={{ fontFamily: 'var(--font-mono)' }}
-            aria-label="Copy email address"
-          >
-            {copied ? '✓ Copied' : 'Copy Email'}
-          </button>
+          </div>
         </motion.div>
-      </AnimatePresence>
-    </motion.div>
-  );
+      </motion.div>
+    </div>
+  )
 }
 
 export default function About() {
   const [mounted, setMounted] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
-  const locationRef = useRef<HTMLDivElement>(null);
-
-  const { data, loading } = usePortfolioData();
-  const bioWords = data?.aboutBio ? data.aboutBio.split(' ') : DEFAULT_BIO_WORDS;
+  const { data } = usePortfolioData();
+  
   const stats = (data && Array.isArray(data.aboutStats) && data.aboutStats.length > 0) ? data.aboutStats : DEFAULT_STATS;
-  const terminalData = data?.aboutTerminal;
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] });
-
-  const isStatsInView = useInView(statsRef, { once: true, margin: '-50px' });
-  const isLocationInView = useInView(locationRef, { once: true, margin: '-50px' });
+  const isTextInView = useInView(textRef, { once: true, margin: '-10%' });
+  const isStatsInView = useInView(statsRef, { once: true, margin: '-10%' });
 
   return (
-    <section
-      id="about"
-      ref={sectionRef}
-      className="relative py-28 md:py-40 overflow-hidden"
-    >
-      <NeuralBg />
-      {/* Decorative bracket behind heading */}
-      <div
-        className="pointer-events-none absolute top-8 left-8 select-none"
-        style={{
-          fontFamily: 'var(--font-syne)',
-          fontSize: 'clamp(6rem, 20vw, 16rem)',
-          color: 'rgba(34,211,238,0.03)',
-          fontWeight: 900,
-          lineHeight: 1,
-          userSelect: 'none',
-        }}
-      >
-        [
-      </div>
-      <div
-        className="pointer-events-none absolute top-8 right-8 select-none"
-        style={{
-          fontFamily: 'var(--font-syne)',
-          fontSize: 'clamp(6rem, 20vw, 16rem)',
-          color: 'rgba(34,211,238,0.03)',
-          fontWeight: 900,
-          lineHeight: 1,
-          userSelect: 'none',
-        }}
-      >
-        ]
+    <section id="about" ref={sectionRef} className="relative py-32 md:py-48 overflow-hidden bg-transparent">
+      
+      {/* Background structure */}
+      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+        <div className="absolute inset-0 blueprint-grid opacity-[0.02]" />
+        
+        <motion.div 
+          animate={{ x: [0, 50, 0], y: [0, -50, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[var(--cyan)] rounded-full blur-[150px] opacity-[0.05]" 
+        />
+        <motion.div 
+          animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-blue-600 rounded-full blur-[150px] opacity-[0.05]" 
+        />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6">
-        <div className="flex flex-col lg:flex-row gap-16 lg:gap-28 items-start">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12">
+        
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-10%' }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center justify-center text-center mb-24 md:mb-32"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--cyan)]" />
+            <span className="text-[9px] uppercase tracking-[0.4em] text-[var(--cyan)]" style={{ fontFamily: 'var(--font-mono)' }}>
+              01 / Identity
+            </span>
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--cyan)]" />
+          </div>
+          <CharSplitHeading text="Architecting" fontSize="clamp(2rem, 10vw, 6rem)" />
+          <CharSplitHeading text="Digital Reality." fontSize="clamp(2rem, 10vw, 6rem)" />
+        </motion.div>
 
-          {/* Left col — section label + heading + bio */}
-          <div className="w-full lg:w-1/2">
-            {/* Rotated section label */}
-            <div className="flex items-center gap-6 mb-10">
-              <span
-                className="hidden md:block text-[10px] uppercase tracking-[0.4em] text-theme-muted -rotate-90 origin-left whitespace-nowrap"
-                style={{ fontFamily: 'var(--font-mono)', marginTop: 24 }}
+        <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 items-start relative">
+          
+          {/* Left: Editorial Bio */}
+          <div className="w-full lg:w-[48%] relative flex flex-col justify-center" ref={textRef}>
+            
+            {/* Magazine Pull-Quote Headline */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={mounted && isTextInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              className="relative mb-12"
+            >
+              <div className="absolute -left-6 top-2 bottom-2 w-1 bg-gradient-to-b from-[var(--cyan)] to-transparent rounded-full opacity-50" />
+              <p
+                className="text-3xl md:text-5xl lg:text-[3.25rem] leading-[1.1] text-white/90 font-bold tracking-tighter"
+                style={{ fontFamily: 'var(--font-syne)' }}
               >
-                / ABOUT
-              </span>
-              <div className="flex flex-col gap-0">
-                <CharSplitHeading text="IDENTITY" />
-                <CharSplitHeading 
-                  text="//YASHVEER" 
-                  fontSize="clamp(1.8rem, 4vw, 3rem)" 
-                  className="text-theme-dim -mt-2"
-                />
+                Building <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--cyan)] to-blue-500">scalable systems</span> that bridge the gap between imagination and reality.
+              </p>
+            </motion.div>
+
+            {/* Glassmorphic Bio Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={mounted && isTextInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              className="relative bg-[#04060C]/40 backdrop-blur-2xl border border-[var(--card-border)] p-8 md:p-10 rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.4)] overflow-hidden group"
+            >
+              {/* Subtle Blueprint Texture inside the card */}
+              <div className="absolute inset-0 blueprint-grid opacity-[0.03]" />
+              
+              <p className="text-lg md:text-xl leading-[1.8] text-[var(--text-dim)] relative z-10 font-light" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+                I am a Computer Science student architecting secure REST APIs, real-time WebSocket systems, and <span className="text-white font-medium">AI-powered pipelines</span>. I believe technical precision must be matched with product-quality design to create truly memorable digital experiences.
+              </p>
+              
+              {/* Status Badge integrated into the card */}
+              <div className="mt-10 pt-6 border-t border-white/5 relative z-10 flex items-center gap-4">
+                <div className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--cyan)] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--cyan)] shadow-[0_0_10px_var(--cyan)]"></span>
+                </div>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-mono">
+                  Open to tackle new challenges
+                </p>
               </div>
-            </div>
+            </motion.div>
 
-            <WordReveal bioWords={bioWords} />
+          </div>
 
-            <div ref={statsRef} className="grid grid-cols-2 gap-4 mt-12">
+          {/* Right: Architectural Stats Ledger */}
+          <div className="w-full lg:w-1/2" ref={statsRef}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {stats.map((s: any, i: number) => (
-                <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={mounted && isStatsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="group relative p-4 sm:p-6 border border-theme bg-theme-shift/30 hover:bg-cyan-400/[0.03] transition-all cursor-default overflow-hidden"
-                >
-                  <div className="absolute top-0 left-0 w-1 h-full bg-cyan-400/20 group-hover:bg-cyan-400 transition-colors" />
-                  <p
-                    className="text-3xl font-black mb-1 text-theme group-hover:scale-105 origin-left transition-transform duration-300"
-                    style={{ fontFamily: 'var(--font-syne)' }}
-                  >
-                    {s.value}
-                  </p>
-                  <p className="text-[10px] text-theme-muted uppercase tracking-[0.2em] font-bold" style={{ fontFamily: 'var(--font-mono)' }}>
-                    {s.label}
-                  </p>
-                </motion.div>
+                <StatCard key={s.label} s={s} i={i} mounted={mounted} isStatsInView={isStatsInView} />
               ))}
             </div>
           </div>
 
-          {/* Right col — code terminal */}
-          <div className="w-full lg:w-1/2 lg:pt-16">
-            <Terminal terminalData={terminalData} />
-
-            {/* Location + availability note */}
-            <motion.div
-              ref={locationRef}
-              initial={{ opacity: 0 }}
-              animate={isLocationInView ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mt-6 flex items-center gap-2"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              <p
-                className="text-xs text-theme-muted uppercase tracking-widest"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              >
-                Burdwan, West Bengal, India · Remote-friendly
-              </p>
-            </motion.div>
-          </div>
         </div>
       </div>
     </section>
   );
 }
-

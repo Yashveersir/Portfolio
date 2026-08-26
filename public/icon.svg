@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+  </defs>
+  
+  <!-- Dark Background -->
+  <rect width="256" height="256" rx="56" fill="#04060C"/>
+  
+  <!-- Inner Border -->
+  <rect width="252" height="252" x="2" y="2" rx="54" fill="none" stroke="#22d3ee" stroke-width="2" stroke-opacity="0.3"/>
+  
+  <!-- Glowing Aura -->
+  <circle cx="128" cy="128" r="70" fill="url(#glow)" filter="url(#blur)"/>
+  
+  <!-- "YS" Monogram -->
+  <text 
+    x="128" 
+    y="136" 
+    font-family="system-ui, -apple-system, sans-serif" 
+    font-size="110" 
+    font-weight="900" 
+    text-anchor="middle" 
+    dominant-baseline="middle" 
+    fill="#ffffff" 
+    letter-spacing="-6"
+  >YS</text>
+</svg>

@@ -9,6 +9,7 @@ import PageLoader from '@/components/PageLoader';
 import ThemeProvider from '@/components/ThemeProvider';
 import { PortfolioProvider } from '@/hooks/usePortfolioData';
 import { Analytics } from "@vercel/analytics/next";
+import Script from 'next/script';
 
 const syne = Syne({
   subsets: ['latin'],
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
     canonical: 'https://yashveersingh.xyz',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/icon.svg',
   },
   verification: {
     google: 'rP5SFGFWNd2zFjbNfD3Qn7j5WojzWlr--Jo0OdttDzc',
@@ -87,24 +88,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                let theme = localStorage.getItem('theme');
-                if (!theme) {
-                  theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                }
-                document.documentElement.setAttribute('data-theme', theme);
-                document.documentElement.classList.add(theme);
-              } catch (e) {}
-            `
-          }}
-        />
       </head>
       <body className={`${dmSans.className} antialiased min-h-screen selection:bg-[var(--cyan)]/30`} suppressHydrationWarning>
-        <script
+        <Script
+          id="structured-data"
           type="application/ld+json"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -142,13 +131,21 @@ export default function RootLayout({
           }}
         />
         <PortfolioProvider>
+          {/* Skip to content — keyboard accessibility */}
+          <a
+            href="#hero"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[var(--cyan)] focus:text-[#05070B] focus:text-xs focus:font-bold focus:uppercase focus:tracking-widest focus:rounded"
+            style={{ fontFamily: 'var(--font-mono)' }}
+          >
+            Skip to content
+          </a>
           <div className="noise-overlay" />
           <ThemeProvider />
           <PageLoader />
           <CustomCursor />
           <ScrollProgress />
           <Navbar />
-          <main>{children}</main>
+          <main id="main-content">{children}</main>
           <Footer />
         </PortfolioProvider>
         <Analytics />
