@@ -131,22 +131,24 @@ export default function RootLayout({
           }}
         />
         <PortfolioProvider>
-          {/* Skip to content — keyboard accessibility */}
-          <a
-            href="#hero"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[var(--cyan)] focus:text-[#05070B] focus:text-xs focus:font-bold focus:uppercase focus:tracking-widest focus:rounded"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            Skip to content
-          </a>
-          <div className="noise-overlay" />
-          <ThemeProvider />
-          <PageLoader />
-          <CustomCursor />
-          <ScrollProgress />
-          <Navbar />
-          <main id="main-content">{children}</main>
-          <Footer />
+          <div className="relative w-full overflow-x-clip">
+            {/* Skip to content — keyboard accessibility */}
+            <a
+              href="#hero"
+              className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[var(--cyan)] focus:text-[#05070B] focus:text-xs focus:font-bold focus:uppercase focus:tracking-widest focus:rounded"
+              style={{ fontFamily: 'var(--font-mono)' }}
+            >
+              Skip to content
+            </a>
+            <div className="noise-overlay" />
+            <ThemeProvider />
+            <PageLoader />
+            <CustomCursor />
+            <ScrollProgress />
+            <Navbar />
+            <main id="main-content">{children}</main>
+            <Footer />
+          </div>
         </PortfolioProvider>
         <Analytics />
       </body>
