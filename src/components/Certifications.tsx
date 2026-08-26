@@ -165,18 +165,19 @@ export default function Certifications() {
           </p>
         </div>
 
-        {/* Dense Archive Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {/* Dense Archive Grid / Slider on Mobile */}
+        <div className="flex overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-8 snap-x snap-mandatory cert-scrollbar -mx-6 px-6 md:mx-0 md:px-0">
           {certifications.map((cert: any, i: number) => (
-            <CertificationCard
-              key={cert.title}
-              cert={cert}
-              index={i}
-              isHovered={hoveredIndex === i}
-              isDimmed={hoveredIndex !== null && hoveredIndex !== i}
-              onMouseEnter={() => setHoveredIndex(i)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            />
+            <div key={cert.title} className="w-[85vw] sm:w-[320px] shrink-0 md:w-auto snap-center md:snap-none">
+              <CertificationCard
+                cert={cert}
+                index={i}
+                isHovered={hoveredIndex === i}
+                isDimmed={hoveredIndex !== null && hoveredIndex !== i}
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(null)}
+              />
+            </div>
           ))}
         </div>
       </div>

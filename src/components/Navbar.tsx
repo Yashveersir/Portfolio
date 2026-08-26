@@ -151,7 +151,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute left-0 top-[calc(100%+8px)] w-full border border-theme bg-theme-card/95 backdrop-blur-xl rounded-2xl md:hidden shadow-2xl overflow-hidden"
+            className="absolute left-0 top-[calc(100%+8px)] w-full border border-theme bg-[#04060C]/95 backdrop-blur-xl rounded-2xl md:hidden shadow-2xl overflow-hidden"
           >
             <div className="flex flex-col items-center gap-5 py-8">
               {navLinks.map((link) => (
