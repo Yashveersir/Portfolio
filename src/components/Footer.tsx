@@ -106,7 +106,7 @@ export default function Footer() {
               <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-[#0077b5] hover:scale-110 transition-all duration-300" aria-label="LinkedIn Profile">
                 <FaLinkedin size={18} aria-hidden="true" />
               </a>
-              <a href="mailto:yashveersingh.work@gmail.com" className="text-white/50 hover:text-[var(--cyan)] hover:scale-110 transition-all duration-300" aria-label="Send Email">
+              <a href="mailto:work.yashveersingh@gmail.com" className="text-white/50 hover:text-[var(--cyan)] hover:scale-110 transition-all duration-300" aria-label="Send Email">
                 <FaEnvelope size={18} aria-hidden="true" />
               </a>
             </div>
