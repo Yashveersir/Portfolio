@@ -388,6 +388,6 @@ export const experiences = [
 export const socialLinks = {
   github: 'https://github.com/Yashveersir',
   linkedin: 'https://www.linkedin.com/in/yashveer-singh-41bb36280',
-  email: 'singhyash9631@gmail.com',
+  email: 'work.yashveersingh@gmail.com',
   phone: '+91 8873394750',
 };

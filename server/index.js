@@ -61,14 +61,14 @@ const transporter = process.env.BREVO_SMTP_KEY
       host: 'smtp-relay.brevo.com',
       port: 587,
       auth: {
-        user: process.env.BREVO_SMTP_USER || process.env.EMAIL_USER || 'singhyash9631@gmail.com',
+        user: process.env.BREVO_SMTP_USER || process.env.EMAIL_USER || 'work.yashveersingh@gmail.com',
         pass: process.env.BREVO_SMTP_KEY
       }
     })
   : nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER || 'singhyash9631@gmail.com',
+        user: process.env.EMAIL_USER || 'work.yashveersingh@gmail.com',
         pass: process.env.EMAIL_PASS || 'YOUR_APP_PASSWORD_HERE' 
       }
     });
@@ -115,8 +115,8 @@ app.post('/api/contact', async (req, res) => {
       console.error('⚠️ [Contact] MongoDB save failed (continuing):', dbErr.message);
     }
     
-    const senderEmail = process.env.BREVO_SMTP_USER || process.env.EMAIL_USER || 'singhyash9631@gmail.com';
-    const recipientEmail = process.env.EMAIL_USER || process.env.BREVO_SMTP_USER || 'singhyash9631@gmail.com';
+    const senderEmail = process.env.BREVO_SMTP_USER || process.env.EMAIL_USER || 'work.yashveersingh@gmail.com';
+    const recipientEmail = process.env.EMAIL_USER || process.env.BREVO_SMTP_USER || 'work.yashveersingh@gmail.com';
 
     const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
